@@ -3,9 +3,9 @@
 // URL: http://www.lokad.com/
 #endregion
 
-using Lokad.Cloud.Instrumentation.Events;
+using Lokad.Cloud.Runtime.Instrumentation.Events;
 
-namespace Lokad.Cloud.Instrumentation
+namespace Lokad.Cloud.Runtime.Instrumentation
 {
     public interface ICloudRuntimeObserver
     {

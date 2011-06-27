@@ -11,8 +11,8 @@ using System.Threading;
 using Autofac;
 using Autofac.Configuration;
 using Lokad.Cloud.Diagnostics;
-using Lokad.Cloud.Instrumentation;
 using Lokad.Cloud.Runtime;
+using Lokad.Cloud.Runtime.Instrumentation;
 using Lokad.Cloud.ServiceFabric;
 using Lokad.Cloud.Storage.Shared.Logging;
 

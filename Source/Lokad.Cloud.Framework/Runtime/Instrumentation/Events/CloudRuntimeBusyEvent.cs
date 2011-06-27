@@ -5,16 +5,16 @@
 
 using System;
 
-namespace Lokad.Cloud.Instrumentation.Events
+namespace Lokad.Cloud.Runtime.Instrumentation.Events
 {
     /// <summary>
-    /// Raised whenever the runtime scheduler becomes idle.
+    /// Raised whenever the runtime scheduler becomes busy.
     /// </summary>
-    public class CloudRuntimeIdleEvent : ICloudRuntimeEvent
+    public class CloudRuntimeBusyEvent : ICloudRuntimeEvent
     {
         public DateTimeOffset Timestamp { get; private set; }
 
-        public CloudRuntimeIdleEvent(DateTimeOffset timestamp)
+        public CloudRuntimeBusyEvent(DateTimeOffset timestamp)
         {
             Timestamp = timestamp;
         }
