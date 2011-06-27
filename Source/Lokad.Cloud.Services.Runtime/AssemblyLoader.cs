@@ -29,8 +29,7 @@ namespace Lokad.Cloud.Services.Runtime
         }
 
         /// <summary>Loads the assembly package.</summary>
-        /// <remarks>This method is expected to be called only once. Call <see cref="CheckUpdate"/>
-        /// afterward.</remarks>
+        /// <remarks>This method is expected to be called only once.</remarks>
         public void LoadPackage()
         {
             var buffer = _provider.GetBlob<byte[]>(AssembliesContainerName, PackageBlobName);

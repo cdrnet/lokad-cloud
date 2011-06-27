@@ -5,11 +5,11 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{07B4D344-AAFD-43B1-B329-18B6242A6C54}</ProjectGuid>
+    <ProjectGuid>{BA1AC04C-5DE2-4E40-8FC9-8EBF31C1B0F3}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Lokad.Cloud.Services.Runtime</RootNamespace>
-    <AssemblyName>Lokad.Cloud.Services.Runtime</AssemblyName>
+    <RootNamespace>Lokad.Cloud.Services.Framework</RootNamespace>
+    <AssemblyName>Lokad.Cloud.Services.Framework</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -31,15 +31,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Autofac">
-      <HintPath>..\..\packages\Autofac.2.4.5.724\lib\NET40\Autofac.dll</HintPath>
-    </Reference>
-    <Reference Include="Autofac.Configuration">
-      <HintPath>..\..\packages\Autofac.2.4.5.724\lib\NET40\Autofac.Configuration.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.WindowsAzure.ServiceRuntime, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\..\Resource\Library\Microsoft.WindowsAzure.ServiceRuntime.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -55,30 +46,19 @@
     <Compile Include="..\VersionAssemblyInfo.cs">
       <Link>Properties\VersionAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="AssemblyLoader.cs" />
-    <Compile Include="NoRestartFloodPolicy.cs" />
+    <Compile Include="CloudServiceType.cs" />
+    <Compile Include="DaemonService.cs" />
+    <Compile Include="ICloudService.cs" />
+    <Compile Include="ScheduledCloudService.cs" />
+    <Compile Include="ScheduledWorkerService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Runtime.cs" />
-    <Compile Include="Scheduler.cs" />
-    <Compile Include="ServiceFabricHost.cs" />
-    <Compile Include="SingleRuntimeHost.cs" />
+    <Compile Include="QueuedCloudService.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Lokad.Cloud.Framework\Lokad.Cloud.Framework.csproj">
-      <Project>{BA84F8E7-F8B9-4912-BF93-9F4D0DDC5C29}</Project>
-      <Name>Lokad.Cloud.Framework</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Lokad.Cloud.Services.Framework\Lokad.Cloud.Services.Framework.csproj">
-      <Project>{BA1AC04C-5DE2-4E40-8FC9-8EBF31C1B0F3}</Project>
-      <Name>Lokad.Cloud.Services.Framework</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Lokad.Cloud.Storage\Lokad.Cloud.Storage.csproj">
       <Project>{0F9244AB-3B7C-4F98-9D44-E46FBC65522C}</Project>
       <Name>Lokad.Cloud.Storage</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
