@@ -8,9 +8,8 @@ using System.IO;
 using System.Reflection;
 using System.Security;
 using System.Threading;
-
 using Autofac;
-
+using Lokad.Cloud.Runtime;
 using Lokad.Cloud.Storage;
 using Lokad.Cloud.Storage.Shared.Logging;
 

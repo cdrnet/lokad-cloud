@@ -62,7 +62,6 @@
     <Compile Include="Scheduler.cs" />
     <Compile Include="ServiceFabricHost.cs" />
     <Compile Include="SingleRuntimeHost.cs" />
-    <Compile Include="TriggerRestartException.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Lokad.Cloud.Framework\Lokad.Cloud.Framework.csproj">

@@ -14,7 +14,7 @@ namespace Lokad.Cloud.Runtime
     ///<summary>Throw this exception in order to force a worker restart.</summary>
     [Serializable]
     [Obsolete("TODO (ruegg, 2011-06-27): Drop from Framework")]
-    internal class TriggerRestartException : ApplicationException
+    public class TriggerRestartException : ApplicationException
     {
         /// <summary>Empty constructor.</summary>
         public TriggerRestartException()
