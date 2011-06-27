@@ -9,7 +9,6 @@ using System.Linq;
 using Autofac;
 using Lokad.Cloud.Management;
 using Lokad.Cloud.Runtime;
-using Lokad.Cloud.ServiceFabric.Runtime;
 using NUnit.Framework;
 
 namespace Lokad.Cloud.Test.ServiceFabric
@@ -35,10 +34,10 @@ namespace Lokad.Cloud.Test.ServiceFabric
             }
 
             var runtimeProviders = GlobalSetup.Container.Resolve<RuntimeProviders>();
-            runtimeProviders.BlobStorage.CreateContainerIfNotExist(AssemblyLoader.ContainerName);
+            runtimeProviders.BlobStorage.CreateContainerIfNotExist(AssemblyLoader.AssembliesContainerName);
 
             // put the sample assembly
-            runtimeProviders.BlobStorage.PutBlob(AssemblyLoader.ContainerName, AssemblyLoader.PackageBlobName, buffer);
+            runtimeProviders.BlobStorage.PutBlob(AssemblyLoader.AssembliesContainerName, AssemblyLoader.PackageBlobName, buffer);
 
             var loader = new AssemblyLoader(runtimeProviders);
             loader.LoadPackage();

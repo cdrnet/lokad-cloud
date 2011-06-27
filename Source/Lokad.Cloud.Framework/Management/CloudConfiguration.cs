@@ -6,7 +6,6 @@
 using System;
 using System.Text;
 using Lokad.Cloud.Runtime;
-using Lokad.Cloud.ServiceFabric.Runtime;
 using Lokad.Cloud.Storage;
 
 namespace Lokad.Cloud.Management
@@ -16,6 +15,9 @@ namespace Lokad.Cloud.Management
     /// </summary>
     public class CloudConfiguration
     {
+        const string AssembliesContainerName = "lokad-cloud-assemblies";
+        const string ConfigurationBlobName = "config";
+
         readonly IBlobStorageProvider _blobProvider;
         readonly UTF8Encoding _encoding = new UTF8Encoding();
 
@@ -33,8 +35,8 @@ namespace Lokad.Cloud.Management
         public string GetConfigurationString()
         {
             var buffer = _blobProvider.GetBlob<byte[]>(
-                AssemblyLoader.ContainerName,
-                AssemblyLoader.ConfigurationBlobName);
+                AssembliesContainerName,
+                ConfigurationBlobName);
 
             return buffer.Convert(bytes => _encoding.GetString(bytes), String.Empty);
         }
@@ -58,8 +60,8 @@ namespace Lokad.Cloud.Management
             }
 
             _blobProvider.PutBlob(
-                AssemblyLoader.ContainerName,
-                AssemblyLoader.ConfigurationBlobName,
+                AssembliesContainerName,
+                ConfigurationBlobName,
                 _encoding.GetBytes(configuration));
         }
 
@@ -69,8 +71,8 @@ namespace Lokad.Cloud.Management
         public void RemoveConfiguration()
         {
             _blobProvider.DeleteBlobIfExist(
-                AssemblyLoader.ContainerName,
-                AssemblyLoader.ConfigurationBlobName);
+                AssembliesContainerName,
+                ConfigurationBlobName);
         }
     }
 }

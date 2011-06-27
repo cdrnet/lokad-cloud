@@ -3,7 +3,8 @@
 // URL: http://www.lokad.com/
 #endregion
 
-using Lokad.Cloud.ServiceFabric.Runtime;
+using Lokad.Cloud.Services.Runtime;
+
 using Microsoft.WindowsAzure.ServiceRuntime;
 
 namespace Lokad.Cloud

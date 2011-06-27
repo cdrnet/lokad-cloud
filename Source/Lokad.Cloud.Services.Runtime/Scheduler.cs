@@ -6,10 +6,12 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
+
 using Lokad.Cloud.Instrumentation;
 using Lokad.Cloud.Instrumentation.Events;
+using Lokad.Cloud.ServiceFabric;
 
-namespace Lokad.Cloud.ServiceFabric.Runtime
+namespace Lokad.Cloud.Services.Runtime
 {
     /// <summary>
     /// Round robin scheduler with adaptive modifications: tasks that claim to have

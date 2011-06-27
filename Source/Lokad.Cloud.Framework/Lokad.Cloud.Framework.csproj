@@ -138,24 +138,20 @@
     <Compile Include="Management\IProvisioningProvider.cs" />
     <Compile Include="Mock\MemoryProvisioning.cs" />
     <Compile Include="RoleConfigurationSettings.cs" />
+    <Compile Include="Runtime\AssemblyLoader.cs" />
     <Compile Include="Runtime\CloudStorageExtensions.cs" />
     <Compile Include="Runtime\RuntimeProviders.cs" />
+    <Compile Include="Runtime\TriggerRestartException.cs" />
     <Compile Include="ServiceFabric\CloudService.cs" />
     <Compile Include="ServiceFabric\CloudServiceSettingsAttribute.cs" />
     <Compile Include="ServiceFabric\IInitializable.cs" />
     <Compile Include="ServiceFabric\QueueService.cs" />
     <Compile Include="ServiceFabric\QueueServiceSettingsAttribute.cs" />
     <Compile Include="ServiceFabric\RuntimeFinalizer.cs" />
-    <Compile Include="ServiceFabric\Runtime\Runtime.cs" />
-    <Compile Include="ServiceFabric\Runtime\ServiceFabricHost.cs" />
-    <Compile Include="ServiceFabric\Runtime\SingleRuntimeHost.cs" />
-    <Compile Include="ServiceFabric\Runtime\TriggerRestartException.cs" />
     <Compile Include="ServiceFabric\ScheduledService.cs" />
     <Compile Include="ServiceFabric\ScheduledServiceSettingsAttribute.cs" />
     <Compile Include="ServiceFabric\ServiceExecutionFeedback.cs" />
     <Compile Include="ServiceFabric\SynchronizationLeaseState.cs" />
-    <Compile Include="ServiceFabric\Runtime\AssemblyLoader.cs" />
-    <Compile Include="ServiceFabric\Runtime\NoRestartFloodPolicy.cs" />
     <Compile Include="CloudInfrastructureProviders.cs" />
     <Compile Include="Diagnostics\DiagnosticsAcquisition.cs" />
     <Compile Include="Diagnostics\DiagnosticsModule.cs" />
@@ -177,7 +173,6 @@
     <Compile Include="Management\CloudServiceScheduling.cs" />
     <Compile Include="Mock\MemoryMonitor.cs" />
     <Compile Include="Mock\MockStorageModule.cs" />
-    <Compile Include="ServiceFabric\Runtime\Scheduler.cs" />
     <Compile Include="Services\AssemblyConfigurationUpdateService.cs" />
     <Compile Include="Services\MonitoringDataRetentionService.cs" />
     <Compile Include="Services\MonitoringService.cs" />
@@ -202,7 +197,6 @@
     <Content Include="Jobs\_ReadMe.txt" />
     <Content Include="Management\ReadMe.txt" />
     <Content Include="ServiceFabric\ReadMe.txt" />
-    <Content Include="ServiceFabric\Runtime\ReadMe.txt" />
     <Content Include="Shared\_ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>

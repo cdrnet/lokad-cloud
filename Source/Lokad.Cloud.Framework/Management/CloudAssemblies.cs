@@ -7,7 +7,6 @@ using System.IO;
 using ICSharpCode.SharpZipLib.Zip;
 using Lokad.Cloud.Application;
 using Lokad.Cloud.Runtime;
-using Lokad.Cloud.ServiceFabric.Runtime;
 using Lokad.Cloud.Storage;
 
 namespace Lokad.Cloud.Management
@@ -15,6 +14,9 @@ namespace Lokad.Cloud.Management
     /// <summary>Management facade for cloud assemblies.</summary>
     public class CloudAssemblies
     {
+        const string AssembliesContainerName = "lokad-cloud-assemblies";
+        const string PackageBlobName = "default";
+
         readonly RuntimeProviders _runtimeProviders;
 
         /// <summary>
@@ -55,8 +57,8 @@ namespace Lokad.Cloud.Management
         public void UploadApplicationZipContainer(byte[] data)
         {
             _runtimeProviders.BlobStorage.PutBlob(
-                AssemblyLoader.ContainerName,
-                AssemblyLoader.PackageBlobName,
+                AssembliesContainerName,
+                PackageBlobName,
                 data,
                 true);
         }

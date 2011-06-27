@@ -13,9 +13,10 @@ using Autofac.Configuration;
 using Lokad.Cloud.Diagnostics;
 using Lokad.Cloud.Instrumentation;
 using Lokad.Cloud.Runtime;
+using Lokad.Cloud.ServiceFabric;
 using Lokad.Cloud.Storage.Shared.Logging;
 
-namespace Lokad.Cloud.ServiceFabric.Runtime
+namespace Lokad.Cloud.Services.Runtime
 {
     /// <summary>Organize the executions of the services.</summary>
     internal class Runtime

@@ -4,27 +4,21 @@
 #endregion
 
 using System;
-
 using Lokad.Cloud.Application;
-using Lokad.Cloud.Runtime;
 using Lokad.Cloud.Storage;
 
-namespace Lokad.Cloud.ServiceFabric.Runtime
+namespace Lokad.Cloud.Runtime
 {
     /// <remarks>
     /// Since the assemblies are loaded in the current <c>AppDomain</c>, this class
     /// should be a natural candidate for a singleton design pattern. Yet, keeping
     /// it as a plain class facilitates the IoC instantiation.
     /// </remarks>
-    public class AssemblyLoader
+    [Obsolete("TODO (ruegg, 2011-06-27): Drop from Framework")]
+    internal class AssemblyLoader
     {
-        /// <summary>Name of the container used to store the assembly package.</summary>
-        public const string ContainerName = "lokad-cloud-assemblies";
-
-        /// <summary>Name of the blob used to store the assembly package.</summary>
+        public const string AssembliesContainerName = "lokad-cloud-assemblies";
         public const string PackageBlobName = "default";
-
-        /// <summary>Name of the blob used to store the optional dependency injection configuration.</summary>
         public const string ConfigurationBlobName = "config";
 
         /// <summary>Frequency for checking for update concerning the assembly package.</summary>
@@ -55,7 +49,7 @@ namespace Lokad.Cloud.ServiceFabric.Runtime
         /// afterward.</remarks>
         public void LoadPackage()
         {
-            var buffer = _provider.GetBlob<byte[]>(ContainerName, PackageBlobName, out _lastPackageEtag);
+            var buffer = _provider.GetBlob<byte[]>(AssembliesContainerName, PackageBlobName, out _lastPackageEtag);
             _lastPackageCheck = DateTimeOffset.UtcNow;
 
             // if no assemblies have been loaded yet, just skip the loading
@@ -72,7 +66,7 @@ namespace Lokad.Cloud.ServiceFabric.Runtime
 
         public Maybe<byte[]> LoadConfiguration()
         {
-            return _provider.GetBlob<byte[]>(ContainerName, ConfigurationBlobName, out _lastConfigurationEtag);
+            return _provider.GetBlob<byte[]>(AssembliesContainerName, ConfigurationBlobName, out _lastConfigurationEtag);
         }
 
         /// <summary>
@@ -81,8 +75,8 @@ namespace Lokad.Cloud.ServiceFabric.Runtime
         /// </summary>
         public void ResetUpdateStatus()
         {
-            _lastPackageEtag = _provider.GetBlobEtag(ContainerName, PackageBlobName);
-            _lastConfigurationEtag = _provider.GetBlobEtag(ContainerName, ConfigurationBlobName);
+            _lastPackageEtag = _provider.GetBlobEtag(AssembliesContainerName, PackageBlobName);
+            _lastConfigurationEtag = _provider.GetBlobEtag(AssembliesContainerName, ConfigurationBlobName);
             _lastPackageCheck = DateTimeOffset.UtcNow;
         }
 
@@ -102,8 +96,8 @@ namespace Lokad.Cloud.ServiceFabric.Runtime
                 return;
             }
 
-            var newPackageEtag = _provider.GetBlobEtag(ContainerName, PackageBlobName);
-            var newConfigurationEtag = _provider.GetBlobEtag(ContainerName, ConfigurationBlobName);
+            var newPackageEtag = _provider.GetBlobEtag(AssembliesContainerName, PackageBlobName);
+            var newConfigurationEtag = _provider.GetBlobEtag(AssembliesContainerName, ConfigurationBlobName);
 
             if (!string.Equals(_lastPackageEtag, newPackageEtag))
             {

@@ -10,7 +10,6 @@ using System.Linq;
 using Lokad.Cloud.Runtime;
 using Lokad.Cloud.ServiceFabric;
 using Lokad.Cloud.Storage;
-using Lokad.Cloud.ServiceFabric.Runtime;
 using Mono.Cecil;
 
 namespace Lokad.Cloud.Application
@@ -25,8 +24,9 @@ namespace Lokad.Cloud.Application
     /// </remarks>
     public class CloudApplicationInspector
     {
-        public const string ContainerName = "lokad-cloud-assemblies";
-        public const string ApplicationDefinitionBlobName = "definition";
+        private const string AssembliesContainerName = "lokad-cloud-assemblies";
+        private const string PackageBlobName = "default";
+        private const string ApplicationDefinitionBlobName = "definition";
 
         private readonly IBlobStorageProvider _blobs;
 
@@ -37,13 +37,13 @@ namespace Lokad.Cloud.Application
 
         public Maybe<CloudApplicationDefinition> Inspect()
         {
-            var definitionBlob = _blobs.GetBlob<CloudApplicationDefinition>(ContainerName, ApplicationDefinitionBlobName);
+            var definitionBlob = _blobs.GetBlob<CloudApplicationDefinition>(AssembliesContainerName, ApplicationDefinitionBlobName);
             Maybe<byte[]> packageBlob;
             string packageETag;
 
             if (definitionBlob.HasValue)
             {
-                packageBlob = _blobs.GetBlobIfModified<byte[]>(AssemblyLoader.ContainerName, AssemblyLoader.PackageBlobName, definitionBlob.Value.PackageETag, out packageETag);
+                packageBlob = _blobs.GetBlobIfModified<byte[]>(AssembliesContainerName, PackageBlobName, definitionBlob.Value.PackageETag, out packageETag);
                 if (!packageBlob.HasValue || definitionBlob.Value.PackageETag == packageETag)
                 {
                     return definitionBlob.Value;
@@ -51,7 +51,7 @@ namespace Lokad.Cloud.Application
             }
             else
             {
-                packageBlob = _blobs.GetBlob<byte[]>(AssemblyLoader.ContainerName, AssemblyLoader.PackageBlobName, out packageETag);
+                packageBlob = _blobs.GetBlob<byte[]>(AssembliesContainerName, PackageBlobName, out packageETag);
             }
 
             if (!packageBlob.HasValue)
@@ -60,7 +60,7 @@ namespace Lokad.Cloud.Application
             }
 
             var definition = Analyze(packageBlob.Value, packageETag);
-            _blobs.PutBlob(ContainerName, ApplicationDefinitionBlobName, definition);
+            _blobs.PutBlob(AssembliesContainerName, ApplicationDefinitionBlobName, definition);
             return definition;
         }
 

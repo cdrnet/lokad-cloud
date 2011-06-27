@@ -9,7 +9,7 @@ using System.Runtime.Serialization;
 // IDEA: the message of the exception could be logged in to the cloud logs.
 // (issue: how to avoid N identical messages to be logged through all workers)
 
-namespace Lokad.Cloud.ServiceFabric.Runtime
+namespace Lokad.Cloud.Services.Runtime
 {
     ///<summary>Throw this exception in order to force a worker restart.</summary>
     [Serializable]
