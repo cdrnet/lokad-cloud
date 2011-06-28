@@ -56,6 +56,7 @@
       <Link>Properties\VersionAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="AssemblyLoader.cs" />
+    <Compile Include="CloudServiceRuntimeCell.cs" />
     <Compile Include="NoRestartFloodPolicy.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Runtime.cs" />
