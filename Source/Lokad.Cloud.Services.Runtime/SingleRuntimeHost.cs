@@ -10,8 +10,8 @@ using System.Security;
 using System.Threading;
 using Autofac;
 using Lokad.Cloud.Runtime;
+using Lokad.Cloud.Services.Framework.Logging;
 using Lokad.Cloud.Storage;
-using Lokad.Cloud.Storage.Shared.Logging;
 
 namespace Lokad.Cloud.Services.Runtime
 {
@@ -100,13 +100,13 @@ namespace Lokad.Cloud.Services.Runtime
             var runtimeBuilder = new ContainerBuilder();
             runtimeBuilder.RegisterModule(new CloudModule());
             runtimeBuilder.RegisterModule(externalRoleConfiguration.Convert(s =>  new CloudConfigurationModule(s), () => new CloudConfigurationModule()));
-            runtimeBuilder.RegisterType<Services.Runtime.Runtime>().InstancePerDependency();
+            runtimeBuilder.RegisterType<Runtime>().InstancePerDependency();
 
             // Run
 
             using (var runtimeContainer = runtimeBuilder.Build())
             {
-                var log = runtimeContainer.Resolve<ILog>();
+                var log = runtimeContainer.Resolve<ILogWriter>();
 
                 AppDomain.CurrentDomain.UnhandledException += (sender, e) => log.ErrorFormat(
                     e.ExceptionObject as Exception,

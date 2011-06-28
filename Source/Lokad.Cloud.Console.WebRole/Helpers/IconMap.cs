@@ -3,7 +3,7 @@
 // URL: http://www.lokad.com/
 #endregion
 
-using Lokad.Cloud.Storage.Shared.Logging;
+using Lokad.Cloud.Services.Framework.Logging;
 
 namespace Lokad.Cloud.Console.WebRole.Helpers
 {

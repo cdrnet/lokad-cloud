@@ -5,8 +5,8 @@
 
 using System;
 using Lokad.Cloud.ServiceFabric;
+using Lokad.Cloud.Services.Framework.Logging;
 using Lokad.Cloud.Storage;
-using Lokad.Cloud.Storage.Shared.Logging;
 
 // HACK: the delayed queue service does not provide a scalable iteration pattern.
 // (single instance iterating over the delayed message)

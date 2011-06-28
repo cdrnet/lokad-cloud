@@ -10,11 +10,10 @@ using System.Linq;
 using System.Threading;
 using Autofac;
 using Autofac.Configuration;
-using Lokad.Cloud.Diagnostics;
 using Lokad.Cloud.Runtime;
 using Lokad.Cloud.Runtime.Instrumentation;
 using Lokad.Cloud.ServiceFabric;
-using Lokad.Cloud.Storage.Shared.Logging;
+using Lokad.Cloud.Services.Framework.Logging;
 
 namespace Lokad.Cloud.Services.Runtime
 {
@@ -23,7 +22,7 @@ namespace Lokad.Cloud.Services.Runtime
     {
         readonly RuntimeProviders _runtimeProviders;
         readonly IRuntimeFinalizer _runtimeFinalizer;
-        readonly ILog _log;
+        readonly ILogWriter _log;
         readonly ICloudRuntimeObserver _observer;
 
         readonly ICloudConfigurationSettings _settings;
@@ -39,7 +38,7 @@ namespace Lokad.Cloud.Services.Runtime
         public IContainer RuntimeContainer { get; set; }
 
         /// <summary>IoC constructor.</summary>
-        public Runtime(RuntimeProviders runtimeProviders, ICloudConfigurationSettings settings, ICloudDiagnosticsRepository diagnosticsRepository, ICloudRuntimeObserver observer = null)
+        public Runtime(RuntimeProviders runtimeProviders, ICloudConfigurationSettings settings, ICloudRuntimeObserver observer = null)
         {
             _runtimeProviders = runtimeProviders;
             _runtimeFinalizer = runtimeProviders.RuntimeFinalizer;

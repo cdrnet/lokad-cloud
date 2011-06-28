@@ -115,9 +115,6 @@
     </Compile>
     <Compile Include="CloudConfigurationModule.cs" />
     <Compile Include="CloudEnvironment.cs" />
-    <Compile Include="Diagnostics\CloudLogger.cs" />
-    <Compile Include="Diagnostics\CloudStorageLogger.cs" />
-    <Compile Include="Diagnostics\CloudProvisioningLogger.cs" />
     <Compile Include="Diagnostics\Persistence\PartitionStatisticsName.cs" />
     <Compile Include="Diagnostics\Persistence\ServiceStatisticsName.cs" />
     <Compile Include="Runtime\Instrumentation\CloudRuntimeInstrumentationSubject.cs" />
@@ -125,42 +122,18 @@
     <Compile Include="Runtime\Instrumentation\Events\CloudRuntimeIdleEvent.cs" />
     <Compile Include="Runtime\Instrumentation\Events\ICloudRuntimeEvent.cs" />
     <Compile Include="Runtime\Instrumentation\ICloudRuntimeObserver.cs" />
-    <Compile Include="Jobs\Job.cs" />
-    <Compile Include="Jobs\JobManager.cs" />
-    <Compile Include="Management\CloudProvisioning.cs" />
-    <Compile Include="Management\IProvisioningProvider.cs" />
-    <Compile Include="Mock\MemoryProvisioning.cs" />
     <Compile Include="RoleConfigurationSettings.cs" />
-    <Compile Include="Runtime\CloudStorageExtensions.cs" />
-    <Compile Include="Runtime\RuntimeProviders.cs" />
     <Compile Include="Runtime\TriggerRestartException.cs" />
-    <Compile Include="CloudInfrastructureProviders.cs" />
-    <Compile Include="Diagnostics\DiagnosticsModule.cs" />
-    <Compile Include="Diagnostics\PartitionMonitor.cs" />
     <Compile Include="Diagnostics\PartitionStatistics.cs" />
-    <Compile Include="Diagnostics\ICloudDiagnosticsRepository.cs" />
-    <Compile Include="Diagnostics\Persistence\BlobDiagnosticsRepository.cs" />
     <Compile Include="Diagnostics\ServiceStatistics.cs" />
     <Compile Include="Diagnostics\TimeSegments.cs" />
-    <Compile Include="Management\ManagementModule.cs" />
-    <Compile Include="Mock\MockStorageModule.cs" />
-    <Compile Include="Shared\Logging\ILog.cs" />
-    <Compile Include="Shared\Logging\ILogExtensions.cs" />
-    <Compile Include="Shared\Logging\ILogProvider.cs" />
-    <Compile Include="Shared\Logging\LogLevel.cs" />
-    <Compile Include="Shared\Logging\NullLog.cs" />
-    <Compile Include="Storage\Azure\StorageModule.cs" />
     <Compile Include="Storage\BlobCounter.cs" />
     <Compile Include="Storage\StorageCredentialsVerifier.cs" />
     <Compile Include="TypeMapperProvider.cs" />
-    <Compile Include="Mock\MemoryLogger.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Diagnostics\ReadMe.txt" />
-    <Content Include="Jobs\_ReadMe.txt" />
-    <Content Include="Management\ReadMe.txt" />
-    <Content Include="Shared\_ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Lokad.Cloud.Provisioning\Lokad.Cloud.Provisioning.csproj">
@@ -175,7 +148,11 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Management\" />
+    <Folder Include="Mock\" />
+    <Folder Include="Storage\Azure\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -11,7 +11,8 @@ using Lokad.Cloud.Console.WebRole.Behavior;
 using Lokad.Cloud.Console.WebRole.Controllers.ObjectModel;
 using Lokad.Cloud.Console.WebRole.Framework.Discovery;
 using Lokad.Cloud.Console.WebRole.Models.Logs;
-using Lokad.Cloud.Diagnostics;
+using Lokad.Cloud.Services.Management.Logging;
+using Lokad.Cloud.Services.Framework.Logging;
 
 namespace Lokad.Cloud.Console.WebRole.Controllers
 {
@@ -32,8 +33,8 @@ namespace Lokad.Cloud.Console.WebRole.Controllers
         {
             InitializeDeploymentTenant(hostedServiceName);
 
-            var entries = new CloudLogger(Providers.BlobStorage, string.Empty)
-                .GetLogsOfLevelOrHigher(Storage.Shared.Logging.LogLevel.Info)
+            var entries = new CloudLogReader(Providers.BlobStorage)
+                .GetLogsOfLevelOrHigher(LogLevel.Info)
                 .Take(InitialEntriesCount);
 
             return View(LogEntriesToModel(entries.ToArray(), InitialEntriesCount));
@@ -46,7 +47,7 @@ namespace Lokad.Cloud.Console.WebRole.Controllers
 
             InitializeDeploymentTenant(hostedServiceName);
 
-            var entries = new CloudLogger(Providers.BlobStorage, string.Empty)
+            var entries = new CloudLogReader(Providers.BlobStorage)
                 .GetLogsOfLevelOrHigher(ParseLogLevel(threshold), skip);
 
             if (!string.IsNullOrWhiteSpace(olderThanToken))
@@ -69,7 +70,7 @@ namespace Lokad.Cloud.Console.WebRole.Controllers
         {
             InitializeDeploymentTenant(hostedServiceName);
 
-            var entry = new CloudLogger(Providers.BlobStorage, string.Empty)
+            var entry = new CloudLogReader(Providers.BlobStorage)
                 .GetLogsOfLevelOrHigher(ParseLogLevel(threshold))
                 .FirstOrDefault();
 
@@ -81,7 +82,7 @@ namespace Lokad.Cloud.Console.WebRole.Controllers
             return Json(new { HasMore = false }, JsonRequestBehavior.AllowGet);
         }
 
-        private static LogsModel LogEntriesToModel(IList<LogEntry> entryList, int requestedCount)
+        private static LogsModel LogEntriesToModel(IList<CloudLogEntry> entryList, int requestedCount)
         {
             if (entryList.Count == 0)
             {
@@ -116,31 +117,31 @@ namespace Lokad.Cloud.Console.WebRole.Controllers
             return logsModel;
         }
 
-        static Storage.Shared.Logging.LogLevel ParseLogLevel(string str)
+        static LogLevel ParseLogLevel(string str)
         {
             switch (str.ToLowerInvariant())
             {
                 case "debug":
-                    return Storage.Shared.Logging.LogLevel.Debug;
+                    return LogLevel.Debug;
                 case "info":
-                    return Storage.Shared.Logging.LogLevel.Info;
+                    return LogLevel.Info;
                 case "warn":
-                    return Storage.Shared.Logging.LogLevel.Warn;
+                    return LogLevel.Warn;
                 case "error":
-                    return Storage.Shared.Logging.LogLevel.Error;
+                    return LogLevel.Error;
                 case "fatal":
-                    return Storage.Shared.Logging.LogLevel.Fatal;
+                    return LogLevel.Fatal;
             }
 
             throw new ArgumentOutOfRangeException();
         }
 
-        static string EntryToToken(LogEntry entry)
+        static string EntryToToken(CloudLogEntry entry)
         {
             return entry.DateTimeUtc.ToString("yyyyMMddHHmmssffff");
         }
 
-        static int EntryToGroupKey(LogEntry entry)
+        static int EntryToGroupKey(CloudLogEntry entry)
         {
             var date = entry.DateTimeUtc.Date;
             return (date.Year * 100 + date.Month) * 100 + date.Day;

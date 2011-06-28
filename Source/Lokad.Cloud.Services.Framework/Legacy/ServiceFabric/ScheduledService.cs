@@ -6,8 +6,8 @@
 using System;
 using System.Linq;
 using System.Runtime.Serialization;
+using Lokad.Cloud.Services.Framework.Logging;
 using Lokad.Cloud.Storage;
-using Lokad.Cloud.Storage.Shared.Logging;
 
 namespace Lokad.Cloud.ServiceFabric
 {
