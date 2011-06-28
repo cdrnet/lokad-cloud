@@ -7,7 +7,7 @@ using System;
 using System.Runtime.Serialization;
 using Lokad.Cloud.Storage;
 
-namespace Lokad.Cloud.Management
+namespace Lokad.Cloud.Services.Management
 {
     /// <summary>
     /// Cloud Service Scheduling Info

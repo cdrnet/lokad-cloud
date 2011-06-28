@@ -6,7 +6,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 
-namespace Lokad.Cloud.Application
+namespace Lokad.Cloud.Services.Management.Application
 {
     public class CloudApplicationPackage
     {

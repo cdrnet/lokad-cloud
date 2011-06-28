@@ -4,7 +4,6 @@
 #endregion
 
 using System;
-using Lokad.Cloud.Application;
 using Lokad.Cloud.Storage;
 
 namespace Lokad.Cloud.Runtime
@@ -42,31 +41,6 @@ namespace Lokad.Cloud.Runtime
         public AssemblyLoader(RuntimeProviders runtimeProviders)
         {
             _provider = runtimeProviders.BlobStorage;
-        }
-
-        /// <summary>Loads the assembly package.</summary>
-        /// <remarks>This method is expected to be called only once. Call <see cref="CheckUpdate"/>
-        /// afterward.</remarks>
-        public void LoadPackage()
-        {
-            var buffer = _provider.GetBlob<byte[]>(AssembliesContainerName, PackageBlobName, out _lastPackageEtag);
-            _lastPackageCheck = DateTimeOffset.UtcNow;
-
-            // if no assemblies have been loaded yet, just skip the loading
-            if (!buffer.HasValue)
-            {
-                return;
-            }
-
-            var reader = new CloudApplicationPackageReader();
-            var package = reader.ReadPackage(buffer.Value, false);
-
-            package.LoadAssemblies();
-        }
-
-        public Maybe<byte[]> LoadConfiguration()
-        {
-            return _provider.GetBlob<byte[]>(AssembliesContainerName, ConfigurationBlobName, out _lastConfigurationEtag);
         }
 
         /// <summary>

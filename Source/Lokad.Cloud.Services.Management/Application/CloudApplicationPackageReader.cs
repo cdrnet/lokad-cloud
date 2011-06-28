@@ -9,7 +9,7 @@ using System.IO;
 using ICSharpCode.SharpZipLib.Zip;
 using Mono.Cecil;
 
-namespace Lokad.Cloud.Application
+namespace Lokad.Cloud.Services.Management.Application
 {
     public class CloudApplicationPackageReader
     {

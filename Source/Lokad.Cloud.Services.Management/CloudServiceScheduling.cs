@@ -6,15 +6,15 @@
 using System;
 using System.Linq;
 using System.Collections.Generic;
+using Lokad.Cloud.Management;
 using Lokad.Cloud.Runtime;
 using Lokad.Cloud.ServiceFabric;
-using Lokad.Cloud.Services;
 using Lokad.Cloud.Storage;
 
 // TODO: blobs are sequentially enumerated, performance issue
 // if there are more than a few dozen services
 
-namespace Lokad.Cloud.Management
+namespace Lokad.Cloud.Services.Management
 {
     /// <summary>Management facade for scheduled cloud services.</summary>
     public class CloudServiceScheduling

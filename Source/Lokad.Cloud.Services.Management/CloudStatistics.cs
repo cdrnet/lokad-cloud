@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Lokad.Cloud.Diagnostics;
 
-namespace Lokad.Cloud.Management
+namespace Lokad.Cloud.Services.Management
 {
     /// <summary>Management facade for cloud configuration.</summary>
     public class CloudStatistics

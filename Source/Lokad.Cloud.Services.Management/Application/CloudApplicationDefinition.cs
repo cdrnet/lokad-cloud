@@ -6,7 +6,7 @@
 using System;
 using System.Runtime.Serialization;
 
-namespace Lokad.Cloud.Application
+namespace Lokad.Cloud.Services.Management.Application
 {
     [DataContract(Namespace = "http://schemas.lokad.com/lokad-cloud/application/1.1"), Serializable]
     public class CloudApplicationDefinition

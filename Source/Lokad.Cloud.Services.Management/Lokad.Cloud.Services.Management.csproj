@@ -31,8 +31,24 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="ICSharpCode.SharpZipLib">
+      <HintPath>..\..\packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.Cecil, Version=0.9.5.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Mono.Cecil.0.9.5.0\lib\net40\Mono.Cecil.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.Cecil.Mdb">
+      <HintPath>..\..\packages\Mono.Cecil.0.9.5.0\lib\net40\Mono.Cecil.Mdb.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.Cecil.Pdb">
+      <HintPath>..\..\packages\Mono.Cecil.0.9.5.0\lib\net40\Mono.Cecil.Pdb.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.Cecil.Rocks">
+      <HintPath>..\..\packages\Mono.Cecil.0.9.5.0\lib\net40\Mono.Cecil.Rocks.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -46,7 +62,33 @@
     <Compile Include="..\VersionAssemblyInfo.cs">
       <Link>Properties\VersionAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="Application\AssemblyResolver.cs" />
+    <Compile Include="Application\CloudApplicationAssemblyInfo.cs" />
+    <Compile Include="Application\CloudApplicationDefinition.cs" />
+    <Compile Include="Application\CloudApplicationInspector.cs" />
+    <Compile Include="Application\CloudApplicationPackage.cs" />
+    <Compile Include="Application\CloudApplicationPackageReader.cs" />
+    <Compile Include="CloudAssemblies.cs" />
+    <Compile Include="CloudConfiguration.cs" />
+    <Compile Include="CloudServiceInfo.cs" />
+    <Compile Include="CloudServices.cs" />
+    <Compile Include="CloudServiceScheduling.cs" />
+    <Compile Include="CloudServiceSchedulingInfo.cs" />
+    <Compile Include="CloudStatistics.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Lokad.Cloud.Framework\Lokad.Cloud.Framework.csproj">
+      <Project>{BA84F8E7-F8B9-4912-BF93-9F4D0DDC5C29}</Project>
+      <Name>Lokad.Cloud.Framework</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Lokad.Cloud.Storage\Lokad.Cloud.Storage.csproj">
+      <Project>{0F9244AB-3B7C-4F98-9D44-E46FBC65522C}</Project>
+      <Name>Lokad.Cloud.Storage</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

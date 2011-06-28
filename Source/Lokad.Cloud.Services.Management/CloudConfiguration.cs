@@ -8,7 +8,7 @@ using System.Text;
 using Lokad.Cloud.Runtime;
 using Lokad.Cloud.Storage;
 
-namespace Lokad.Cloud.Management
+namespace Lokad.Cloud.Services.Management
 {
     /// <summary>
     /// Management facade for cloud configuration.

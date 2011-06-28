@@ -5,11 +5,11 @@
 
 using System.IO;
 using ICSharpCode.SharpZipLib.Zip;
-using Lokad.Cloud.Application;
 using Lokad.Cloud.Runtime;
+using Lokad.Cloud.Services.Management.Application;
 using Lokad.Cloud.Storage;
 
-namespace Lokad.Cloud.Management
+namespace Lokad.Cloud.Services.Management
 {
     /// <summary>Management facade for cloud assemblies.</summary>
     public class CloudAssemblies

@@ -6,11 +6,11 @@
 using System.IO;
 using System.Web;
 using System.Web.Mvc;
-using Lokad.Cloud.Application;
 using Lokad.Cloud.Console.WebRole.Behavior;
 using Lokad.Cloud.Console.WebRole.Controllers.ObjectModel;
 using Lokad.Cloud.Console.WebRole.Framework.Discovery;
 using Lokad.Cloud.Console.WebRole.Models.Assemblies;
+using Lokad.Cloud.Services.Management.Application;
 
 namespace Lokad.Cloud.Console.WebRole.Controllers
 {
@@ -26,7 +26,7 @@ namespace Lokad.Cloud.Console.WebRole.Controllers
         public override ActionResult ByHostedService(string hostedServiceName)
         {
             InitializeDeploymentTenant(hostedServiceName);
-            var cloudAssemblies = new Management.CloudAssemblies(Providers);
+            var cloudAssemblies = new Services.Management.CloudAssemblies(Providers);
             var appDefinition = cloudAssemblies.GetApplicationDefinition();
 
             return View(new AssembliesModel
@@ -40,7 +40,7 @@ namespace Lokad.Cloud.Console.WebRole.Controllers
         public ActionResult UploadPackage(string hostedServiceName, HttpPostedFileBase package)
         {
             InitializeDeploymentTenant(hostedServiceName);
-            var cloudAssemblies = new Management.CloudAssemblies(Providers);
+            var cloudAssemblies = new Services.Management.CloudAssemblies(Providers);
 
             byte[] bytes;
             using (var reader = new BinaryReader(package.InputStream))

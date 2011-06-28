@@ -8,7 +8,7 @@ using Lokad.Cloud.Console.WebRole.Behavior;
 using Lokad.Cloud.Console.WebRole.Controllers.ObjectModel;
 using Lokad.Cloud.Console.WebRole.Framework.Discovery;
 using Lokad.Cloud.Console.WebRole.Framework.Services;
-using Lokad.Cloud.Management;
+using Lokad.Cloud.Services.Management;
 
 namespace Lokad.Cloud.Console.WebRole.Controllers
 {

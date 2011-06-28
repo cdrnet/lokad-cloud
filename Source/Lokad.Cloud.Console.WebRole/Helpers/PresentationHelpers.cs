@@ -4,7 +4,7 @@
 #endregion
 
 using System;
-using Lokad.Cloud.Management;
+using Lokad.Cloud.Services.Management;
 
 namespace Lokad.Cloud.Console.WebRole.Helpers
 {

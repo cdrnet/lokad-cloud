@@ -3,7 +3,7 @@
 // URL: http://www.lokad.com/
 #endregion
 
-using Lokad.Cloud.Application;
+using Lokad.Cloud.Services.Management.Application;
 using Lokad.Cloud.Storage;
 
 namespace Lokad.Cloud.Console.WebRole.Models.Assemblies

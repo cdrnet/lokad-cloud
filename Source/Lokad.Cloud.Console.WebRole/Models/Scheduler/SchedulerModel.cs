@@ -3,7 +3,7 @@
 // URL: http://www.lokad.com/
 #endregion
 
-using Lokad.Cloud.Management;
+using Lokad.Cloud.Services.Management;
 
 namespace Lokad.Cloud.Console.WebRole.Models.Scheduler
 {

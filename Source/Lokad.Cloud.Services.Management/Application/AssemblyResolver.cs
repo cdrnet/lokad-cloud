@@ -7,7 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 
-namespace Lokad.Cloud.Application
+namespace Lokad.Cloud.Services.Management.Application
 {
     /// <summary>Resolves assemblies by caching assemblies that were loaded.</summary>
     public sealed class AssemblyResolver

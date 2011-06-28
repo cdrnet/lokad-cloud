@@ -12,7 +12,7 @@ using Lokad.Cloud.ServiceFabric;
 using Lokad.Cloud.Storage;
 using Mono.Cecil;
 
-namespace Lokad.Cloud.Application
+namespace Lokad.Cloud.Services.Management.Application
 {
     /// <summary>
     /// Utility to inspect a cloud application package and its services.

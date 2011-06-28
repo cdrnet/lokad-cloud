@@ -5,7 +5,7 @@
 
 using System.Runtime.Serialization;
 
-namespace Lokad.Cloud.Management.Api10
+namespace Lokad.Cloud.Services.Management
 {
     /// <summary>
     /// Cloud Service Info
