@@ -11,10 +11,6 @@ using Lokad.Cloud.Management;
 using Lokad.Cloud.Provisioning.Instrumentation;
 using Lokad.Cloud.Provisioning.Instrumentation.Events;
 using Lokad.Cloud.Services.Framework.Logging;
-using Lokad.Cloud.Services.Management.Logging;
-using Lokad.Cloud.Storage;
-
-using Microsoft.WindowsAzure;
 
 namespace Lokad.Cloud.Services.Management
 {
@@ -34,31 +30,10 @@ namespace Lokad.Cloud.Services.Management
                 .As<CloudProvisioning, IProvisioningProvider>()
                 .SingleInstance();
 
-            builder.Register(CloudLogReader);
-
             // Provisioning Observer Subject
             builder.Register(ProvisioningObserver)
                 .As<ICloudProvisioningObserver, IObservable<ICloudProvisioningEvent>>()
                 .SingleInstance();
-        }
-
-        static CloudLogReader CloudLogReader(IComponentContext c)
-        {
-            return new CloudLogReader(BlobStorageForDiagnostics(c));
-        }
-
-        static IBlobStorageProvider BlobStorageForDiagnostics(IComponentContext c)
-        {
-            // Neither log nor observers are provided since the providers
-            // used for logging obviously can't log themselves (cyclic dependency)
-
-            // We also always use the CloudFormatter, so this is equivalent
-            // to the RuntimeProvider, for the same reasons.
-
-            return CloudStorage
-                .ForAzureAccount(c.Resolve<CloudStorageAccount>())
-                .WithDataSerializer(new CloudFormatter())
-                .BuildBlobStorage();
         }
 
         static CloudProvisioningInstrumentationSubject ProvisioningObserver(IComponentContext c)

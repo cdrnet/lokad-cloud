@@ -4,7 +4,6 @@
 #endregion
 
 using Autofac;
-using Autofac.Builder;
 
 namespace Lokad.Cloud
 {

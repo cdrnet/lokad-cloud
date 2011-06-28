@@ -40,7 +40,6 @@
     <Reference Include="ICSharpCode.SharpZipLib">
       <HintPath>..\..\packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.WindowsAzure.StorageClient, Version=1.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="Mono.Cecil, Version=0.9.5.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Mono.Cecil.0.9.5.0\lib\net40\Mono.Cecil.dll</HintPath>
     </Reference>
@@ -87,10 +86,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Lokad.Cloud.Framework\Lokad.Cloud.Framework.csproj">
-      <Project>{BA84F8E7-F8B9-4912-BF93-9F4D0DDC5C29}</Project>
-      <Name>Lokad.Cloud.Framework</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Lokad.Cloud.Provisioning\Lokad.Cloud.Provisioning.csproj">
       <Project>{B3CA9DCB-04DB-4442-AC0C-6E1F70854DA1}</Project>
       <Name>Lokad.Cloud.Provisioning</Name>
