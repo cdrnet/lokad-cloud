@@ -26,9 +26,6 @@ namespace Lokad.Cloud.Services.Runtime
         readonly ILog _log;
         readonly ICloudRuntimeObserver _observer;
 
-        readonly IServiceMonitor _monitoring;
-        readonly DiagnosticsAcquisition _diagnostics;
-
         readonly ICloudConfigurationSettings _settings;
 
         /// <summary>Main thread used to schedule services in <see cref="Execute()"/>.</summary>
@@ -50,8 +47,6 @@ namespace Lokad.Cloud.Services.Runtime
             _observer = observer;
 
             _settings = settings;
-            _monitoring = new ServiceMonitor(diagnosticsRepository);
-            _diagnostics = new DiagnosticsAcquisition(diagnosticsRepository);
         }
 
         /// <summary>Called once by the service fabric. Call is not supposed to return
@@ -68,8 +63,6 @@ namespace Lokad.Cloud.Services.Runtime
                 List<CloudService> services;
                 using (var applicationContainer = LoadAndBuildApplication(out services))
                 {
-                    // Give the application a chance to override external diagnostics sources
-                    applicationContainer.InjectProperties(_diagnostics);
                     _applicationFinalizer = applicationContainer.ResolveOptional<IRuntimeFinalizer>();
                     _scheduler = new Scheduler(services, RunService, _observer);
 
@@ -125,8 +118,6 @@ namespace Lokad.Cloud.Services.Runtime
                     _applicationFinalizer.FinalizeRuntime();
                 }
 
-                TryDumpDiagnostics();
-
                 _log.DebugFormat("Runtime: stopped on worker {0}.", CloudEnvironment.PartitionKey);
             }
         }
@@ -136,14 +127,7 @@ namespace Lokad.Cloud.Services.Runtime
         /// </summary>
         ServiceExecutionFeedback RunService(CloudService service)
         {
-            ServiceExecutionFeedback feedback;
-
-            using (_monitoring.Monitor(service))
-            {
-                feedback = service.Start();
-            }
-
-            return feedback;
+            return service.Start();
         }
 
         /// <summary>The name of the service that is being executed, if any, <c>null</c> otherwise.</summary>
@@ -240,29 +224,6 @@ namespace Lokad.Cloud.Services.Runtime
             services = serviceTypes.Select(type => (CloudService)applicationContainer.Resolve(type)).ToList();
 
             return applicationContainer;
-        }
-
-        /// <summary>
-        /// Try to dump diagnostics, but suppress any exceptions if it fails
-        /// </summary>
-        void TryDumpDiagnostics()
-        {
-            try
-            {
-                _diagnostics.CollectStatistics();
-            }
-            catch (ThreadAbortException)
-            {
-                Thread.ResetAbort();
-                _log.WarnFormat("Runtime: skipped acquiring statistics on worker {0}", CloudEnvironment.PartitionKey);
-            }
-            catch(Exception e)
-            {
-                _log.WarnFormat(e, "Runtime: failed to acquire statistics on worker {0}: {1}", CloudEnvironment.PartitionKey, e.Message);
-                // might fail when shutting down on exception
-                // logging is likely to fail as well in this case
-                // Suppress exception, can't do anything (will be recycled anyway)
-            }
         }
     }
 }

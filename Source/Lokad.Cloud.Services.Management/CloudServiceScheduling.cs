@@ -6,7 +6,6 @@
 using System;
 using System.Linq;
 using System.Collections.Generic;
-using Lokad.Cloud.Management;
 using Lokad.Cloud.Runtime;
 using Lokad.Cloud.ServiceFabric;
 using Lokad.Cloud.Storage;
@@ -101,27 +100,6 @@ namespace Lokad.Cloud.Services.Management
         {
             return _blobProvider.ListBlobNames(ScheduledServiceStateName.GetPrefix())
                 .Select(reference => reference.ServiceName).ToList();
-        }
-
-        /// <summary>
-        /// Enumerate the names of all scheduled user cloud service (system services are skipped).
-        /// </summary>
-        public List<string> GetScheduledUserServiceNames()
-        {
-            var systemServices =
-                new[]
-                    {
-                        typeof(GarbageCollectorService),
-                        typeof(DelayedQueueService),
-                        typeof(MonitoringService),
-                        typeof(MonitoringDataRetentionService),
-                        typeof(AssemblyConfigurationUpdateService)
-                    }
-                    .Select(type => type.FullName)
-                    .ToList();
-
-            return GetScheduledServiceNames()
-                .Where(service => !systemServices.Contains(service)).ToList();
         }
 
         /// <summary>

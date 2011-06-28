@@ -17,7 +17,7 @@ namespace Lokad.Cloud.Storage
     /// Due to genericity, this message is not tagged with <c>DataContract</c>.
     /// </remarks>
     [Serializable]
-    class DelayedMessage
+    public class DelayedMessage
     {
         /// <summary>Name of the queue where the inner message will be put
         /// once the delay is expired.</summary>
@@ -35,7 +35,7 @@ namespace Lokad.Cloud.Storage
     }
 
     [Serializable, DataContract]
-    class DelayedMessageName : BlobName<DelayedMessage>
+    public class DelayedMessageName : BlobName<DelayedMessage>
     {
         public override string ContainerName
         {

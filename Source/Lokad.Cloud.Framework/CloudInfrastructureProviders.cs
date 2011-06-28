@@ -4,7 +4,6 @@
 #endregion
 
 using Lokad.Cloud.Management;
-using Lokad.Cloud.ServiceFabric;
 using Lokad.Cloud.Storage;
 using Lokad.Cloud.Storage.Shared.Logging;
 

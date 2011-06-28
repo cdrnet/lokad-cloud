@@ -68,27 +68,6 @@ namespace Lokad.Cloud.Services.Management
         }
 
         /// <summary>
-        /// Enumerate the names of all user cloud services (system services are skipped).
-        /// </summary>
-        public List<string> GetUserServiceNames()
-        {
-            var systemServices =
-                new[]
-                    {
-                        typeof(GarbageCollectorService),
-                        typeof(DelayedQueueService),
-                        typeof(MonitoringService),
-                        typeof(MonitoringDataRetentionService),
-                        typeof(AssemblyConfigurationUpdateService)
-                    }
-                    .Select(type => type.FullName)
-                    .ToList();
-
-            return GetServiceNames()
-                .Where(service => !systemServices.Contains(service)).ToList();
-        }
-
-        /// <summary>
         /// Enable a cloud service
         /// </summary>
         public void EnableService(string serviceName)

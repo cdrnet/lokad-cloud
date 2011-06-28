@@ -4,6 +4,7 @@
 #endregion
 
 using Autofac;
+using Lokad.Cloud.ServiceFabric;
 
 namespace Lokad.Cloud
 {
@@ -28,7 +29,7 @@ namespace Lokad.Cloud
             builder.RegisterModule(new Management.ManagementModule());
 
             builder.RegisterType<Jobs.JobManager>();
-            builder.RegisterType<ServiceFabric.RuntimeFinalizer>().As<IRuntimeFinalizer>().InstancePerLifetimeScope();
+            builder.RegisterType<RuntimeFinalizer>().As<IRuntimeFinalizer>().InstancePerLifetimeScope();
         }
     }
 }

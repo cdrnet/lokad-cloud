@@ -115,7 +115,6 @@
     </Compile>
     <Compile Include="CloudConfigurationModule.cs" />
     <Compile Include="CloudEnvironment.cs" />
-    <Compile Include="CloudModule.cs" />
     <Compile Include="Diagnostics\CloudLogger.cs" />
     <Compile Include="Diagnostics\CloudStorageLogger.cs" />
     <Compile Include="Diagnostics\CloudProvisioningLogger.cs" />
@@ -132,58 +131,35 @@
     <Compile Include="Management\IProvisioningProvider.cs" />
     <Compile Include="Mock\MemoryProvisioning.cs" />
     <Compile Include="RoleConfigurationSettings.cs" />
-    <Compile Include="Runtime\AssemblyLoader.cs" />
     <Compile Include="Runtime\CloudStorageExtensions.cs" />
     <Compile Include="Runtime\RuntimeProviders.cs" />
     <Compile Include="Runtime\TriggerRestartException.cs" />
-    <Compile Include="ServiceFabric\CloudService.cs" />
-    <Compile Include="ServiceFabric\CloudServiceSettingsAttribute.cs" />
-    <Compile Include="ServiceFabric\IInitializable.cs" />
-    <Compile Include="ServiceFabric\QueueService.cs" />
-    <Compile Include="ServiceFabric\QueueServiceSettingsAttribute.cs" />
-    <Compile Include="ServiceFabric\RuntimeFinalizer.cs" />
-    <Compile Include="ServiceFabric\ScheduledService.cs" />
-    <Compile Include="ServiceFabric\ScheduledServiceSettingsAttribute.cs" />
-    <Compile Include="ServiceFabric\ServiceExecutionFeedback.cs" />
-    <Compile Include="ServiceFabric\SynchronizationLeaseState.cs" />
     <Compile Include="CloudInfrastructureProviders.cs" />
-    <Compile Include="Diagnostics\DiagnosticsAcquisition.cs" />
     <Compile Include="Diagnostics\DiagnosticsModule.cs" />
     <Compile Include="Diagnostics\PartitionMonitor.cs" />
     <Compile Include="Diagnostics\PartitionStatistics.cs" />
     <Compile Include="Diagnostics\ICloudDiagnosticsRepository.cs" />
     <Compile Include="Diagnostics\Persistence\BlobDiagnosticsRepository.cs" />
-    <Compile Include="Diagnostics\ServiceMonitor.cs" />
-    <Compile Include="Diagnostics\IServiceMonitor.cs" />
     <Compile Include="Diagnostics\ServiceStatistics.cs" />
     <Compile Include="Diagnostics\TimeSegments.cs" />
     <Compile Include="Management\ManagementModule.cs" />
-    <Compile Include="Mock\MemoryMonitor.cs" />
     <Compile Include="Mock\MockStorageModule.cs" />
-    <Compile Include="Services\AssemblyConfigurationUpdateService.cs" />
-    <Compile Include="Services\MonitoringDataRetentionService.cs" />
-    <Compile Include="Services\MonitoringService.cs" />
     <Compile Include="Shared\Logging\ILog.cs" />
     <Compile Include="Shared\Logging\ILogExtensions.cs" />
     <Compile Include="Shared\Logging\ILogProvider.cs" />
     <Compile Include="Shared\Logging\LogLevel.cs" />
     <Compile Include="Shared\Logging\NullLog.cs" />
-    <Compile Include="Standalone.cs" />
     <Compile Include="Storage\Azure\StorageModule.cs" />
     <Compile Include="Storage\BlobCounter.cs" />
-    <Compile Include="Storage\DelayedQueue.cs" />
     <Compile Include="Storage\StorageCredentialsVerifier.cs" />
     <Compile Include="TypeMapperProvider.cs" />
     <Compile Include="Mock\MemoryLogger.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Services\DelayedQueueService.cs" />
-    <Compile Include="Services\GarbageCollectorService.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Diagnostics\ReadMe.txt" />
     <Content Include="Jobs\_ReadMe.txt" />
     <Content Include="Management\ReadMe.txt" />
-    <Content Include="ServiceFabric\ReadMe.txt" />
     <Content Include="Shared\_ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
