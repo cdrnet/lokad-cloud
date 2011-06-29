@@ -42,6 +42,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -55,14 +56,20 @@
     <Compile Include="..\VersionAssemblyInfo.cs">
       <Link>Properties\VersionAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="AssemblyLoader.cs" />
+    <Compile Include="Legacy\AssemblyLoader.cs" />
     <Compile Include="CloudServiceRuntimeCell.cs" />
-    <Compile Include="NoRestartFloodPolicy.cs" />
+    <Compile Include="Legacy\NoRestartFloodPolicy.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Runtime.cs" />
-    <Compile Include="Scheduler.cs" />
-    <Compile Include="ServiceFabricHost.cs" />
-    <Compile Include="SingleRuntimeHost.cs" />
+    <Compile Include="Legacy\Runtime.cs" />
+    <Compile Include="Legacy\Scheduler.cs" />
+    <Compile Include="Legacy\ServiceFabricHost.cs" />
+    <Compile Include="Legacy\SingleRuntimeHost.cs" />
+    <Compile Include="Settings\CloudServicesSettings.cs" />
+    <Compile Include="Settings\CommonServiceSettings.cs" />
+    <Compile Include="Settings\DaemonServiceSettings.cs" />
+    <Compile Include="Settings\QueuedCloudServiceSettings.cs" />
+    <Compile Include="Settings\ScheduledCloudServiceSettings.cs" />
+    <Compile Include="Settings\ScheduledWorkerServiceSettings.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Lokad.Cloud.Services.Framework\Lokad.Cloud.Services.Framework.csproj">
@@ -81,9 +88,7 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Legacy\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

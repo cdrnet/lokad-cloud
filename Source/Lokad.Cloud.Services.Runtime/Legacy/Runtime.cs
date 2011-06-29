@@ -172,7 +172,7 @@ namespace Lokad.Cloud.Services.Runtime
             applicationBuilder.RegisterInstance(_settings);
 
             // Load Application Assemblies into the AppDomain
-            var loader = new AssemblyLoader(_runtimeProviders);
+            var loader = new AssemblyLoader(_runtimeProviders.BlobStorage);
             loader.LoadPackage();
 
             // Load Application IoC Configuration and apply it to the builder

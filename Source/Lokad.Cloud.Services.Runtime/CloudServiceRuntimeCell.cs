@@ -20,9 +20,14 @@ namespace Lokad.Cloud.Services.Runtime
     /// </summary>
     public class CloudServiceRuntimeCell
     {
+        private const string ServiceSettingsContainerName = "lokad-cloud-services";
+        private const string ServiceSettingsBlobName = "service-settings.lokadcloud";
+
         private readonly CloudStorageProviders _storage;
         private readonly IBlobStorageProvider _blobs;
         private readonly List<ICloudService> _allServices;
+
+        private string _settingsEtag;
 
         public CloudServiceRuntimeCell(CloudStorageProviders storageProviders, IEnumerable<ICloudService> services)
         {
@@ -37,5 +42,15 @@ namespace Lokad.Cloud.Services.Runtime
         {
             // TODO
         }
+
+        //private void Setup()
+        //{
+        //    string newEtag;
+        //    var settingsBlob = _blobs.GetBlobIfModified<CloudServicesSettings>(ServiceSettingsContainerName, ServiceSettingsBlobName, _settingsEtag, out newEtag);
+
+        //    _blobs.UpsertBlobOrSkip<CloudServicesSettings>(ServiceSettingsContainerName, ServiceSettingsBlobName,
+        //        insert: () => new CloudServicesSettings(),
+        //        update: old => Maybe<CloudServicesSettings>.Empty);
+        //}
     }
 }

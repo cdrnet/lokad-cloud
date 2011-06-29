@@ -5,7 +5,6 @@
 
 using System.IO;
 using ICSharpCode.SharpZipLib.Zip;
-using Lokad.Cloud.Runtime;
 using Lokad.Cloud.Services.Management.Application;
 using Lokad.Cloud.Storage;
 
@@ -17,19 +16,19 @@ namespace Lokad.Cloud.Services.Management
         const string AssembliesContainerName = "lokad-cloud-assemblies";
         const string PackageBlobName = "default";
 
-        readonly RuntimeProviders _runtimeProviders;
+        readonly IBlobStorageProvider _blobs;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CloudAssemblies"/> class.
         /// </summary>
-        public CloudAssemblies(RuntimeProviders runtimeProviders)
+        public CloudAssemblies(IBlobStorageProvider blobStorageProvider)
         {
-            _runtimeProviders = runtimeProviders;
+            _blobs = blobStorageProvider;
         }
 
         public Maybe<CloudApplicationDefinition> GetApplicationDefinition()
         {
-            var inspector = new CloudApplicationInspector(_runtimeProviders);
+            var inspector = new CloudApplicationInspector(_blobs);
             return inspector.Inspect();
         }
 
@@ -56,7 +55,7 @@ namespace Lokad.Cloud.Services.Management
         /// </summary>
         public void UploadApplicationZipContainer(byte[] data)
         {
-            _runtimeProviders.BlobStorage.PutBlob(
+            _blobs.PutBlob(
                 AssembliesContainerName,
                 PackageBlobName,
                 data,

@@ -7,7 +7,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Lokad.Cloud.Runtime;
 using Lokad.Cloud.ServiceFabric;
 using Lokad.Cloud.Storage;
 using Mono.Cecil;
@@ -30,9 +29,9 @@ namespace Lokad.Cloud.Services.Management.Application
 
         private readonly IBlobStorageProvider _blobs;
 
-        public CloudApplicationInspector(RuntimeProviders runtimeProviders)
+        public CloudApplicationInspector(IBlobStorageProvider blobStorageProvider)
         {
-            _blobs = runtimeProviders.BlobStorage;
+            _blobs = blobStorageProvider;
         }
 
         public Maybe<CloudApplicationDefinition> Inspect()

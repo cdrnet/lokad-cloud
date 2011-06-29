@@ -13,7 +13,6 @@ namespace Lokad.Cloud.Runtime
     /// should be a natural candidate for a singleton design pattern. Yet, keeping
     /// it as a plain class facilitates the IoC instantiation.
     /// </remarks>
-    [Obsolete("TODO (ruegg, 2011-06-27): Drop from Framework")]
     internal class AssemblyLoader
     {
         public const string AssembliesContainerName = "lokad-cloud-assemblies";
@@ -26,7 +25,7 @@ namespace Lokad.Cloud.Runtime
             get { return TimeSpan.FromMinutes(1); }
         }
 
-        readonly IBlobStorageProvider _provider;
+        readonly IBlobStorageProvider _blobs;
 
         /// <summary>Etag of the assembly package. This property is set when
         /// assemblies are loaded. It can be used to monitor the availability of
@@ -38,9 +37,9 @@ namespace Lokad.Cloud.Runtime
         DateTimeOffset _lastPackageCheck;
 
         /// <summary>Build a new package loader.</summary>
-        public AssemblyLoader(RuntimeProviders runtimeProviders)
+        public AssemblyLoader(IBlobStorageProvider blobStorageProvider)
         {
-            _provider = runtimeProviders.BlobStorage;
+            _blobs = blobStorageProvider;
         }
 
         /// <summary>
@@ -49,8 +48,8 @@ namespace Lokad.Cloud.Runtime
         /// </summary>
         public void ResetUpdateStatus()
         {
-            _lastPackageEtag = _provider.GetBlobEtag(AssembliesContainerName, PackageBlobName);
-            _lastConfigurationEtag = _provider.GetBlobEtag(AssembliesContainerName, ConfigurationBlobName);
+            _lastPackageEtag = _blobs.GetBlobEtag(AssembliesContainerName, PackageBlobName);
+            _lastConfigurationEtag = _blobs.GetBlobEtag(AssembliesContainerName, ConfigurationBlobName);
             _lastPackageCheck = DateTimeOffset.UtcNow;
         }
 
@@ -70,8 +69,8 @@ namespace Lokad.Cloud.Runtime
                 return;
             }
 
-            var newPackageEtag = _provider.GetBlobEtag(AssembliesContainerName, PackageBlobName);
-            var newConfigurationEtag = _provider.GetBlobEtag(AssembliesContainerName, ConfigurationBlobName);
+            var newPackageEtag = _blobs.GetBlobEtag(AssembliesContainerName, PackageBlobName);
+            var newConfigurationEtag = _blobs.GetBlobEtag(AssembliesContainerName, ConfigurationBlobName);
 
             if (!string.Equals(_lastPackageEtag, newPackageEtag))
             {

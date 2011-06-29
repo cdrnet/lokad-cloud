@@ -31,10 +31,10 @@ namespace Lokad.Cloud.Console.WebRole.Framework.Services
 
         public ServicesModel QueryServices()
         {
-            var serviceManager = new CloudServices(_runtimeProviders);
+            var serviceManager = new CloudServices(_runtimeProviders.BlobStorage);
             var services = serviceManager.GetServices();
 
-            var inspector = new CloudApplicationInspector(_runtimeProviders);
+            var inspector = new CloudApplicationInspector(_runtimeProviders.BlobStorage);
             var applicationDefinition = inspector.Inspect();
 
             if (!applicationDefinition.HasValue)
@@ -74,7 +74,7 @@ namespace Lokad.Cloud.Console.WebRole.Framework.Services
         public QueuesModel QueryQueues()
         {
             var queueStorage = _runtimeProviders.QueueStorage;
-            var inspector = new CloudApplicationInspector(_runtimeProviders);
+            var inspector = new CloudApplicationInspector(_runtimeProviders.BlobStorage);
             var applicationDefinition = inspector.Inspect();
 
             var failingMessages = queueStorage.ListPersisted(FailingMessagesStoreName)

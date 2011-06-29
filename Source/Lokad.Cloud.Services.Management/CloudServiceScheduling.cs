@@ -6,7 +6,6 @@
 using System;
 using System.Linq;
 using System.Collections.Generic;
-using Lokad.Cloud.Runtime;
 using Lokad.Cloud.ServiceFabric;
 using Lokad.Cloud.Storage;
 
@@ -18,14 +17,14 @@ namespace Lokad.Cloud.Services.Management
     /// <summary>Management facade for scheduled cloud services.</summary>
     public class CloudServiceScheduling
     {
-        readonly IBlobStorageProvider _blobProvider;
+        readonly IBlobStorageProvider _blobs;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CloudServiceScheduling"/> class.
         /// </summary>
-        public CloudServiceScheduling(RuntimeProviders runtimeProviders)
+        public CloudServiceScheduling(IBlobStorageProvider blobStorageProvider)
         {
-            _blobProvider = runtimeProviders.BlobStorage;
+            _blobs = blobStorageProvider;
         }
 
         /// <summary>
@@ -35,8 +34,8 @@ namespace Lokad.Cloud.Services.Management
         {
             // TODO: Redesign to make it self-contained (so that we don't need to pass the name as well)
 
-            return _blobProvider.ListBlobNames(ScheduledServiceStateName.GetPrefix())
-                .Select(name => System.Tuple.Create(name, _blobProvider.GetBlob(name)))
+            return _blobs.ListBlobNames(ScheduledServiceStateName.GetPrefix())
+                .Select(name => System.Tuple.Create(name, _blobs.GetBlob(name)))
                 .Where(pair => pair.Item2.HasValue)
                 .Select(pair =>
                     {
@@ -69,7 +68,7 @@ namespace Lokad.Cloud.Services.Management
         /// </summary>
         public CloudServiceSchedulingInfo GetSchedule(string serviceName)
         {
-            var blob = _blobProvider.GetBlob(new ScheduledServiceStateName(serviceName));
+            var blob = _blobs.GetBlob(new ScheduledServiceStateName(serviceName));
 
             var state = blob.Value;
             var info = new CloudServiceSchedulingInfo
@@ -98,7 +97,7 @@ namespace Lokad.Cloud.Services.Management
         /// </summary>
         public List<string> GetScheduledServiceNames()
         {
-            return _blobProvider.ListBlobNames(ScheduledServiceStateName.GetPrefix())
+            return _blobs.ListBlobNames(ScheduledServiceStateName.GetPrefix())
                 .Select(reference => reference.ServiceName).ToList();
         }
 
@@ -107,7 +106,7 @@ namespace Lokad.Cloud.Services.Management
         /// </summary>
         public void SetTriggerInterval(string serviceName, TimeSpan triggerInterval)
         {
-            _blobProvider.UpdateBlobIfExist(
+            _blobs.UpdateBlobIfExist(
                 new ScheduledServiceStateName(serviceName),
                 state =>
                     {
@@ -121,7 +120,7 @@ namespace Lokad.Cloud.Services.Management
         /// </summary>
         public void ResetSchedule(string serviceName)
         {
-            _blobProvider.DeleteBlobIfExist(new ScheduledServiceStateName(serviceName));
+            _blobs.DeleteBlobIfExist(new ScheduledServiceStateName(serviceName));
         }
 
         /// <summary>
@@ -129,7 +128,7 @@ namespace Lokad.Cloud.Services.Management
         /// </summary>
         public void ReleaseLease(string serviceName)
         {
-            _blobProvider.UpdateBlobIfExist(
+            _blobs.UpdateBlobIfExist(
                 new ScheduledServiceStateName(serviceName),
                 state =>
                     {

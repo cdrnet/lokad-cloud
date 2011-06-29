@@ -32,7 +32,7 @@ namespace Lokad.Cloud.Console.WebRole.Controllers
         public ActionResult Status(string hostedServiceName, string id, bool isStarted)
         {
             InitializeDeploymentTenant(hostedServiceName);
-            var cloudServices = new CloudServices(Providers);
+            var cloudServices = new CloudServices(Providers.BlobStorage);
 
             if (isStarted)
             {

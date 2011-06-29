@@ -24,7 +24,7 @@ namespace Lokad.Cloud.Console.WebRole.Controllers
         public override ActionResult ByHostedService(string hostedServiceName)
         {
             InitializeDeploymentTenant(hostedServiceName);
-            var cloudServiceScheduling = new CloudServiceScheduling(Providers);
+            var cloudServiceScheduling = new CloudServiceScheduling(Providers.BlobStorage);
 
             return View(new SchedulerModel
                 {

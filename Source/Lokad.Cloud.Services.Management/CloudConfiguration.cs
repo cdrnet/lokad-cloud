@@ -5,7 +5,6 @@
 
 using System;
 using System.Text;
-using Lokad.Cloud.Runtime;
 using Lokad.Cloud.Storage;
 
 namespace Lokad.Cloud.Services.Management
@@ -18,15 +17,15 @@ namespace Lokad.Cloud.Services.Management
         const string AssembliesContainerName = "lokad-cloud-assemblies";
         const string ConfigurationBlobName = "config";
 
-        readonly IBlobStorageProvider _blobProvider;
+        readonly IBlobStorageProvider _blobs;
         readonly UTF8Encoding _encoding = new UTF8Encoding();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CloudConfiguration"/> class.
         /// </summary>
-        public CloudConfiguration(RuntimeProviders runtimeProviders)
+        public CloudConfiguration(IBlobStorageProvider blobStorageProvider)
         {
-            _blobProvider = runtimeProviders.BlobStorage;
+            _blobs = blobStorageProvider;
         }
 
         /// <summary>
@@ -34,7 +33,7 @@ namespace Lokad.Cloud.Services.Management
         /// </summary>
         public string GetConfigurationString()
         {
-            var buffer = _blobProvider.GetBlob<byte[]>(
+            var buffer = _blobs.GetBlob<byte[]>(
                 AssembliesContainerName,
                 ConfigurationBlobName);
 
@@ -59,7 +58,7 @@ namespace Lokad.Cloud.Services.Management
                 return;
             }
 
-            _blobProvider.PutBlob(
+            _blobs.PutBlob(
                 AssembliesContainerName,
                 ConfigurationBlobName,
                 _encoding.GetBytes(configuration));
@@ -70,7 +69,7 @@ namespace Lokad.Cloud.Services.Management
         /// </summary>
         public void RemoveConfiguration()
         {
-            _blobProvider.DeleteBlobIfExist(
+            _blobs.DeleteBlobIfExist(
                 AssembliesContainerName,
                 ConfigurationBlobName);
         }

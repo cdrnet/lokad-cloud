@@ -3,7 +3,6 @@
 // URL: http://www.lokad.com/
 #endregion
 
-using Lokad.Cloud.Runtime;
 using Lokad.Cloud.Services.Management.Application;
 using Lokad.Cloud.Storage;
 
@@ -20,19 +19,19 @@ namespace Lokad.Cloud.Services.Runtime
         const string PackageBlobName = "default";
         const string ConfigurationBlobName = "config";
 
-        readonly IBlobStorageProvider _provider;
+        readonly IBlobStorageProvider _blobs;
 
         /// <summary>Build a new package loader.</summary>
-        public AssemblyLoader(RuntimeProviders runtimeProviders)
+        public AssemblyLoader(IBlobStorageProvider blobStorageProvider)
         {
-            _provider = runtimeProviders.BlobStorage;
+            _blobs = blobStorageProvider;
         }
 
         /// <summary>Loads the assembly package.</summary>
         /// <remarks>This method is expected to be called only once.</remarks>
         public void LoadPackage()
         {
-            var buffer = _provider.GetBlob<byte[]>(AssembliesContainerName, PackageBlobName);
+            var buffer = _blobs.GetBlob<byte[]>(AssembliesContainerName, PackageBlobName);
 
             // if no assemblies have been loaded yet, just skip the loading
             if (!buffer.HasValue)
@@ -48,7 +47,7 @@ namespace Lokad.Cloud.Services.Runtime
 
         public Maybe<byte[]> LoadConfiguration()
         {
-            return _provider.GetBlob<byte[]>(AssembliesContainerName, ConfigurationBlobName);
+            return _blobs.GetBlob<byte[]>(AssembliesContainerName, ConfigurationBlobName);
         }
     }
 }

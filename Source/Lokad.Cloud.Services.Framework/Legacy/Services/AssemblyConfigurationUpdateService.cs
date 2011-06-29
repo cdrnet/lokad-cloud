@@ -19,21 +19,22 @@ namespace Lokad.Cloud.Services
            SchedulePerWorker = true)]
     public class AssemblyConfigurationUpdateService : ScheduledService
     {
-        readonly AssemblyLoader _assemblyLoader;
+        AssemblyLoader _assemblyLoader;
 
-        public AssemblyConfigurationUpdateService(RuntimeProviders runtimeProviders)
+        public override void Initialize()
         {
-            // NOTE: we can't use the BlobStorage as provided by the base class
-            // as this is not available at constructur time, but we want to reset
-            // the status as soon as possible to avoid missing any changes
+            base.Initialize();
 
-            _assemblyLoader = new AssemblyLoader(runtimeProviders);
+            _assemblyLoader = new AssemblyLoader(BlobStorage);
             _assemblyLoader.ResetUpdateStatus();
         }
 
         protected override void StartOnSchedule()
         {
-            _assemblyLoader.CheckUpdate(false);
+            if (_assemblyLoader != null)
+            {
+                _assemblyLoader.CheckUpdate(false);
+            }
         }
     }
 }
