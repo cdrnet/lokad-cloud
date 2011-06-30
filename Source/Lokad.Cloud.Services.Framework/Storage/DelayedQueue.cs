@@ -7,8 +7,9 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 using Lokad.Cloud.ServiceFabric;
+using Lokad.Cloud.Storage;
 
-namespace Lokad.Cloud.Storage
+namespace Lokad.Cloud.Services.Framework.Storage
 {
     /// <summary>Used as a wrapper for delayed messages (stored in the
     /// blob storage waiting to be pushed into a queue).</summary>

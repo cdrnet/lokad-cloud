@@ -4,6 +4,7 @@
 #endregion
 
 using System;
+using Lokad.Cloud.Services.Framework.Storage;
 using Lokad.Cloud.Storage;
 
 namespace Lokad.Cloud
@@ -36,7 +37,7 @@ namespace Lokad.Cloud
     }
 
     /// <summary>
-    /// Settings used among others by the <see cref="Lokad.Cloud.Storage.Azure.StorageModule" />.
+    /// Settings used among others by the <see cref="StorageModule" />.
     /// </summary>
     public interface ICloudConfigurationSettings
     {

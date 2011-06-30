@@ -6,11 +6,12 @@
 using System;
 using System.Net;
 using Autofac;
+using Lokad.Cloud.Storage;
 using Lokad.Cloud.Storage.Instrumentation;
 using Lokad.Cloud.Storage.Shared;
 using Microsoft.WindowsAzure;
 
-namespace Lokad.Cloud.Storage.Azure
+namespace Lokad.Cloud.Services.Framework.Storage
 {
     /// <summary>IoC module that registers
     /// <see cref="BlobStorageProvider"/>, <see cref="QueueStorageProvider"/> and

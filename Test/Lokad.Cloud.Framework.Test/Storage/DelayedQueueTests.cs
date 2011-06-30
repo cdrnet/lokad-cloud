@@ -6,6 +6,7 @@
 using System;
 using System.Linq;
 using Autofac;
+using Lokad.Cloud.Services.Framework.Storage;
 using Lokad.Cloud.Storage;
 using NUnit.Framework;
 

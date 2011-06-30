@@ -6,6 +6,7 @@
 using System;
 using Lokad.Cloud.ServiceFabric;
 using Lokad.Cloud.Services.Framework.Logging;
+using Lokad.Cloud.Services.Framework.Storage;
 using Lokad.Cloud.Storage;
 
 // HACK: the delayed queue service does not provide a scalable iteration pattern.

@@ -6,9 +6,10 @@
 using Autofac;
 using Lokad.Cloud.Services.Framework.Logging;
 using Lokad.Cloud.Services.Framework.Provisioning;
+using Lokad.Cloud.Storage;
 using Lokad.Cloud.Storage.InMemory;
 
-namespace Lokad.Cloud.Storage.Azure
+namespace Lokad.Cloud.Services.Framework.Storage
 {
     /// <remarks></remarks>
     public sealed class NullStorageModule : Module

@@ -8,7 +8,7 @@ using Lokad.Cloud.ServiceFabric;
 using Lokad.Cloud.Services.Framework.Instrumentation;
 using Lokad.Cloud.Services.Framework.Jobs;
 using Lokad.Cloud.Services.Framework.Logging;
-using Lokad.Cloud.Storage.Azure;
+using Lokad.Cloud.Services.Framework.Storage;
 
 namespace Lokad.Cloud.Services.Framework
 {
