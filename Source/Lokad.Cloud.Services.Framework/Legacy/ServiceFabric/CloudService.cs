@@ -202,46 +202,46 @@ namespace Lokad.Cloud.ServiceFabric
         protected abstract ServiceExecutionFeedback StartImpl();
 
         /// <summary>Put a message into the queue implicitly associated to the type <c>T</c>.</summary>
-        public void Put<T>(T message)
+        protected void Put<T>(T message)
         {
-            PutRange(new[]{message});
+            Queues.Put(message);
         }
 
         /// <summary>Put a message into the queue identified by <c>queueName</c>.</summary>
-        public void Put<T>(T message, string queueName)
+        protected void Put<T>(T message, string queueName)
         {
-            PutRange(new[] { message }, queueName);
+            Queues.Put(queueName, message);
         }
 
         /// <summary>Put messages into the queue implicitly associated to the type <c>T</c>.</summary>
-        public void PutRange<T>(IEnumerable<T> messages)
+        protected void PutRange<T>(IEnumerable<T> messages)
         {
-            PutRange(messages, TypeMapper.GetStorageName(typeof(T)));
+            Queues.PutRange(messages);
         }
 
         /// <summary>Put messages into the queue identified by <c>queueName</c>.</summary>
-        public void PutRange<T>(IEnumerable<T> messages, string queueName)
+        protected void PutRange<T>(IEnumerable<T> messages, string queueName)
         {
             Queues.PutRange(queueName, messages);
         }
 
         /// <summary>Put a message into the queue implicitly associated to the type <c>T</c> at the
         /// time specified by the <c>triggerTime</c>.</summary>
-        public void PutWithDelay<T>(T message, DateTimeOffset triggerTime)
+        protected void PutWithDelay<T>(T message, DateTimeOffset triggerTime)
         {
             new DelayedQueue(Blobs).PutWithDelay(message, triggerTime);
         }
 
         /// <summary>Put a message into the queue identified by <c>queueName</c> at the
         /// time specified by the <c>triggerTime</c>.</summary>
-        public void PutWithDelay<T>(T message, DateTimeOffset triggerTime, string queueName)
+        protected void PutWithDelay<T>(T message, DateTimeOffset triggerTime, string queueName)
         {
             new DelayedQueue(Blobs).PutWithDelay(message, triggerTime, queueName);
         }
 
         /// <summary>Put messages into the queue implicitly associated to the type <c>T</c> at the
         /// time specified by the <c>triggerTime</c>.</summary>
-        public void PutRangeWithDelay<T>(IEnumerable<T> messages, DateTimeOffset triggerTime)
+        protected void PutRangeWithDelay<T>(IEnumerable<T> messages, DateTimeOffset triggerTime)
         {
             new DelayedQueue(Blobs).PutRangeWithDelay(messages, triggerTime);
         }
@@ -250,7 +250,7 @@ namespace Lokad.Cloud.ServiceFabric
         /// time specified by the <c>triggerTime</c>.</summary>
         /// <remarks>This method acts as a delayed put operation, the message not being put
         /// before the <c>triggerTime</c> is reached.</remarks>
-        public void PutRangeWithDelay<T>(IEnumerable<T> messages, DateTimeOffset triggerTime, string queueName)
+        protected void PutRangeWithDelay<T>(IEnumerable<T> messages, DateTimeOffset triggerTime, string queueName)
         {
             new DelayedQueue(Blobs).PutRangeWithDelay(messages, triggerTime, queueName);
         }

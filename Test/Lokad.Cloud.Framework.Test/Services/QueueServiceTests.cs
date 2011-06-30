@@ -37,8 +37,7 @@ namespace Lokad.Cloud.Test.Services
                     IsStart = true
                 };
 
-            var queueName = TypeMapper.GetStorageName(typeof(SquareMessage));
-            providersForCloudStorage.QueueStorage.Put(queueName, squareMessage);
+            providersForCloudStorage.QueueStorage.Put(squareMessage);
 
             for (int i = 0 ; i < 11 ; i++)
             {

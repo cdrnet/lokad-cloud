@@ -103,7 +103,6 @@
     <Compile Include="Legacy\StorageModule.cs" />
     <Compile Include="Legacy\Storage\DelayedQueue.cs" />
     <Compile Include="Legacy\TriggerRestartException.cs" />
-    <Compile Include="Legacy\TypeMapperProvider.cs" />
     <Compile Include="Logging\CloudLogWriter.cs" />
     <Compile Include="Logging\ILogWriter.cs" />
     <Compile Include="Logging\ILogWriterExtensions.cs" />
@@ -131,9 +130,7 @@
     <Content Include="Jobs\_ReadMe.txt" />
     <Content Include="Legacy\ServiceFabric\ReadMe.txt" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Legacy\Diagnostics\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

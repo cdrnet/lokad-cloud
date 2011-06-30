@@ -5,6 +5,7 @@
 
 using System;
 using System.Linq;
+using Lokad.Cloud.Storage;
 
 namespace Lokad.Cloud.ServiceFabric
 {
@@ -42,7 +43,7 @@ namespace Lokad.Cloud.ServiceFabric
 
             if (null != settings) // settings are provided through custom attribute
             {
-                _queueName = settings.QueueName ?? TypeMapper.GetStorageName(typeof (T));
+                _queueName = settings.QueueName ?? QueueStorageExtensions.GetDefaultStorageName(typeof(T));
                 _serviceName = settings.ServiceName ?? GetType().FullName;
 
                 if (settings.MaxProcessingTrials > 0)
@@ -52,7 +53,7 @@ namespace Lokad.Cloud.ServiceFabric
             }
             else
             {
-                _queueName = TypeMapper.GetStorageName(typeof (T));
+                _queueName = QueueStorageExtensions.GetDefaultStorageName(typeof(T));
                 _serviceName = GetType().FullName;
             }
 

@@ -3,6 +3,7 @@
 // URL: http://www.lokad.com/
 #endregion
 
+using Lokad.Cloud.Storage;
 using NUnit.Framework;
 
 namespace Lokad.Cloud.Test
@@ -15,7 +16,7 @@ namespace Lokad.Cloud.Test
         {
             Assert.AreEqual(
                 "lokad-cloud-test-typemapperprovidertests",
-                TypeMapper.GetStorageName(typeof (TypeMapperProviderTests)));
+                QueueStorageExtensions.GetDefaultStorageName(typeof(TypeMapperProviderTests)));
         }
     }
 }

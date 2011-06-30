@@ -76,7 +76,7 @@ namespace Lokad.Cloud.Storage
         /// time specified by the <c>triggerTime</c>.</summary>
         public void PutWithDelay<T>(T message, DateTimeOffset triggerTime)
         {
-            PutWithDelay(message, triggerTime, TypeMapper.GetStorageName(typeof(T)));
+            PutWithDelay(message, triggerTime, QueueStorageExtensions.GetDefaultStorageName(typeof(T)));
         }
 
         /// <summary>Put a message into the queue identified by <c>queueName</c> at the
@@ -90,7 +90,7 @@ namespace Lokad.Cloud.Storage
         /// time specified by the <c>triggerTime</c>.</summary>
         public void PutRangeWithDelay<T>(IEnumerable<T> messages, DateTimeOffset triggerTime)
         {
-            PutRangeWithDelay(messages, triggerTime, TypeMapper.GetStorageName(typeof(T)));
+            PutRangeWithDelay(messages, triggerTime, QueueStorageExtensions.GetDefaultStorageName(typeof(T)));
         }
 
         /// <summary>Put messages into the queue identified by <c>queueName</c> at the
