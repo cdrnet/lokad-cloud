@@ -5,9 +5,7 @@
 
 using System;
 
-using Lokad.Cloud.Services.Framework.Logging;
-
-namespace Lokad.Cloud.Mock
+namespace Lokad.Cloud.Services.Framework.Logging
 {
     public class NullLogWriter : ILogWriter
     {

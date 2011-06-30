@@ -6,7 +6,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Lokad.Cloud.Management
+namespace Lokad.Cloud.Services.Framework.Provisioning
 {
     /// <summary>Defines an interface to auto-scale your cloud app.</summary>
     /// <remarks>The implementation relies on the Management API on Windows Azure.</remarks>

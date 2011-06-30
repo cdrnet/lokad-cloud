@@ -83,8 +83,8 @@
     <Compile Include="Legacy\Diagnostics\DiagnosticsModule.cs" />
     <Compile Include="Legacy\Mock\NullProvisioning.cs" />
     <Compile Include="Legacy\Mock\MockStorageModule.cs" />
-    <Compile Include="Legacy\Provisioning\CloudProvisioning.cs" />
-    <Compile Include="Legacy\Provisioning\IProvisioningProvider.cs" />
+    <Compile Include="Provisioning\CloudProvisioning.cs" />
+    <Compile Include="Provisioning\IProvisioningProvider.cs" />
     <Compile Include="Legacy\RoleConfigurationSettings.cs" />
     <Compile Include="Legacy\Runtime\CloudStorageExtensions.cs" />
     <Compile Include="Legacy\Runtime\RuntimeProviders.cs" />
@@ -132,7 +132,6 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Jobs\_ReadMe.txt" />
-    <Content Include="Legacy\Provisioning\ReadMe.txt" />
     <Content Include="Legacy\ServiceFabric\ReadMe.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -3,8 +3,8 @@
 // URL: http://www.lokad.com/
 #endregion
 
-using Lokad.Cloud.Management;
 using Lokad.Cloud.Services.Framework.Logging;
+using Lokad.Cloud.Services.Framework.Provisioning;
 using Lokad.Cloud.Storage;
 
 namespace Lokad.Cloud

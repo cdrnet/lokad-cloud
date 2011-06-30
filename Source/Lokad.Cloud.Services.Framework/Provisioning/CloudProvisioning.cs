@@ -13,7 +13,7 @@ using Lokad.Cloud.Provisioning.Instrumentation;
 using Lokad.Cloud.Services.Framework.Logging;
 using Lokad.Cloud.Storage;
 
-namespace Lokad.Cloud.Management
+namespace Lokad.Cloud.Services.Framework.Provisioning
 {
     /// <summary>Azure Management API Provider, Provisioning Provider.</summary>
     public class CloudProvisioning : IProvisioningProvider
@@ -77,7 +77,7 @@ namespace Lokad.Cloud.Management
                         {
                             case HttpStatusCode.Forbidden:
                                 _log.WarnFormat(baseException, "Provisioning: Initial discovery failed with HTTP 403 Forbidden. We tried using subscription '{0}' and certificate '{1}' ({2}) {3} a private key.",
-                                    settings.SelfManagementSubscriptionId, certificate.Value.SubjectName, certificate.Value.Thumbprint, certificate.Value.HasPrivateKey ? "with" : "without");
+                                    settings.SelfManagementSubscriptionId, certificate.Value.SubjectName.Name, certificate.Value.Thumbprint, certificate.Value.HasPrivateKey ? "with" : "without");
                                 return;
                             default:
                                 _log.WarnFormat(baseException, "Provisioning: Initial discovery failed with a permanent HTTP {0} {1} error.", (int)httpStatus, httpStatus);

@@ -1,10 +1,9 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
-using Lokad.Cloud.Management;
 
-namespace Lokad.Cloud.Mock
+namespace Lokad.Cloud.Services.Framework.Provisioning
 {
-    public class NullProvisioning : IProvisioningProvider
+    public class NullProvisioningProvider : IProvisioningProvider
     {
         public bool IsAvailable
         {

@@ -7,10 +7,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Autofac;
-using Lokad.Cloud.Management;
 using Lokad.Cloud.Provisioning.Instrumentation;
 using Lokad.Cloud.Provisioning.Instrumentation.Events;
 using Lokad.Cloud.Services.Framework.Logging;
+using Lokad.Cloud.Services.Framework.Provisioning;
 
 namespace Lokad.Cloud.Services.Management
 {
