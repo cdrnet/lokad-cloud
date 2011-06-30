@@ -4,8 +4,9 @@
 #endregion
 
 using System;
+using Lokad.Cloud.Storage;
 
-namespace Lokad.Cloud.Storage
+namespace Lokad.Cloud.Services.Framework.Storage
 {
     /// <summary>Simple non-sharded counter shared among several workers.</summary>
     /// <remarks>The content of the counter is stored in a single blob value. Present design 

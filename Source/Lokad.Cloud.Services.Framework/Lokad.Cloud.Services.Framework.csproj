@@ -73,7 +73,7 @@
     <Compile Include="Instrumentation\ICloudRuntimeObserver.cs" />
     <Compile Include="Jobs\Job.cs" />
     <Compile Include="Jobs\JobManager.cs" />
-    <Compile Include="Legacy\BlobCounter.cs" />
+    <Compile Include="Storage\BlobCounter.cs" />
     <Compile Include="Legacy\CloudConfigurationModule.cs" />
     <Compile Include="Legacy\CloudEnvironment.cs" />
     <Compile Include="CloudModule.cs" />
@@ -82,7 +82,7 @@
     <Compile Include="Instrumentation\InstrumentationModule.cs" />
     <Compile Include="Logging\LoggingModule.cs" />
     <Compile Include="Provisioning\NullProvisioningProvider.cs" />
-    <Compile Include="Legacy\NullStorageModule.cs" />
+    <Compile Include="Storage\NullStorageModule.cs" />
     <Compile Include="Provisioning\CloudProvisioning.cs" />
     <Compile Include="Provisioning\IProvisioningProvider.cs" />
     <Compile Include="Legacy\RoleConfigurationSettings.cs" />
@@ -100,8 +100,8 @@
     <Compile Include="Legacy\Services\AssemblyLoader.cs" />
     <Compile Include="Legacy\Services\DelayedQueueService.cs" />
     <Compile Include="Legacy\Services\GarbageCollectorService.cs" />
-    <Compile Include="Legacy\StorageModule.cs" />
-    <Compile Include="Legacy\Storage\DelayedQueue.cs" />
+    <Compile Include="Storage\StorageModule.cs" />
+    <Compile Include="Storage\DelayedQueue.cs" />
     <Compile Include="Legacy\TriggerRestartException.cs" />
     <Compile Include="Logging\CloudLogWriter.cs" />
     <Compile Include="Logging\ILogWriter.cs" />

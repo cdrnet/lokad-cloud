@@ -31,7 +31,6 @@ namespace Lokad.Cloud.Services.Framework
             builder.RegisterModule(new StorageModule());
             builder.RegisterModule(new InstrumentationModule());
             builder.RegisterModule(new LoggingModule());
-            //builder.RegisterModule(new Management.ManagementModule());
 
             builder.RegisterType<JobManager>();
             builder.RegisterType<RuntimeFinalizer>().As<IRuntimeFinalizer>().InstancePerLifetimeScope();

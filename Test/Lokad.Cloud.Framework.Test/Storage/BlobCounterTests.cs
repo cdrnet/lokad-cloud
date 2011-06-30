@@ -5,11 +5,10 @@
 
 using System;
 using System.Linq;
-using System.Threading;
 using Autofac;
+using Lokad.Cloud.Services.Framework.Storage;
 using Lokad.Cloud.Shared.Test;
 using Lokad.Cloud.Storage;
-using Lokad.Cloud.Storage.Shared;
 using Lokad.Cloud.Storage.Shared.Threading;
 using NUnit.Framework;
 
