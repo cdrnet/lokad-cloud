@@ -97,24 +97,18 @@ namespace Lokad.Cloud.ServiceFabric
         }
 
         /// <summary>Providers used by the cloud service to access the storage.</summary>
-        public CloudInfrastructureProviders Providers { get; set; }
-
-        public RuntimeProviders RuntimeProviders { get; set; }
-
-        // Short-hands are only provided for the most frequently used providers.
-        // (ex: IRuntimeFinalizer is typically NOT a frequently used provider)
+        public CloudStorageProviders Storage { get; set; }
 
         /// <summary>Short-hand for <c>Providers.BlobStorage</c>.</summary>
-        public IBlobStorageProvider BlobStorage { get { return Providers.BlobStorage; } }
+        public IBlobStorageProvider Blobs { get { return Storage.BlobStorage; } }
 
         /// <summary>Short-hand for <c>Providers.QueueStorage</c>.</summary>
-        public IQueueStorageProvider QueueStorage { get { return Providers.QueueStorage; } }
+        public IQueueStorageProvider Queues { get { return Storage.QueueStorage; } }
 
         /// <summary>Short-hand for <c>Providers.TableStorage</c>.</summary>
-        public ITableStorageProvider TableStorage { get { return Providers.TableStorage; } }
+        public ITableStorageProvider Tables { get { return Storage.TableStorage; } }
 
-        /// <summary>Short-hand for <c>Providers.Log</c>.</summary>
-        public ILogWriter Log { get { return Providers.Log; } }
+        public ILogWriter Log { get; set; }
 
         public JobManager Jobs { get; set; }
 
@@ -169,13 +163,13 @@ namespace Lokad.Cloud.ServiceFabric
             {
                 var stateBlobName = new CloudServiceStateName(Name);
 
-                var state = RuntimeProviders.BlobStorage.GetBlob(stateBlobName);
+                var state = Storage.NeutralBlobStorage.GetBlob(stateBlobName);
 
                 // no state can be retrieved, update blob storage
                 if(!state.HasValue)
                 {
                     state = _defaultState;
-                    RuntimeProviders.BlobStorage.PutBlob(stateBlobName, state.Value);
+                    Storage.NeutralBlobStorage.PutBlob(stateBlobName, state.Value);
                 }
 
                 _state = state.Value;
@@ -228,28 +222,28 @@ namespace Lokad.Cloud.ServiceFabric
         /// <summary>Put messages into the queue identified by <c>queueName</c>.</summary>
         public void PutRange<T>(IEnumerable<T> messages, string queueName)
         {
-            QueueStorage.PutRange(queueName, messages);
+            Queues.PutRange(queueName, messages);
         }
 
         /// <summary>Put a message into the queue implicitly associated to the type <c>T</c> at the
         /// time specified by the <c>triggerTime</c>.</summary>
         public void PutWithDelay<T>(T message, DateTimeOffset triggerTime)
         {
-            new DelayedQueue(BlobStorage).PutWithDelay(message, triggerTime);
+            new DelayedQueue(Blobs).PutWithDelay(message, triggerTime);
         }
 
         /// <summary>Put a message into the queue identified by <c>queueName</c> at the
         /// time specified by the <c>triggerTime</c>.</summary>
         public void PutWithDelay<T>(T message, DateTimeOffset triggerTime, string queueName)
         {
-            new DelayedQueue(BlobStorage).PutWithDelay(message, triggerTime, queueName);
+            new DelayedQueue(Blobs).PutWithDelay(message, triggerTime, queueName);
         }
 
         /// <summary>Put messages into the queue implicitly associated to the type <c>T</c> at the
         /// time specified by the <c>triggerTime</c>.</summary>
         public void PutRangeWithDelay<T>(IEnumerable<T> messages, DateTimeOffset triggerTime)
         {
-            new DelayedQueue(BlobStorage).PutRangeWithDelay(messages, triggerTime);
+            new DelayedQueue(Blobs).PutRangeWithDelay(messages, triggerTime);
         }
 
         /// <summary>Put messages into the queue identified by <c>queueName</c> at the
@@ -258,7 +252,7 @@ namespace Lokad.Cloud.ServiceFabric
         /// before the <c>triggerTime</c> is reached.</remarks>
         public void PutRangeWithDelay<T>(IEnumerable<T> messages, DateTimeOffset triggerTime, string queueName)
         {
-            new DelayedQueue(BlobStorage).PutRangeWithDelay(messages, triggerTime, queueName);
+            new DelayedQueue(Blobs).PutRangeWithDelay(messages, triggerTime, queueName);
         }
     }
 }

@@ -14,13 +14,15 @@ using Lokad.Cloud.Runtime;
 using Lokad.Cloud.Runtime.Instrumentation;
 using Lokad.Cloud.ServiceFabric;
 using Lokad.Cloud.Services.Framework.Logging;
+using Lokad.Cloud.Services.Management;
+using Lokad.Cloud.Storage;
 
 namespace Lokad.Cloud.Services.Runtime
 {
     /// <summary>Organize the executions of the services.</summary>
     internal class Runtime
     {
-        readonly RuntimeProviders _runtimeProviders;
+        readonly IBlobStorageProvider _blobs;
         readonly IRuntimeFinalizer _runtimeFinalizer;
         readonly ILogWriter _log;
         readonly ICloudRuntimeObserver _observer;
@@ -38,11 +40,11 @@ namespace Lokad.Cloud.Services.Runtime
         public IContainer RuntimeContainer { get; set; }
 
         /// <summary>IoC constructor.</summary>
-        public Runtime(RuntimeProviders runtimeProviders, ICloudConfigurationSettings settings, ICloudRuntimeObserver observer = null)
+        public Runtime(CloudStorageProviders storage, ICloudConfigurationSettings settings, ILogWriter log, ICloudRuntimeObserver observer = null)
         {
-            _runtimeProviders = runtimeProviders;
-            _runtimeFinalizer = runtimeProviders.RuntimeFinalizer;
-            _log = runtimeProviders.Log;
+            _blobs = storage.NeutralBlobStorage;
+            _runtimeFinalizer = storage.RuntimeFinalizer;
+            _log = log;
             _observer = observer;
 
             _settings = settings;
@@ -169,10 +171,11 @@ namespace Lokad.Cloud.Services.Runtime
         {
             var applicationBuilder = new ContainerBuilder();
             applicationBuilder.RegisterModule(new CloudModule());
+            applicationBuilder.RegisterModule(new ManagementModule());
             applicationBuilder.RegisterInstance(_settings);
 
             // Load Application Assemblies into the AppDomain
-            var loader = new AssemblyLoader(_runtimeProviders.BlobStorage);
+            var loader = new AssemblyLoader(_blobs);
             loader.LoadPackage();
 
             // Load Application IoC Configuration and apply it to the builder

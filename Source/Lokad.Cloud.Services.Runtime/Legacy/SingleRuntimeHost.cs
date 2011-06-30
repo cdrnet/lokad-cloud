@@ -11,6 +11,7 @@ using System.Threading;
 using Autofac;
 using Lokad.Cloud.Runtime;
 using Lokad.Cloud.Services.Framework.Logging;
+using Lokad.Cloud.Services.Management;
 using Lokad.Cloud.Storage;
 
 namespace Lokad.Cloud.Services.Runtime
@@ -99,6 +100,7 @@ namespace Lokad.Cloud.Services.Runtime
 
             var runtimeBuilder = new ContainerBuilder();
             runtimeBuilder.RegisterModule(new CloudModule());
+            runtimeBuilder.RegisterModule(new ManagementModule());
             runtimeBuilder.RegisterModule(externalRoleConfiguration.Convert(s =>  new CloudConfigurationModule(s), () => new CloudConfigurationModule()));
             runtimeBuilder.RegisterType<Runtime>().InstancePerDependency();
 

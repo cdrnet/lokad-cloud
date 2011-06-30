@@ -126,7 +126,7 @@ namespace Lokad.Cloud.ServiceFabric
             //    scheduled services (because they have a lease).
             if (!_scheduledPerWorker)
             {
-                Providers.RuntimeFinalizer.Register(this);
+                Storage.RuntimeFinalizer.Register(this);
             }
         }
 
@@ -139,13 +139,13 @@ namespace Lokad.Cloud.ServiceFabric
 
             if (_scheduledPerWorker)
             {
-                var blobState = RuntimeProviders.BlobStorage.GetBlob(stateReference);
+                var blobState = Storage.NeutralBlobStorage.GetBlob(stateReference);
                 if (!blobState.HasValue)
                 {
                     // even though we will never change it from here, a state blob 
                     // still needs to exist so it can be configured by the console
                     var newState = GetDefaultState();
-                    RuntimeProviders.BlobStorage.PutBlob(stateReference, newState);
+                    Storage.NeutralBlobStorage.PutBlob(stateReference, newState);
                     blobState = newState;
                 }
 
@@ -169,7 +169,7 @@ namespace Lokad.Cloud.ServiceFabric
             // it simply means that another worker is already on its ways
             // to execute the service.
 
-            var resultIfChanged = RuntimeProviders.BlobStorage.UpsertBlobOrSkip(
+            var resultIfChanged = Storage.NeutralBlobStorage.UpsertBlobOrSkip(
                 stateReference,
                 () =>
                     {
@@ -243,7 +243,7 @@ namespace Lokad.Cloud.ServiceFabric
             // a lease has been forcefully removed from the console and another service
             // has taken a lease in the meantime.
 
-            RuntimeProviders.BlobStorage.UpdateBlobIfExistOrSkip(
+            Storage.NeutralBlobStorage.UpdateBlobIfExistOrSkip(
                 new ScheduledServiceStateName(Name),
                 state =>
                     {

@@ -76,18 +76,15 @@
     <Compile Include="Legacy\BlobCounter.cs" />
     <Compile Include="Legacy\CloudConfigurationModule.cs" />
     <Compile Include="Legacy\CloudEnvironment.cs" />
-    <Compile Include="Legacy\CloudInfrastructureProviders.cs" />
     <Compile Include="Legacy\CloudModule.cs" />
     <Compile Include="Legacy\Diagnostics\CloudProvisioningLogger.cs" />
     <Compile Include="Legacy\Diagnostics\CloudStorageLogger.cs" />
     <Compile Include="Legacy\Diagnostics\DiagnosticsModule.cs" />
-    <Compile Include="Legacy\Mock\NullProvisioning.cs" />
-    <Compile Include="Legacy\Mock\MockStorageModule.cs" />
+    <Compile Include="Provisioning\NullProvisioningProvider.cs" />
+    <Compile Include="Legacy\NullStorageModule.cs" />
     <Compile Include="Provisioning\CloudProvisioning.cs" />
     <Compile Include="Provisioning\IProvisioningProvider.cs" />
     <Compile Include="Legacy\RoleConfigurationSettings.cs" />
-    <Compile Include="Legacy\Runtime\CloudStorageExtensions.cs" />
-    <Compile Include="Legacy\Runtime\RuntimeProviders.cs" />
     <Compile Include="Legacy\ServiceFabric\CloudService.cs" />
     <Compile Include="Legacy\ServiceFabric\CloudServiceSettingsAttribute.cs" />
     <Compile Include="Legacy\ServiceFabric\IInitializable.cs" />
@@ -102,7 +99,6 @@
     <Compile Include="Legacy\Services\AssemblyLoader.cs" />
     <Compile Include="Legacy\Services\DelayedQueueService.cs" />
     <Compile Include="Legacy\Services\GarbageCollectorService.cs" />
-    <Compile Include="Legacy\Standalone.cs" />
     <Compile Include="Legacy\StorageModule.cs" />
     <Compile Include="Legacy\Storage\DelayedQueue.cs" />
     <Compile Include="Legacy\TriggerRestartException.cs" />
@@ -134,6 +130,7 @@
     <Content Include="Jobs\_ReadMe.txt" />
     <Content Include="Legacy\ServiceFabric\ReadMe.txt" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

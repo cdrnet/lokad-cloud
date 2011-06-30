@@ -6,13 +6,12 @@
 using Autofac;
 using Lokad.Cloud.Services.Framework.Logging;
 using Lokad.Cloud.Services.Framework.Provisioning;
-using Lokad.Cloud.Storage;
 using Lokad.Cloud.Storage.InMemory;
 
-namespace Lokad.Cloud.Mock
+namespace Lokad.Cloud.Storage.Azure
 {
     /// <remarks></remarks>
-    public sealed class MockStorageModule : Module
+    public sealed class NullStorageModule : Module
     {
         protected override void Load(ContainerBuilder builder)
         {

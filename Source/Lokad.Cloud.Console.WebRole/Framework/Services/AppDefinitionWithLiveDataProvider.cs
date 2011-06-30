@@ -11,7 +11,6 @@ using System.Xml;
 using Lokad.Cloud.Console.WebRole.Helpers;
 using Lokad.Cloud.Console.WebRole.Models.Queues;
 using Lokad.Cloud.Console.WebRole.Models.Services;
-using Lokad.Cloud.Runtime;
 using Lokad.Cloud.Services.Management;
 using Lokad.Cloud.Services.Management.Application;
 using Lokad.Cloud.Storage;
@@ -22,19 +21,21 @@ namespace Lokad.Cloud.Console.WebRole.Framework.Services
     public class AppDefinitionWithLiveDataProvider
     {
         const string FailingMessagesStoreName = "failing-messages";
-        private readonly RuntimeProviders _runtimeProviders;
+        private readonly IBlobStorageProvider _blobs;
+        private readonly IQueueStorageProvider _queues;
 
-        public AppDefinitionWithLiveDataProvider(RuntimeProviders runtimeProviders)
+        public AppDefinitionWithLiveDataProvider(IBlobStorageProvider blobStorage, IQueueStorageProvider queueStorage)
         {
-            _runtimeProviders = runtimeProviders;
+            _blobs = blobStorage;
+            _queues = queueStorage;
         }
 
         public ServicesModel QueryServices()
         {
-            var serviceManager = new CloudServices(_runtimeProviders.BlobStorage);
+            var serviceManager = new CloudServices(_blobs);
             var services = serviceManager.GetServices();
 
-            var inspector = new CloudApplicationInspector(_runtimeProviders.BlobStorage);
+            var inspector = new CloudApplicationInspector(_blobs);
             var applicationDefinition = inspector.Inspect();
 
             if (!applicationDefinition.HasValue)
@@ -73,12 +74,11 @@ namespace Lokad.Cloud.Console.WebRole.Framework.Services
 
         public QueuesModel QueryQueues()
         {
-            var queueStorage = _runtimeProviders.QueueStorage;
-            var inspector = new CloudApplicationInspector(_runtimeProviders.BlobStorage);
+            var inspector = new CloudApplicationInspector(_blobs);
             var applicationDefinition = inspector.Inspect();
 
-            var failingMessages = queueStorage.ListPersisted(FailingMessagesStoreName)
-                .Select(key => queueStorage.GetPersisted(FailingMessagesStoreName, key))
+            var failingMessages = _queues.ListPersisted(FailingMessagesStoreName)
+                .Select(key => _queues.GetPersisted(FailingMessagesStoreName, key))
                 .Where(m => m.HasValue)
                 .Select(m => m.Value)
                 .OrderByDescending(m => m.PersistenceTime)
@@ -87,11 +87,11 @@ namespace Lokad.Cloud.Console.WebRole.Framework.Services
 
             return new QueuesModel
                 {
-                    Queues = queueStorage.List(null).Select(queueName => new AzureQueue
+                    Queues = _queues.List(null).Select(queueName => new AzureQueue
                     {
                         QueueName = queueName,
-                        MessageCount = queueStorage.GetApproximateCount(queueName),
-                        Latency = queueStorage.GetApproximateLatency(queueName).Convert(ts => ts.PrettyFormat(), string.Empty),
+                        MessageCount = _queues.GetApproximateCount(queueName),
+                        Latency = _queues.GetApproximateLatency(queueName).Convert(ts => ts.PrettyFormat(), string.Empty),
                         Services = applicationDefinition.Convert(cd => cd.QueueServices.Where(d => d.QueueName == queueName).ToArray(), new QueueServiceDefinition[0])
                     }).ToArray(),
 

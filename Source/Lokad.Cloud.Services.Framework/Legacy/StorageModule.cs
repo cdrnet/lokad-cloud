@@ -8,9 +8,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using Autofac;
-using Lokad.Cloud.Runtime;
-using Lokad.Cloud.Services.Framework.Logging;
-using Lokad.Cloud.Services.Framework.Provisioning;
 using Lokad.Cloud.Storage.Instrumentation;
 using Lokad.Cloud.Storage.Instrumentation.Events;
 using Lokad.Cloud.Storage.Shared;
@@ -32,9 +29,7 @@ namespace Lokad.Cloud.Storage.Azure
             builder.Register(QueueStorageProvider);
             builder.Register(TableStorageProvider);
 
-            builder.Register(RuntimeProviders);
             builder.Register(CloudStorageProviders);
-            builder.Register(CloudInfrastructureProviders);
 
             // Storage Observer Subject
             builder.Register(StorageObserver)
@@ -56,23 +51,6 @@ namespace Lokad.Cloud.Storage.Azure
                 return account;
             }
             throw new InvalidOperationException("Failed to get valid connection string");
-        }
-
-        static RuntimeProviders RuntimeProviders(IComponentContext c)
-        {
-            return CloudStorage
-                .ForAzureAccount(c.Resolve<CloudStorageAccount>())
-                .WithObserver(c.Resolve<ICloudStorageObserver>())
-                .WithRuntimeFinalizer(c.ResolveOptional<IRuntimeFinalizer>())
-                .BuildRuntimeProviders(c.ResolveOptional<ILogWriter>());
-        }
-
-        static CloudInfrastructureProviders CloudInfrastructureProviders(IComponentContext c)
-        {
-            return new CloudInfrastructureProviders(
-                c.Resolve<CloudStorageProviders>(),
-                c.ResolveOptional<IProvisioningProvider>(),
-                c.ResolveOptional<ILogWriter>());
         }
 
         static CloudStorageProviders CloudStorageProviders(IComponentContext c)

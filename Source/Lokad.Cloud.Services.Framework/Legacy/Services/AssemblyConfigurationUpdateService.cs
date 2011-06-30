@@ -25,7 +25,7 @@ namespace Lokad.Cloud.Services
         {
             base.Initialize();
 
-            _assemblyLoader = new AssemblyLoader(BlobStorage);
+            _assemblyLoader = new AssemblyLoader(Blobs);
             _assemblyLoader.ResetUpdateStatus();
         }
 

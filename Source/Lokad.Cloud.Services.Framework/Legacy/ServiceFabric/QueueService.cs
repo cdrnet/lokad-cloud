@@ -64,7 +64,7 @@ namespace Lokad.Cloud.ServiceFabric
         protected sealed override ServiceExecutionFeedback StartImpl()
         {
             // 1 message at most
-            var messages = QueueStorage.Get<T>(_queueName, 1, _visibilityTimeout, _maxProcessingTrials);
+            var messages = Queues.Get<T>(_queueName, 1, _visibilityTimeout, _maxProcessingTrials);
 
             if (messages.Any())
             {
@@ -91,7 +91,7 @@ namespace Lokad.Cloud.ServiceFabric
         /// </summary>
         public void Delete(T message)
         {
-            QueueStorage.Delete(message);
+            Queues.Delete(message);
         }
 
         /// <summary>
@@ -100,7 +100,7 @@ namespace Lokad.Cloud.ServiceFabric
         /// </summary>
         public void Abandon(T message)
         {
-            QueueStorage.Abandon(message);
+            Queues.Abandon(message);
         }
     }
 }

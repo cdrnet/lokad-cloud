@@ -17,9 +17,9 @@ namespace Lokad.Cloud.Test.Services
         [Test]
         public void SquareServiceTest()
         {
-            var providersForCloudStorage = Standalone.CreateMockProviders();
+            var providersForCloudStorage = CloudStorage.ForInMemoryStorage().BuildStorageProviders();
             
-            var service = new SquareQueueService { Providers = providersForCloudStorage };
+            var service = new SquareQueueService { Storage = providersForCloudStorage };
             var blobStorage = providersForCloudStorage.BlobStorage;
 
             const string containerName = "mockcontainer";
@@ -76,7 +76,7 @@ namespace Lokad.Cloud.Test.Services
 
             protected override void Start(SquareMessage message)
             {
-                var blobStorage = Providers.BlobStorage;
+                var blobStorage = Storage.BlobStorage;
 
                 if (message.IsStart)
                 {
@@ -109,7 +109,7 @@ namespace Lokad.Cloud.Test.Services
                     var value = blobStorage.GetBlob<double>(message.ContainerName, message.BlobName).Value;
                     blobStorage.PutBlob(message.ContainerName, message.BlobName, value * value);
 
-                    var counter = new BlobCounter(Providers.BlobStorage, message.BlobCounter);
+                    var counter = new BlobCounter(Storage.BlobStorage, message.BlobCounter);
                     if (0m >= counter.Increment(-1))
                     {
                         Finish(counter);
