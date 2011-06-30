@@ -4,10 +4,9 @@
 #endregion
 
 using System;
+using Lokad.Cloud.Services.Framework.Instrumentation.Events;
 
-using Lokad.Cloud.Runtime.Instrumentation.Events;
-
-namespace Lokad.Cloud.Runtime.Instrumentation
+namespace Lokad.Cloud.Services.Framework.Instrumentation
 {
     /// <summary>
     /// Cloud runtime observer that implements a hot Rx Observable, forwarding all events synchronously

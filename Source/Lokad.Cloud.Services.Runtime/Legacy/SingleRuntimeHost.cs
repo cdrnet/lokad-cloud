@@ -10,6 +10,7 @@ using System.Security;
 using System.Threading;
 using Autofac;
 using Lokad.Cloud.Runtime;
+using Lokad.Cloud.Services.Framework;
 using Lokad.Cloud.Services.Framework.Logging;
 using Lokad.Cloud.Services.Management;
 using Lokad.Cloud.Storage;

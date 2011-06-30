@@ -6,9 +6,9 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
-using Lokad.Cloud.Runtime.Instrumentation;
-using Lokad.Cloud.Runtime.Instrumentation.Events;
 using Lokad.Cloud.ServiceFabric;
+using Lokad.Cloud.Services.Framework.Instrumentation;
+using Lokad.Cloud.Services.Framework.Instrumentation.Events;
 
 namespace Lokad.Cloud.Services.Runtime
 {

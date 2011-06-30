@@ -5,6 +5,7 @@
 
 using Autofac;
 using Autofac.Configuration;
+using Lokad.Cloud.Services.Framework;
 
 namespace Lokad.Cloud.Test
 {

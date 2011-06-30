@@ -4,12 +4,9 @@
 #endregion
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using Autofac;
 using Lokad.Cloud.Storage.Instrumentation;
-using Lokad.Cloud.Storage.Instrumentation.Events;
 using Lokad.Cloud.Storage.Shared;
 using Microsoft.WindowsAzure;
 
@@ -30,11 +27,6 @@ namespace Lokad.Cloud.Storage.Azure
             builder.Register(TableStorageProvider);
 
             builder.Register(CloudStorageProviders);
-
-            // Storage Observer Subject
-            builder.Register(StorageObserver)
-                .As<ICloudStorageObserver, IObservable<ICloudStorageEvent>>()
-                .SingleInstance();
         }
 
         private static CloudStorageAccount StorageAccountFromSettings(IComponentContext c)
@@ -91,12 +83,6 @@ namespace Lokad.Cloud.Storage.Azure
                 .WithObserver(c.Resolve<ICloudStorageObserver>())
                 .WithRuntimeFinalizer(c.ResolveOptional<IRuntimeFinalizer>())
                 .BuildBlobStorage();
-        }
-
-        static CloudStorageInstrumentationSubject StorageObserver(IComponentContext c)
-        {
-            // will include any registered storage event observers, if there are any, as fixed subscriptions
-            return new CloudStorageInstrumentationSubject(c.Resolve<IEnumerable<IObserver<ICloudStorageEvent>>>().ToArray());
         }
     }
 }

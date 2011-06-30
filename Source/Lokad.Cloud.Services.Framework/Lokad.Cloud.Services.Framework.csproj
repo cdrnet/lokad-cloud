@@ -76,10 +76,11 @@
     <Compile Include="Legacy\BlobCounter.cs" />
     <Compile Include="Legacy\CloudConfigurationModule.cs" />
     <Compile Include="Legacy\CloudEnvironment.cs" />
-    <Compile Include="Legacy\CloudModule.cs" />
-    <Compile Include="Legacy\Diagnostics\CloudProvisioningLogger.cs" />
-    <Compile Include="Legacy\Diagnostics\CloudStorageLogger.cs" />
-    <Compile Include="Legacy\Diagnostics\DiagnosticsModule.cs" />
+    <Compile Include="CloudModule.cs" />
+    <Compile Include="Instrumentation\CloudProvisioningLogger.cs" />
+    <Compile Include="Instrumentation\CloudStorageLogger.cs" />
+    <Compile Include="Instrumentation\InstrumentationModule.cs" />
+    <Compile Include="Logging\LoggingModule.cs" />
     <Compile Include="Provisioning\NullProvisioningProvider.cs" />
     <Compile Include="Legacy\NullStorageModule.cs" />
     <Compile Include="Provisioning\CloudProvisioning.cs" />
@@ -130,7 +131,9 @@
     <Content Include="Jobs\_ReadMe.txt" />
     <Content Include="Legacy\ServiceFabric\ReadMe.txt" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Legacy\Diagnostics\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

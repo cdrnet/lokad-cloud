@@ -5,9 +5,12 @@
 
 using Autofac;
 using Lokad.Cloud.ServiceFabric;
+using Lokad.Cloud.Services.Framework.Instrumentation;
 using Lokad.Cloud.Services.Framework.Jobs;
+using Lokad.Cloud.Services.Framework.Logging;
+using Lokad.Cloud.Storage.Azure;
 
-namespace Lokad.Cloud
+namespace Lokad.Cloud.Services.Framework
 {
     /// <summary>
     /// IoC module that registers all usually required components, including
@@ -25,8 +28,9 @@ namespace Lokad.Cloud
     {
         protected override void Load(ContainerBuilder builder)
         {
-            builder.RegisterModule(new Storage.Azure.StorageModule());
-            builder.RegisterModule(new Diagnostics.DiagnosticsModule());
+            builder.RegisterModule(new StorageModule());
+            builder.RegisterModule(new InstrumentationModule());
+            builder.RegisterModule(new LoggingModule());
             //builder.RegisterModule(new Management.ManagementModule());
 
             builder.RegisterType<JobManager>();

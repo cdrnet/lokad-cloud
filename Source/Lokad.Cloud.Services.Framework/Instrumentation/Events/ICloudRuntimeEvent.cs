@@ -3,7 +3,7 @@
 // URL: http://www.lokad.com/
 #endregion
 
-namespace Lokad.Cloud.Runtime.Instrumentation.Events
+namespace Lokad.Cloud.Services.Framework.Instrumentation.Events
 {
     public interface ICloudRuntimeEvent
     {

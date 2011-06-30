@@ -5,7 +5,7 @@
 
 using System;
 
-namespace Lokad.Cloud.Runtime.Instrumentation.Events
+namespace Lokad.Cloud.Services.Framework.Instrumentation.Events
 {
     /// <summary>
     /// Raised whenever the runtime scheduler becomes busy.
