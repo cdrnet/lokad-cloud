@@ -73,6 +73,7 @@
     <Compile Include="Instrumentation\ICloudRuntimeObserver.cs" />
     <Compile Include="Jobs\Job.cs" />
     <Compile Include="Jobs\JobManager.cs" />
+    <Compile Include="Legacy\Threading\WaitFor.cs" />
     <Compile Include="Storage\BlobCounter.cs" />
     <Compile Include="Legacy\CloudConfigurationModule.cs" />
     <Compile Include="Legacy\CloudEnvironment.cs" />

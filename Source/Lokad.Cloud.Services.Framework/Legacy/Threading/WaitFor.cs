@@ -6,7 +6,7 @@
 using System;
 using System.Threading;
 
-namespace Lokad.Cloud.Storage.Shared.Threading
+namespace Lokad.Cloud.Services.Framework.Legacy.Threading
 {
     // HACK: imported back from Lokad.Shared
 

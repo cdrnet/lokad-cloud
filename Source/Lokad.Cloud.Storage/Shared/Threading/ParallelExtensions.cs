@@ -12,19 +12,8 @@ namespace Lokad.Cloud.Storage.Shared.Threading
     ///<summary>
     /// Quick alternatives to PLinq with minimal overhead and simple implementations.
     ///</summary>
-    public static class ParallelExtensions
+    internal static class ParallelExtensions
     {
-        static int ThreadCount = Environment.ProcessorCount;
-
-        /// <summary>Executes the specified function in parallel over an array.</summary>
-        /// <param name="input">Input array to processed in parallel.</param>
-        /// <param name="func">The action to perform. Parameters and all the members should be immutable.</param>
-        /// <remarks>Threads are recycled. Synchronization overhead is minimal.</remarks>
-        public static TResult[] SelectInParallel<TItem, TResult>(this TItem[] input, Func<TItem, TResult> func)
-        {
-            return SelectInParallel(input, func, ThreadCount);
-        }
-
         /// <summary>
         /// Executes the specified function in parallel over an array, using the provided number of threads.
         /// </summary>

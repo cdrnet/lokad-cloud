@@ -7,10 +7,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Lokad.Cloud.Services.Framework.Jobs;
+using Lokad.Cloud.Services.Framework.Legacy.Threading;
 using Lokad.Cloud.Services.Framework.Logging;
 using Lokad.Cloud.Services.Framework.Storage;
 using Lokad.Cloud.Storage;
-using Lokad.Cloud.Storage.Shared.Threading;
 
 namespace Lokad.Cloud.ServiceFabric
 {
