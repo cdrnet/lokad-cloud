@@ -7,13 +7,13 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 
-namespace Lokad.Cloud.Services.Runtime.Settings
+namespace Lokad.Cloud.Services.Management.Settings
 {
     /// <summary>
     /// Runtime-relevant settings for all cloud services
     /// </summary>
     [DataContract(Namespace = "http://schemas.lokad.com/lokad-cloud/services/settings/1.0"), Serializable]
-    internal class CloudServicesSettings : IExtensibleDataObject
+    public class CloudServicesSettings : IExtensibleDataObject
     {
         [DataMember]
         public List<QueuedCloudServiceSettings> QueuedCloudServices { get; set; }

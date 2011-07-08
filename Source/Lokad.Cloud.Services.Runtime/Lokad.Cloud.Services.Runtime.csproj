@@ -69,12 +69,6 @@
     <Compile Include="WorkingSet\CellProcess.cs" />
     <Compile Include="WorkingSet\CellWorkingSet.cs" />
     <Compile Include="WorkingSet\RuntimeWorkingSet.cs" />
-    <Compile Include="Settings\CloudServicesSettings.cs" />
-    <Compile Include="Settings\CommonServiceSettings.cs" />
-    <Compile Include="Settings\DaemonServiceSettings.cs" />
-    <Compile Include="Settings\QueuedCloudServiceSettings.cs" />
-    <Compile Include="Settings\ScheduledCloudServiceSettings.cs" />
-    <Compile Include="Settings\ScheduledWorkerServiceSettings.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Lokad.Cloud.Services.Framework\Lokad.Cloud.Services.Framework.csproj">

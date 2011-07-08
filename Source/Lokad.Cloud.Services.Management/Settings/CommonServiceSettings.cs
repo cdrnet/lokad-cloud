@@ -1,15 +1,20 @@
-﻿using System;
+﻿#region Copyright (c) Lokad 2009-2011
+// This code is released under the terms of the new BSD licence.
+// URL: http://www.lokad.com/
+#endregion
+
+using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 
-namespace Lokad.Cloud.Services.Runtime.Settings
+namespace Lokad.Cloud.Services.Management.Settings
 {
     /// <summary>
     /// Common settings shared by all cloud services.
     /// </summary>
     [DataContract(Namespace = "http://schemas.lokad.com/lokad-cloud/services/settings/1.0"), Serializable]
     [KnownType(typeof(QueuedCloudServiceSettings)), KnownType(typeof(ScheduledCloudServiceSettings)), KnownType(typeof(ScheduledWorkerServiceSettings)), KnownType(typeof(DaemonServiceSettings))]
-    internal abstract class CommonServiceSettings
+    public abstract class CommonServiceSettings
     {
         /// <summary>
         /// Full type name of the service, used for IoC activation.

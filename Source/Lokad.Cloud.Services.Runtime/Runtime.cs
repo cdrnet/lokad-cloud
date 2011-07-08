@@ -10,8 +10,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Lokad.Cloud.Services.Framework.Instrumentation;
 using Lokad.Cloud.Services.Management.Application;
+using Lokad.Cloud.Services.Management.Settings;
 using Lokad.Cloud.Services.Runtime.Legacy;
-using Lokad.Cloud.Services.Runtime.Settings;
 using Lokad.Cloud.Services.Runtime.WorkingSet;
 using Lokad.Cloud.Storage;
 
