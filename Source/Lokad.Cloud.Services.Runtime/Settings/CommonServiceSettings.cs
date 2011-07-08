@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Runtime.Serialization;
 
 namespace Lokad.Cloud.Services.Runtime.Settings
@@ -6,7 +7,7 @@ namespace Lokad.Cloud.Services.Runtime.Settings
     /// <summary>
     /// Common settings shared by all cloud services.
     /// </summary>
-    [DataContract(Namespace = "http://schemas.lokad.com/lokad-cloud/services/settings/1.0")]
+    [DataContract(Namespace = "http://schemas.lokad.com/lokad-cloud/services/settings/1.0"), Serializable]
     [KnownType(typeof(QueuedCloudServiceSettings)), KnownType(typeof(ScheduledCloudServiceSettings)), KnownType(typeof(ScheduledWorkerServiceSettings)), KnownType(typeof(DaemonServiceSettings))]
     internal abstract class CommonServiceSettings
     {
@@ -21,13 +22,6 @@ namespace Lokad.Cloud.Services.Runtime.Settings
         /// </summary>
         [DataMember]
         public bool IsDisabled { get; set; }
-
-        /// <summary>
-        /// True if this service is configured but was not found in the assembly package.
-        /// The settings may be obsolete and can probably be removed.
-        /// </summary>
-        [DataMember]
-        public bool IsUnavailable { get; set; }
 
         /// <summary>
         /// List of runtime cells this service should execute on.

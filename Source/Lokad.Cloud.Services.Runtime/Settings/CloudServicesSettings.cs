@@ -3,6 +3,7 @@
 // URL: http://www.lokad.com/
 #endregion
 
+using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 
@@ -11,7 +12,7 @@ namespace Lokad.Cloud.Services.Runtime.Settings
     /// <summary>
     /// Runtime-relevant settings for all cloud services
     /// </summary>
-    [DataContract(Namespace = "http://schemas.lokad.com/lokad-cloud/services/settings/1.0")]
+    [DataContract(Namespace = "http://schemas.lokad.com/lokad-cloud/services/settings/1.0"), Serializable]
     internal class CloudServicesSettings : IExtensibleDataObject
     {
         [DataMember]
@@ -26,6 +27,12 @@ namespace Lokad.Cloud.Services.Runtime.Settings
         [DataMember]
         public List<DaemonServiceSettings> DaemonServices { get; set; }
 
-        public ExtensionDataObject ExtensionData { get; set; }
+        [NonSerialized]
+        private ExtensionDataObject _extensionData;
+        ExtensionDataObject IExtensibleDataObject.ExtensionData
+        {
+            get { return _extensionData; }
+            set { _extensionData = value; }
+        }
     }
 }

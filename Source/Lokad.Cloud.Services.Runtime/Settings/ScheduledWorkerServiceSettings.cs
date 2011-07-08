@@ -3,7 +3,7 @@ using System.Runtime.Serialization;
 
 namespace Lokad.Cloud.Services.Runtime.Settings
 {
-    [DataContract(Namespace = "http://schemas.lokad.com/lokad-cloud/services/settings/1.0")]
+    [DataContract(Namespace = "http://schemas.lokad.com/lokad-cloud/services/settings/1.0"), Serializable]
     internal class ScheduledWorkerServiceSettings : CommonServiceSettings, IExtensibleDataObject
     {
         [DataMember]
@@ -12,6 +12,12 @@ namespace Lokad.Cloud.Services.Runtime.Settings
         [DataMember]
         public TimeSpan TriggerInterval { get; set; }
 
-        public ExtensionDataObject ExtensionData { get; set; }
+        [NonSerialized]
+        private ExtensionDataObject _extensionData;
+        ExtensionDataObject IExtensibleDataObject.ExtensionData
+        {
+            get { return _extensionData; }
+            set { _extensionData = value; }
+        }
     }
 }
