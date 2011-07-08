@@ -8,7 +8,7 @@
     <ProjectGuid>{78EC3B0C-6C2B-4919-A986-658A40A34825}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Lokad.Cloud</RootNamespace>
+    <RootNamespace>Lokad.Cloud.Worker</RootNamespace>
     <AssemblyName>Lokad.Cloud_WorkerRole</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -82,6 +82,10 @@
     <ProjectReference Include="..\Lokad.Cloud.Provisioning\Lokad.Cloud.Provisioning.csproj">
       <Project>{B3CA9DCB-04DB-4442-AC0C-6E1F70854DA1}</Project>
       <Name>Lokad.Cloud.Provisioning</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Lokad.Cloud.Services.Framework\Lokad.Cloud.Services.Framework.csproj">
+      <Project>{BA1AC04C-5DE2-4E40-8FC9-8EBF31C1B0F3}</Project>
+      <Name>Lokad.Cloud.Services.Framework</Name>
     </ProjectReference>
     <ProjectReference Include="..\Lokad.Cloud.Services.Runtime\Lokad.Cloud.Services.Runtime.csproj">
       <Project>{07B4D344-AAFD-43B1-B329-18B6242A6C54}</Project>

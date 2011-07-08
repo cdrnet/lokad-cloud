@@ -6,7 +6,7 @@
 using Lokad.Cloud.Services.Management.Application;
 using Lokad.Cloud.Storage;
 
-namespace Lokad.Cloud.Services.Runtime
+namespace Lokad.Cloud.Services.Runtime.Legacy
 {
     /// <remarks>
     /// Since the assemblies are loaded in the current <c>AppDomain</c>, this class

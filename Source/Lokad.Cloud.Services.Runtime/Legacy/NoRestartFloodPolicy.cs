@@ -6,7 +6,7 @@
 using System;
 using System.Threading;
 
-namespace Lokad.Cloud.Services.Runtime
+namespace Lokad.Cloud.Services.Runtime.Legacy
 {
     /// <summary>
     /// Helper class to deal with pathological situations where a worker crashes at

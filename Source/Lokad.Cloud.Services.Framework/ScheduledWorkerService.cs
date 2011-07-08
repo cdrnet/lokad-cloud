@@ -3,6 +3,8 @@
 // URL: http://www.lokad.com/
 #endregion
 
+using System;
+using System.Threading;
 using Lokad.Cloud.Storage;
 
 namespace Lokad.Cloud.Services.Framework
@@ -11,7 +13,7 @@ namespace Lokad.Cloud.Services.Framework
     {
         // Actions to be implemented by implementors
         public virtual void Initialize() { }
-        public abstract void OnSchedule();
+        public abstract void OnSchedule(DateTimeOffset scheduledTime, CancellationToken cancellationToken);
 
         // Injected by Runtime
         public IBlobStorageProvider Blobs { get; set; }

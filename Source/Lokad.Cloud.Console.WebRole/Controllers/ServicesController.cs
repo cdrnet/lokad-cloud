@@ -24,7 +24,7 @@ namespace Lokad.Cloud.Console.WebRole.Controllers
         public override ActionResult ByHostedService(string hostedServiceName)
         {
             InitializeDeploymentTenant(hostedServiceName);
-            var provider = new AppDefinitionWithLiveDataProvider(Blobs, Queues);
+            var provider = new AppDefinitionWithLiveDataProvider(Storage);
             return View(provider.QueryServices());
         }
 

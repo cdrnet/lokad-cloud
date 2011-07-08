@@ -15,7 +15,7 @@ using Lokad.Cloud.Services.Framework.Logging;
 using Lokad.Cloud.Services.Management;
 using Lokad.Cloud.Storage;
 
-namespace Lokad.Cloud.Services.Runtime
+namespace Lokad.Cloud.Services.Runtime.Legacy
 {
     /// <summary>
     /// AppDomain-isolated host for a single runtime instance.
@@ -82,7 +82,7 @@ namespace Lokad.Cloud.Services.Runtime
     internal class SingleRuntimeHost : MarshalByRefObject, IDisposable
     {
         /// <summary>Current hosted runtime instance.</summary>
-        volatile Services.Runtime.Runtime _runtime;
+        volatile Runtime _runtime;
 
         /// <summary>
         /// Manual-reset wait handle, signaled once the host stopped running.
@@ -119,7 +119,7 @@ namespace Lokad.Cloud.Services.Runtime
                 _runtime = null;
                 try
                 {
-                    _runtime = runtimeContainer.Resolve<Services.Runtime.Runtime>();
+                    _runtime = runtimeContainer.Resolve<Runtime>();
                     _runtime.RuntimeContainer = runtimeContainer;
 
                     // runtime endlessly keeps pinging queues for pending work

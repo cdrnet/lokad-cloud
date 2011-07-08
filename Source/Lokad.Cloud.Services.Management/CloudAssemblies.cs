@@ -16,19 +16,19 @@ namespace Lokad.Cloud.Services.Management
         const string AssembliesContainerName = "lokad-cloud-assemblies";
         const string PackageBlobName = "default";
 
-        readonly IBlobStorageProvider _blobs;
+        readonly CloudStorageProviders _storage;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CloudAssemblies"/> class.
         /// </summary>
-        public CloudAssemblies(IBlobStorageProvider blobStorageProvider)
+        public CloudAssemblies(CloudStorageProviders storage)
         {
-            _blobs = blobStorageProvider;
+            _storage = storage;
         }
 
         public Maybe<CloudApplicationDefinition> GetApplicationDefinition()
         {
-            var inspector = new CloudApplicationInspector(_blobs);
+            var inspector = new CloudApplicationInspector(_storage);
             return inspector.Inspect();
         }
 
@@ -55,7 +55,7 @@ namespace Lokad.Cloud.Services.Management
         /// </summary>
         public void UploadApplicationZipContainer(byte[] data)
         {
-            _blobs.PutBlob(
+            _storage.NeutralBlobStorage.PutBlob(
                 AssembliesContainerName,
                 PackageBlobName,
                 data,

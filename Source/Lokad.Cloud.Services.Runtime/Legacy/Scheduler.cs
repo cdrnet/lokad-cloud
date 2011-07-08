@@ -10,7 +10,7 @@ using Lokad.Cloud.ServiceFabric;
 using Lokad.Cloud.Services.Framework.Instrumentation;
 using Lokad.Cloud.Services.Framework.Instrumentation.Events;
 
-namespace Lokad.Cloud.Services.Runtime
+namespace Lokad.Cloud.Services.Runtime.Legacy
 {
     /// <summary>
     /// Round robin scheduler with adaptive modifications: tasks that claim to have

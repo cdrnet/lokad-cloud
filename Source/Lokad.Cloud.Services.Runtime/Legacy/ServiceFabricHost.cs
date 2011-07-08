@@ -4,10 +4,9 @@
 #endregion
 
 using System.Linq;
-
 using Microsoft.WindowsAzure.ServiceRuntime;
 
-namespace Lokad.Cloud.Services.Runtime
+namespace Lokad.Cloud.Services.Runtime.Legacy
 {
     /// <summary>
     /// Entry point, hosting the service fabric with one or more

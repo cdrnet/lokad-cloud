@@ -18,7 +18,7 @@ using Lokad.Cloud.Services.Framework.Logging;
 using Lokad.Cloud.Services.Management;
 using Lokad.Cloud.Storage;
 
-namespace Lokad.Cloud.Services.Runtime
+namespace Lokad.Cloud.Services.Runtime.Legacy
 {
     /// <summary>Organize the executions of the services.</summary>
     internal class Runtime
