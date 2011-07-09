@@ -15,7 +15,7 @@ namespace Lokad.Cloud.Storage
     public class RawFormatter : IDataSerializer
     {
         /// <remarks>Supports byte[] only</remarks>
-        public void Serialize(object instance, Stream destination)
+        public void Serialize(object instance, Stream destination, Type type)
         {
             var data = instance as byte[];
             if (data == null)

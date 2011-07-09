@@ -110,7 +110,7 @@
     <Compile Include="Shared\Monads\Result.1.cs" />
     <Compile Include="Shared\Monads\Result.2.cs" />
     <Compile Include="Shared\Monads\Result.cs" />
-    <Compile Include="Shared\IDataSerializer.cs" />
+    <Compile Include="IDataSerializer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Shared\Threading\ParallelExtensions.cs" />
     <Compile Include="Tables\CloudEntity.cs" />
