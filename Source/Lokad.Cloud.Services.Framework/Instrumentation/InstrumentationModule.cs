@@ -25,10 +25,6 @@ namespace Lokad.Cloud.Services.Framework.Instrumentation
             builder.Register(StorageObserver)
                 .As<ICloudStorageObserver, IObservable<ICloudStorageEvent>>()
                 .SingleInstance();
-
-            // TODO (ruegg, 2011-05-30): Observer that logs system events to the log: temporary! to keep old logging behavior for now
-            builder.RegisterType<CloudStorageLogger>().As<IStartable>().SingleInstance();
-            builder.RegisterType<CloudProvisioningLogger>().As<IStartable>().SingleInstance();
         }
 
         static CloudRuntimeInstrumentationSubject RuntimeObserver(IComponentContext c)

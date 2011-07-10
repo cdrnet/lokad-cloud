@@ -17,7 +17,6 @@ namespace Lokad.Cloud
     /// to let the <see cref="Standalone"/> factory create the storage providers on demand.
     /// </remarks>
     /// <seealso cref="CloudModule"/>
-    /// <seealso cref="Standalone"/>
     public sealed class CloudConfigurationModule : Module
     {
         /// <summary>Azure storage connection string.</summary>

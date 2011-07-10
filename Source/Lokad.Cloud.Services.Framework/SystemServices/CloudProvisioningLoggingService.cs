@@ -7,52 +7,69 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
+using Lokad.Cloud.Provisioning.Instrumentation.Events;
 using Lokad.Cloud.Services.Framework.Logging;
-using Lokad.Cloud.Storage.Instrumentation.Events;
 
-namespace Lokad.Cloud.Services.Framework.Instrumentation
+namespace Lokad.Cloud.Services.Framework.SystemServices
 {
-    // TODO (ruegg, 2011-05-30): Temporary class to maintain logging via system events for now -> rework
-
-    internal class CloudStorageLogger : Autofac.IStartable, IDisposable
+    public class CloudProvisioningLoggingService : DaemonService
     {
-        private readonly IObservable<ICloudStorageEvent> _observable;
+        private readonly IObservable<ICloudProvisioningEvent> _observable;
         private readonly ILogWriter _log;
         private readonly List<IDisposable> _subscriptions;
 
-        public CloudStorageLogger(IObservable<ICloudStorageEvent> observable, ILogWriter log)
+        public CloudProvisioningLoggingService(IObservable<ICloudProvisioningEvent> observable, ILogWriter log)
         {
             _observable = observable;
             _log = log;
             _subscriptions = new List<IDisposable>();
         }
 
-        void Autofac.IStartable.Start()
+        public sealed override void OnStart()
         {
             if (_log == null || _observable == null)
             {
                 return;
             }
 
-            _subscriptions.Add(_observable.OfType<BlobDeserializationFailedEvent>().Subscribe(e => TryLog(e, e.Exception)));
-            _subscriptions.Add(_observable.OfType<MessageDeserializationFailedQuarantinedEvent>().Subscribe(e => TryLog(e, e.Exceptions)));
-            _subscriptions.Add(_observable.OfType<MessageProcessingFailedQuarantinedEvent>().Subscribe(e => TryLog(e)));
+            // Dispose old subscriptions, in case of bad protocol
+            foreach(var subscription in _subscriptions)
+            {
+                subscription.Dispose();
+            }
+            _subscriptions.Clear();
 
-            _subscriptions.Add(_observable.OfType<StorageOperationRetriedEvent>()
-                .Buffer(TimeSpan.FromHours(1))
+            // Subscribe
+            _subscriptions.AddRange(Subscribe(_observable));
+        }
+
+        public sealed override void OnStop()
+        {
+            foreach (var subscription in _subscriptions)
+            {
+                subscription.Dispose();
+            }
+            _subscriptions.Clear();
+        }
+
+        protected virtual IEnumerable<IDisposable> Subscribe(IObservable<ICloudProvisioningEvent> observable)
+        {
+            yield return observable
+                .OfType<ProvisioningOperationRetriedEvent>()
+                .Buffer(TimeSpan.FromMinutes(5))
                 .Subscribe(events =>
                     {
                         foreach (var group in events.GroupBy(e => e.Policy))
                         {
-                            TryLog(string.Format("Storage: {0} retries per hour for the {1} policy on {2}. {3}",
+                            TryLog(string.Format("Provisioning: {0} retries in 5 min for the {1} policy on {2}. {3}",
                                 group.Count(), group.Key, CloudEnvironment.PartitionKey,
                                 string.Join(", ", group.Where(e => e.Exception != null).Select(e => e.Exception.GetType().Name).Distinct().ToArray())),
                                 level: LogLevel.Debug);
                         }
-                    }));
+                    });
         }
 
-        void TryLog(object message, Exception exception = null, LogLevel level = LogLevel.Warn)
+        protected void TryLog(object message, Exception exception = null, LogLevel level = LogLevel.Info)
         {
             try
             {
@@ -69,16 +86,6 @@ namespace Lokad.Cloud.Services.Framework.Instrumentation
             {
                 // If logging fails, ignore (we can't report)
             }
-        }
-
-        public void Dispose()
-        {
-            foreach (var subscription in _subscriptions)
-            {
-                subscription.Dispose();
-            }
-
-            _subscriptions.Clear();
         }
     }
 }

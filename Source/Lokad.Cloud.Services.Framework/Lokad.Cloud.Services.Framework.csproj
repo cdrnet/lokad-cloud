@@ -78,8 +78,6 @@
     <Compile Include="Legacy\CloudConfigurationModule.cs" />
     <Compile Include="Legacy\CloudEnvironment.cs" />
     <Compile Include="CloudModule.cs" />
-    <Compile Include="Instrumentation\CloudProvisioningLogger.cs" />
-    <Compile Include="Instrumentation\CloudStorageLogger.cs" />
     <Compile Include="Instrumentation\InstrumentationModule.cs" />
     <Compile Include="Logging\LoggingModule.cs" />
     <Compile Include="Provisioning\NullProvisioningProvider.cs" />
@@ -113,6 +111,8 @@
     <Compile Include="ScheduledWorkerService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="QueuedCloudService.cs" />
+    <Compile Include="SystemServices\CloudProvisioningLoggingService.cs" />
+    <Compile Include="SystemServices\CloudStorageLoggingService.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Lokad.Cloud.Provisioning\Lokad.Cloud.Provisioning.csproj">
