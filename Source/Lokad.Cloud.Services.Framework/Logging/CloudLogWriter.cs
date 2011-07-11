@@ -11,9 +11,9 @@ namespace Lokad.Cloud.Services.Framework.Logging
 
         private readonly IBlobStorageProvider _blobStorage;
 
-        public CloudLogWriter(IBlobStorageProvider blobStorage)
+        public CloudLogWriter(CloudStorageProviders storage)
         {
-            _blobStorage = blobStorage;
+            _blobStorage = storage.NeutralBlobStorage;
         }
 
         public void Log(LogLevel level, object message)

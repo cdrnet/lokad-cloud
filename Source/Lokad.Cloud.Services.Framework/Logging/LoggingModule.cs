@@ -19,21 +19,9 @@ namespace Lokad.Cloud.Services.Framework.Logging
 
         static CloudLogWriter CloudLogWriter(IComponentContext c)
         {
-            return new CloudLogWriter(BlobStorageForDiagnostics(c));
-        }
-
-        static IBlobStorageProvider BlobStorageForDiagnostics(IComponentContext c)
-        {
-            // Neither log nor observers are provided since the providers
-            // used for logging obviously can't log themselves (cyclic dependency)
-
-            // We also always use the CloudFormatter, so this is equivalent
-            // to the RuntimeProvider, for the same reasons.
-
-            return CloudStorage
+            return new CloudLogWriter(CloudStorage
                 .ForAzureAccount(c.Resolve<CloudStorageAccount>())
-                .WithDataSerializer(new CloudFormatter())
-                .BuildBlobStorage();
+                .BuildStorageProviders());
         }
     }
 }

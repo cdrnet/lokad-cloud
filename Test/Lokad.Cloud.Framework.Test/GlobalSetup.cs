@@ -6,6 +6,7 @@
 using Autofac;
 using Autofac.Configuration;
 using Lokad.Cloud.Services.Framework;
+using Lokad.Cloud.Services.Management;
 
 namespace Lokad.Cloud.Test
 {
@@ -17,6 +18,7 @@ namespace Lokad.Cloud.Test
         {
             var builder = new ContainerBuilder();
             builder.RegisterModule(new CloudModule());
+            builder.RegisterModule(new ManagementModule());
             builder.RegisterModule(new ConfigurationSettingsReader("autofac"));
 
             return builder.Build();

@@ -21,9 +21,9 @@ namespace Lokad.Cloud.Services.Management.Logging
 
         private readonly IBlobStorageProvider _blobStorage;
 
-        public CloudLogReader(IBlobStorageProvider blobStorage)
+        public CloudLogReader(CloudStorageProviders storage)
         {
-            _blobStorage = blobStorage;
+            _blobStorage = storage.NeutralBlobStorage;
         }
 
         /// <summary>
