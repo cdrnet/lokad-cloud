@@ -47,10 +47,10 @@ namespace Lokad.Cloud.Services.Runtime.Runner
                 service.Initialize();
             }
 
-            var queuedCloudServiceRunner = new QueuedCloudServiceRunner(Match(services.OfType<UntypedQueuedCloudService>(), settings.QueuedCloudServices));
-            var scheduledWorkerServiceRunner = new ScheduledWorkerServiceRunner(Match(services.OfType<ScheduledWorkerService>(), settings.ScheduledWorkerServices));
-            var scheduledCloudServiceRunner = new ScheduledCloudServiceRunner(Match(services.OfType<ScheduledCloudService>(), settings.ScheduledCloudServices));
-            var daemonServices = new List<DaemonService>(services.OfType<DaemonService>());
+            var queuedCloudServiceRunner = new QueuedCloudServiceRunner(MatchActive(services.OfType<UntypedQueuedCloudService>(), settings.QueuedCloudServices, settings.CellName));
+            var scheduledWorkerServiceRunner = new ScheduledWorkerServiceRunner(MatchActive(services.OfType<ScheduledWorkerService>(), settings.ScheduledWorkerServices, settings.CellName));
+            var scheduledCloudServiceRunner = new ScheduledCloudServiceRunner(MatchActive(services.OfType<ScheduledCloudService>(), settings.ScheduledCloudServices, settings.CellName));
+            var daemonServices = new List<ServiceWithSettings<DaemonService, DaemonServiceSettings>>(MatchActive(services.OfType<DaemonService>(), settings.DaemonServices, settings.CellName));
 
             // 2. LOCAL CANCELLATION SUPPORT
 
@@ -63,15 +63,15 @@ namespace Lokad.Cloud.Services.Runtime.Runner
             {
                 foreach (var service in daemonServices)
                 {
-                    service.Initialize();
-                    service.OnStart();
+                    service.Service.Initialize();
+                    service.Service.OnStart();
                 }
 
                 localCancellationToken.Register(() =>
                     {
                         foreach (var service in daemonServices)
                         {
-                            service.OnStop();
+                            service.Service.OnStop();
                         }
                     });
             }
@@ -100,16 +100,22 @@ namespace Lokad.Cloud.Services.Runtime.Runner
             }
         }
 
-        private static IEnumerable<ServiceWithSettings<TService, TSetting>> Match<TService, TSetting>(IEnumerable<TService> services, TSetting[] settings)
+        /// <summary>
+        /// Matches services with their settings but skip disabled services (globally or for this cell only).
+        /// </summary>
+        private static IEnumerable<ServiceWithSettings<TService, TSetting>> MatchActive<TService, TSetting>(IEnumerable<TService> services, IEnumerable<TSetting> settings, string cellName)
             where TService : ICloudService
             where TSetting : CommonServiceSettings
         {
             var settingsByType = settings.ToDictionary(s => s.TypeName);
-
-            return services
-                .Select(service => new { Service = service, Settings = settingsByType[service.GetType().FullName] })
-                .Where(s => !s.Settings.IsDisabled)
-                .Select(s => new ServiceWithSettings<TService, TSetting>(s.Service, s.Settings));
+            foreach(var service in services)
+            {
+                TSetting setting;
+                if (settingsByType.TryGetValue(service.GetType().FullName, out setting) && !setting.IsDisabled && setting.CellAffinity.Contains(cellName))
+                {
+                    yield return new ServiceWithSettings<TService, TSetting>(service, setting);
+                }
+            }
         }
     }
 }
