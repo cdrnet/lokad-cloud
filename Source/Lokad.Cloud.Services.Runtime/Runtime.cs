@@ -258,7 +258,7 @@ namespace Lokad.Cloud.Services.Runtime
             }
         }
 
-        static IEnumerable<CellServiceSettings> ArrangeCellsFromSettings(CloudServicesSettings serviceSettings)
+        static IEnumerable<CellArrangement> ArrangeCellsFromSettings(CloudServicesSettings serviceSettings)
         {
             var cellAffinities = new List<string>();
             cellAffinities.AddRange(serviceSettings.QueuedCloudServices.SelectMany(s => s.CellAffinity));
@@ -267,11 +267,11 @@ namespace Lokad.Cloud.Services.Runtime
             cellAffinities.AddRange(serviceSettings.DaemonServices.SelectMany(s => s.CellAffinity));
 
             return cellAffinities.Distinct().ToList().Select(name =>
-                new CellServiceSettings(name,
-                    serviceSettings.QueuedCloudServices.Where(s => s.CellAffinity.Contains(name)).ToArray(),
-                    serviceSettings.ScheduledCloudServices.Where(s => s.CellAffinity.Contains(name)).ToArray(),
-                    serviceSettings.ScheduledWorkerServices.Where(s => s.CellAffinity.Contains(name)).ToArray(),
-                    serviceSettings.DaemonServices.Where(s => s.CellAffinity.Contains(name)).ToArray()));
+                new CellArrangement(name,
+                    serviceSettings.QueuedCloudServices.Where(s => !s.IsDisabled && s.CellAffinity.Contains(name)).ToArray(),
+                    serviceSettings.ScheduledCloudServices.Where(s => !s.IsDisabled && s.CellAffinity.Contains(name)).ToArray(),
+                    serviceSettings.ScheduledWorkerServices.Where(s => !s.IsDisabled && s.CellAffinity.Contains(name)).ToArray(),
+                    serviceSettings.DaemonServices.Where(s => !s.IsDisabled && s.CellAffinity.Contains(name)).ToArray()));
         }
 
         static Maybe<CloudServicesSettings> UpdateSettingsFromDefinitionIfNeeded(CloudServicesSettings settings, CloudApplicationDefinition definition)

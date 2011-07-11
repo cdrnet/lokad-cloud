@@ -9,7 +9,6 @@ using System.Linq;
 using System.Threading;
 using Lokad.Cloud.Services.Framework;
 using Lokad.Cloud.Services.Management.Settings;
-using Lokad.Cloud.Services.Runtime.WorkingSet;
 
 namespace Lokad.Cloud.Services.Runtime.Runner
 {
@@ -24,16 +23,18 @@ namespace Lokad.Cloud.Services.Runtime.Runner
     /// A cell runner does neither check for new package assemblies, configuration
     /// or server settings nor supports applying such changes. Instead, cancel
     /// the runner and start it with the new service instances.
+    /// Also, a service runner does not care of any cell affinities, it simply
+    /// runs each service which matching settings.
     /// </remarks>
-    internal class ServiceRunner
+    public class ServiceRunner
     {
-        // TODO: Make this publicly available (useful for testing)
-
-        private static readonly TimeSpan IdleTime = TimeSpan.FromSeconds(10);
+        public static TimeSpan IdleTime = TimeSpan.FromSeconds(10);
 
         /// <param name="services">List of all enabled cloud services, fully populated (e.g. using IoC) but not initialized yet.</param>
         /// <remarks> Only returns on unhandled exceptions or when canceled.</remarks>
-        internal void Run(List<ICloudService> services, CellServiceSettings settings, CancellationToken cancellationToken)
+        public void Run(List<ICloudService> services,
+            CloudServicesSettings settings,
+            CancellationToken cancellationToken)
         {
             if (cancellationToken.IsCancellationRequested)
             {
@@ -47,30 +48,30 @@ namespace Lokad.Cloud.Services.Runtime.Runner
 
             // 2. MATCH AND FILTER ACTIVE SERVICES, BUILD RUNNERS
 
-            var queuedCloudServiceRunner = new QueuedCloudServiceRunner(MatchActive(services.OfType<UntypedQueuedCloudService>(), settings.QueuedCloudServices, settings.CellName));
-            var scheduledWorkerServiceRunner = new ScheduledWorkerServiceRunner(MatchActive(services.OfType<ScheduledWorkerService>(), settings.ScheduledWorkerServices, settings.CellName));
-            var scheduledCloudServiceRunner = new ScheduledCloudServiceRunner(MatchActive(services.OfType<ScheduledCloudService>(), settings.ScheduledCloudServices, settings.CellName));
-            var daemonServiceRunner = new DaemonServiceRunner(MatchActive(services.OfType<DaemonService>(), settings.DaemonServices, settings.CellName));
+            var queuedCloudServiceRunner = new QueuedCloudServiceRunner(MatchActive(services.OfType<UntypedQueuedCloudService>(), settings.QueuedCloudServices));
+            var scheduledCloudServiceRunner = new ScheduledCloudServiceRunner(MatchActive(services.OfType<ScheduledCloudService>(), settings.ScheduledCloudServices));
+            var scheduledWorkerServiceRunner = new ScheduledWorkerServiceRunner(MatchActive(services.OfType<ScheduledWorkerService>(), settings.ScheduledWorkerServices));
+            var daemonServiceRunner = new DaemonServiceRunner(MatchActive(services.OfType<DaemonService>(), settings.DaemonServices));
 
             // 3. INITIALIZE SERVICES
 
             queuedCloudServiceRunner.Initialize();
-            scheduledWorkerServiceRunner.Initialize();
             scheduledCloudServiceRunner.Initialize();
+            scheduledWorkerServiceRunner.Initialize();
             daemonServiceRunner.Initialize();
 
             // 4. START SERVICES, REGISTER FOR STOP  (mostly for daemons, but other services can use it as well)
 
             queuedCloudServiceRunner.Start();
-            scheduledWorkerServiceRunner.Start();
             scheduledCloudServiceRunner.Start();
+            scheduledWorkerServiceRunner.Start();
             daemonServiceRunner.Start();
 
             localCancellationToken.Register(() =>
                 {
                     queuedCloudServiceRunner.Stop();
-                    scheduledWorkerServiceRunner.Stop();
                     scheduledCloudServiceRunner.Stop();
+                    scheduledWorkerServiceRunner.Stop();
                     daemonServiceRunner.Stop();
                 });
 
@@ -82,8 +83,8 @@ namespace Lokad.Cloud.Services.Runtime.Runner
                 {
                     var hadWork = false;
                     hadWork |= queuedCloudServiceRunner.RunSingle(localCancellationToken);
-                    hadWork |= scheduledWorkerServiceRunner.RunSingle(localCancellationToken);
                     hadWork |= scheduledCloudServiceRunner.RunSingle(localCancellationToken);
+                    hadWork |= scheduledWorkerServiceRunner.RunSingle(localCancellationToken);
 
                     if (!hadWork)
                     {
@@ -101,7 +102,7 @@ namespace Lokad.Cloud.Services.Runtime.Runner
         /// <summary>
         /// Matches services with their settings but skip disabled services (globally or for this cell only).
         /// </summary>
-        private static List<ServiceWithSettings<TService, TSetting>> MatchActive<TService, TSetting>(IEnumerable<TService> services, IEnumerable<TSetting> settings, string cellName)
+        private static List<ServiceWithSettings<TService, TSetting>> MatchActive<TService, TSetting>(IEnumerable<TService> services, IEnumerable<TSetting> settings)
             where TService : ICloudService
             where TSetting : CommonServiceSettings
         {
@@ -110,7 +111,7 @@ namespace Lokad.Cloud.Services.Runtime.Runner
             foreach(var service in services)
             {
                 TSetting setting;
-                if (settingsByType.TryGetValue(service.GetType().FullName, out setting) && !setting.IsDisabled && setting.CellAffinity.Contains(cellName))
+                if (settingsByType.TryGetValue(service.GetType().FullName, out setting) && !setting.IsDisabled)
                 {
                     matched.Add(new ServiceWithSettings<TService, TSetting>(service, setting));
                 }

@@ -33,7 +33,7 @@ namespace Lokad.Cloud.Services.Runtime.WorkingSet
         /// <summary>
         /// Create a new runtime working set and start all its cell processes.
         /// </summary>
-        public static RuntimeWorkingSet StartNew(byte[] packageAssemblies, byte[] packageConfig, IEnumerable<CellServiceSettings> arrangements, CancellationToken cancellationToken)
+        public static RuntimeWorkingSet StartNew(byte[] packageAssemblies, byte[] packageConfig, IEnumerable<CellArrangement> arrangements, CancellationToken cancellationToken)
         {
             return new RuntimeWorkingSet
                 {
@@ -41,8 +41,8 @@ namespace Lokad.Cloud.Services.Runtime.WorkingSet
                     _packageConfig = packageConfig,
                     _cancellationToken = cancellationToken,
                     _cells = arrangements
-                        .Select(a => CellWorkingSet.StartNew(packageAssemblies, packageConfig, a, cancellationToken))
-                        .ToDictionary(c => c.Settings.CellName)
+                        .Select(a => CellWorkingSet.StartNew(packageAssemblies, packageConfig, a.CellName, a.ServicesSettings, cancellationToken))
+                        .ToDictionary(c => c.CellName)
                 };
         }
 
@@ -97,7 +97,7 @@ namespace Lokad.Cloud.Services.Runtime.WorkingSet
         /// and updating the service settings of the remaining cells.
         /// </summary>
         /// <param name="newSettings"></param>
-        public void Rearrange(IEnumerable<CellServiceSettings> newSettings)
+        public void Rearrange(IEnumerable<CellArrangement> newSettings)
         {
             // TODO: consider timeout
 
@@ -109,8 +109,8 @@ namespace Lokad.Cloud.Services.Runtime.WorkingSet
             // 1. ANALYSE CHANGES
 
             var removedSettings = new Dictionary<string, CellWorkingSet>(_cells);
-            var addedSettings = new List<CellServiceSettings>();
-            var remainingSettings = new List<CellServiceSettings>();
+            var addedSettings = new List<CellArrangement>();
+            var remainingSettings = new List<CellArrangement>();
 
             foreach(var settings in newSettings)
             {
@@ -138,14 +138,14 @@ namespace Lokad.Cloud.Services.Runtime.WorkingSet
 
             foreach (var settings in remainingSettings)
             {
-                _cells[settings.CellName].ApplySettings(settings);
+                _cells[settings.CellName].ApplySettings(settings.ServicesSettings);
             }
 
             // 4. ADD
 
             foreach (var settings in addedSettings)
             {
-                _cells.Add(settings.CellName, CellWorkingSet.StartNew(_packageAssemblies, _packageConfig, settings, _cancellationToken));
+                _cells.Add(settings.CellName, CellWorkingSet.StartNew(_packageAssemblies, _packageConfig, settings.CellName, settings.ServicesSettings, _cancellationToken));
             }
         }
     }

@@ -59,7 +59,7 @@
     <Compile Include="Runner\ScheduledWorkerServiceRunner.cs" />
     <Compile Include="Runner\ServiceWithSettings.cs" />
     <Compile Include="WorkingSet\CellProcessAppDomainEntryPoint.cs" />
-    <Compile Include="WorkingSet\CellServiceSettings.cs" />
+    <Compile Include="WorkingSet\CellArrangement.cs" />
     <Compile Include="Runner\ServiceRunner.cs" />
     <Compile Include="Legacy\NoRestartFloodPolicy.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

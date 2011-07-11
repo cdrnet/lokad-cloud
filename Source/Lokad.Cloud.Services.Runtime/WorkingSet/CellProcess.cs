@@ -2,6 +2,7 @@
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using Lokad.Cloud.Services.Management.Settings;
 
 namespace Lokad.Cloud.Services.Runtime.WorkingSet
 {
@@ -16,8 +17,9 @@ namespace Lokad.Cloud.Services.Runtime.WorkingSet
         private static readonly TimeSpan FloodFrequencyThreshold = TimeSpan.FromMinutes(1);
         private static readonly TimeSpan DelayWhenFlooding = TimeSpan.FromMinutes(5);
 
-        private CellServiceSettings _settings;
+        private readonly string _cellName;
         private readonly byte[] _packageAssemblies;
+        private CloudServicesSettings _servicesSettings;
         private byte[] _packageConfig;
 
         private CellProcessAppDomainEntryPoint _entryPoint;
@@ -25,18 +27,20 @@ namespace Lokad.Cloud.Services.Runtime.WorkingSet
         public CellProcess(
             byte[] packageAssemblies,
             byte[] packageConfig,
-            CellServiceSettings settings)
+            string cellName,
+            CloudServicesSettings servicesSettings)
         {
             _packageAssemblies = packageAssemblies;
             _packageConfig = packageConfig;
-            _settings = settings;
+            _cellName = cellName;
+            _servicesSettings = servicesSettings;
         }
 
         public Task Run(CancellationToken cancellationToken)
         {
             var completionSource = new TaskCompletionSource<object>(TaskCreationOptions.LongRunning);
 
-            var domain = AppDomain.CreateDomain("CellAppDomain_" + _settings.CellName, null, AppDomain.CurrentDomain.SetupInformation);
+            var domain = AppDomain.CreateDomain("CellAppDomain_" + _cellName, null, AppDomain.CurrentDomain.SetupInformation);
 
             try
             {
@@ -63,10 +67,12 @@ namespace Lokad.Cloud.Services.Runtime.WorkingSet
                     {
                         try
                         {
-                            _entryPoint.Run(new EntryPointSettings
+                            _entryPoint.Run(new EntryPointParameters
                                 {
                                     PackageAssemblies = _packageAssemblies,
-                                    PackageConfig = _packageConfig
+                                    PackageConfig = _packageConfig,
+                                    CellName = _cellName,
+                                    ServicesSettings = _servicesSettings
                                 });
                         }
                         catch (ThreadAbortException)
@@ -75,8 +81,11 @@ namespace Lokad.Cloud.Services.Runtime.WorkingSet
                         }
                         catch (Exception)
                         {
+                            // ...
                             throw;
                         }
+
+                        // ...
                     }
 
                     completionSource.TrySetCanceled();
@@ -97,13 +106,13 @@ namespace Lokad.Cloud.Services.Runtime.WorkingSet
             }
         }
 
-        public void ApplySettings(CellServiceSettings newSettings)
+        public void ApplySettings(CloudServicesSettings newServicesSettings)
         {
-            _settings = newSettings;
+            _servicesSettings = newServicesSettings;
             var entryPoint = _entryPoint;
             if (entryPoint != null)
             {
-                entryPoint.ApplySettings(newSettings);
+                entryPoint.ApplySettings(newServicesSettings);
             }
         }
     }

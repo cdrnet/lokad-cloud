@@ -1,6 +1,10 @@
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Lokad.Cloud.Services.Framework;
+using Lokad.Cloud.Services.Management.Settings;
+using Lokad.Cloud.Services.Runtime.Runner;
 
 namespace Lokad.Cloud.Services.Runtime.WorkingSet
 {
@@ -11,20 +15,33 @@ namespace Lokad.Cloud.Services.Runtime.WorkingSet
     {
         private readonly object _startStopLock = new object();
         private CancellationTokenSource _externalCancellationTokenSource;
-        private CancellationTokenSource _runnerCancellationTokenSource;
         private TaskCompletionSource<object> _completionSource;
 
-        public void Run(EntryPointSettings settings)
+        public void Run(EntryPointParameters parameters)
         {
             lock (_startStopLock)
             {
                 _externalCancellationTokenSource = new CancellationTokenSource();
-                _runnerCancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(_externalCancellationTokenSource.Token);
                 _completionSource = new TaskCompletionSource<object>(TaskCreationOptions.LongRunning);
             }
 
             try
             {
+                while (!_externalCancellationTokenSource.Token.IsCancellationRequested)
+                {
+                    var runner = new ServiceRunner();
+
+                    try
+                    {
+                        runner.Run(new List<ICloudService>(), parameters.ServicesSettings, _externalCancellationTokenSource.Token);
+                    }
+                    catch (Exception)
+                    {
+                        
+                        throw;
+                    }
+                }
+
                 // load assemblies and config
 
                 // load and run cell runner (sync)
@@ -68,16 +85,18 @@ namespace Lokad.Cloud.Services.Runtime.WorkingSet
 
         }
 
-        public void ApplySettings(CellServiceSettings newSettings)
+        public void ApplySettings(CloudServicesSettings newServicesSettings)
         {
 
         }
     }
 
     [Serializable]
-    internal sealed class EntryPointSettings
+    internal sealed class EntryPointParameters
     {
         public byte[] PackageAssemblies { get; set; }
         public byte[] PackageConfig { get; set; }
+        public string CellName { get; set; }
+        public CloudServicesSettings ServicesSettings { get; set; }
     }
 }
