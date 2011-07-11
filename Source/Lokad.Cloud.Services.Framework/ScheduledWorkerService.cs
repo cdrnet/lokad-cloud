@@ -13,6 +13,8 @@ namespace Lokad.Cloud.Services.Framework
     {
         // Actions to be implemented by implementors
         public virtual void Initialize() { }
+        public virtual void OnStart() { }
+        public virtual void OnStop() { }
         public abstract void OnSchedule(DateTimeOffset scheduledTime, CancellationToken cancellationToken);
 
         // Injected by Runtime

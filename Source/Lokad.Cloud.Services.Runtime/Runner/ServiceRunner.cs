@@ -40,41 +40,39 @@ namespace Lokad.Cloud.Services.Runtime.Runner
                 return;
             }
 
-            // 1. INITIALIZE SERVICES
-
-            foreach (var service in services)
-            {
-                service.Initialize();
-            }
-
-            var queuedCloudServiceRunner = new QueuedCloudServiceRunner(MatchActive(services.OfType<UntypedQueuedCloudService>(), settings.QueuedCloudServices, settings.CellName));
-            var scheduledWorkerServiceRunner = new ScheduledWorkerServiceRunner(MatchActive(services.OfType<ScheduledWorkerService>(), settings.ScheduledWorkerServices, settings.CellName));
-            var scheduledCloudServiceRunner = new ScheduledCloudServiceRunner(MatchActive(services.OfType<ScheduledCloudService>(), settings.ScheduledCloudServices, settings.CellName));
-            var daemonServices = new List<ServiceWithSettings<DaemonService, DaemonServiceSettings>>(MatchActive(services.OfType<DaemonService>(), settings.DaemonServices, settings.CellName));
-
-            // 2. LOCAL CANCELLATION SUPPORT
+            // 1. LOCAL CANCELLATION SUPPORT
 
             var cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
             var localCancellationToken = cancellationTokenSource.Token;
 
-            // 3. START DAEMONS, REGISTER FOR UNLOAD
+            // 2. MATCH AND FILTER ACTIVE SERVICES, BUILD RUNNERS
 
-            if (daemonServices.Count != 0)
-            {
-                foreach (var service in daemonServices)
+            var queuedCloudServiceRunner = new QueuedCloudServiceRunner(MatchActive(services.OfType<UntypedQueuedCloudService>(), settings.QueuedCloudServices, settings.CellName));
+            var scheduledWorkerServiceRunner = new ScheduledWorkerServiceRunner(MatchActive(services.OfType<ScheduledWorkerService>(), settings.ScheduledWorkerServices, settings.CellName));
+            var scheduledCloudServiceRunner = new ScheduledCloudServiceRunner(MatchActive(services.OfType<ScheduledCloudService>(), settings.ScheduledCloudServices, settings.CellName));
+            var daemonServiceRunner = new DaemonServiceRunner(MatchActive(services.OfType<DaemonService>(), settings.DaemonServices, settings.CellName));
+
+            // 3. INITIALIZE SERVICES
+
+            queuedCloudServiceRunner.Initialize();
+            scheduledWorkerServiceRunner.Initialize();
+            scheduledCloudServiceRunner.Initialize();
+            daemonServiceRunner.Initialize();
+
+            // 4. START SERVICES, REGISTER FOR STOP  (mostly for daemons, but other services can use it as well)
+
+            queuedCloudServiceRunner.Start();
+            scheduledWorkerServiceRunner.Start();
+            scheduledCloudServiceRunner.Start();
+            daemonServiceRunner.Start();
+
+            localCancellationToken.Register(() =>
                 {
-                    service.Service.Initialize();
-                    service.Service.OnStart();
-                }
-
-                localCancellationToken.Register(() =>
-                    {
-                        foreach (var service in daemonServices)
-                        {
-                            service.Service.OnStop();
-                        }
-                    });
-            }
+                    queuedCloudServiceRunner.Stop();
+                    scheduledWorkerServiceRunner.Stop();
+                    scheduledCloudServiceRunner.Stop();
+                    daemonServiceRunner.Stop();
+                });
 
             // 4. RUN REGULAR SERVICES IN MAIN LOOP
 
@@ -103,19 +101,21 @@ namespace Lokad.Cloud.Services.Runtime.Runner
         /// <summary>
         /// Matches services with their settings but skip disabled services (globally or for this cell only).
         /// </summary>
-        private static IEnumerable<ServiceWithSettings<TService, TSetting>> MatchActive<TService, TSetting>(IEnumerable<TService> services, IEnumerable<TSetting> settings, string cellName)
+        private static List<ServiceWithSettings<TService, TSetting>> MatchActive<TService, TSetting>(IEnumerable<TService> services, IEnumerable<TSetting> settings, string cellName)
             where TService : ICloudService
             where TSetting : CommonServiceSettings
         {
+            var matched = new List<ServiceWithSettings<TService, TSetting>>();
             var settingsByType = settings.ToDictionary(s => s.TypeName);
             foreach(var service in services)
             {
                 TSetting setting;
                 if (settingsByType.TryGetValue(service.GetType().FullName, out setting) && !setting.IsDisabled && setting.CellAffinity.Contains(cellName))
                 {
-                    yield return new ServiceWithSettings<TService, TSetting>(service, setting);
+                    matched.Add(new ServiceWithSettings<TService, TSetting>(service, setting));
                 }
             }
+            return matched;
         }
     }
 }

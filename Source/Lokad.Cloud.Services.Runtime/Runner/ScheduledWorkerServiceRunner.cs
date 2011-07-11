@@ -1,4 +1,9 @@
-﻿using System;
+﻿#region Copyright (c) Lokad 2009-2011
+// This code is released under the terms of the new BSD licence.
+// URL: http://www.lokad.com/
+#endregion
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -7,12 +12,13 @@ using Lokad.Cloud.Services.Management.Settings;
 
 namespace Lokad.Cloud.Services.Runtime.Runner
 {
-    internal class ScheduledWorkerServiceRunner
+    internal class ScheduledWorkerServiceRunner : CommonServiceRunner
     {
         private readonly SortedSet<DateTimeOffset> _triggers;
         private readonly List<ScheduledWorkerServiceContext> _services;
 
-        public ScheduledWorkerServiceRunner(IEnumerable<ServiceWithSettings<ScheduledWorkerService, ScheduledWorkerServiceSettings>> services)
+        public ScheduledWorkerServiceRunner(List<ServiceWithSettings<ScheduledWorkerService, ScheduledWorkerServiceSettings>> services)
+            : base(services.Select(s => s.Service))
         {
             var now = DateTimeOffset.UtcNow;
             _services = services.Select(s => new ScheduledWorkerServiceContext(s.Service, s.Settings, now)).ToList();

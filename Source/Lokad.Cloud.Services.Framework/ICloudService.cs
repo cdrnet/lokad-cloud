@@ -11,6 +11,8 @@ namespace Lokad.Cloud.Services.Framework
     {
         CloudServiceType ServiceType { get; }
         void Initialize();
+        void OnStart();
+        void OnStop();
 
         // Injected by Runtime
         IBlobStorageProvider Blobs { get; set; }

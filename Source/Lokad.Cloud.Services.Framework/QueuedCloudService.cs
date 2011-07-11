@@ -40,6 +40,8 @@ namespace Lokad.Cloud.Services.Framework
     {
         // Actions to be implemented by implementors
         public virtual void Initialize() { }
+        public virtual void OnStart() { }
+        public virtual void OnStop() { }
         public abstract bool TryGetMessageAndProcess(string queueName, TimeSpan visibilityTimeout, int maxProcessingTrials, CancellationToken cancellationToken);
 
         // Injected by Runtime

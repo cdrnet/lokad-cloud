@@ -52,6 +52,8 @@
       <Link>Properties\VersionAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="Legacy\AssemblyLoader.cs" />
+    <Compile Include="Runner\CommonServiceRunner.cs" />
+    <Compile Include="Runner\DaemonServiceRunner.cs" />
     <Compile Include="Runner\QueuedCloudServiceRunner.cs" />
     <Compile Include="Runner\ScheduledCloudServiceRunner.cs" />
     <Compile Include="Runner\ScheduledWorkerServiceRunner.cs" />

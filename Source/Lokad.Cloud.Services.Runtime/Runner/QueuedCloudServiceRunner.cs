@@ -1,4 +1,9 @@
-﻿using System;
+﻿#region Copyright (c) Lokad 2009-2011
+// This code is released under the terms of the new BSD licence.
+// URL: http://www.lokad.com/
+#endregion
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -7,14 +12,15 @@ using Lokad.Cloud.Services.Management.Settings;
 
 namespace Lokad.Cloud.Services.Runtime.Runner
 {
-    internal class QueuedCloudServiceRunner
+    internal class QueuedCloudServiceRunner : CommonServiceRunner
     {
         private readonly List<ServiceWithSettings<UntypedQueuedCloudService, QueuedCloudServiceSettings>> _services;
         private int _nextIndex;
 
-        public QueuedCloudServiceRunner(IEnumerable<ServiceWithSettings<UntypedQueuedCloudService, QueuedCloudServiceSettings>> services)
+        public QueuedCloudServiceRunner(List<ServiceWithSettings<UntypedQueuedCloudService, QueuedCloudServiceSettings>> services)
+            : base(services.Select(s => s.Service))
         {
-            _services = services.ToList();
+            _services = services;
         }
 
         public bool RunSingle(CancellationToken cancellationToken)
