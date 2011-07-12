@@ -39,7 +39,7 @@ namespace Lokad.Cloud.Console.WebRole
 
         private static string GetSetting(string name)
         {
-            return RoleEnvironment.IsAvailable
+            return RoleEnvironment.IsAvailable && !RoleEnvironment.DeploymentId.StartsWith("deployment(")
                 ? RoleEnvironment.GetConfigurationSettingValue(name)
                 : ConfigurationManager.AppSettings[name];
         }
