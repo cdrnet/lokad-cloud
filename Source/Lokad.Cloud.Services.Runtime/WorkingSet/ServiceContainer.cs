@@ -57,7 +57,7 @@ namespace Lokad.Cloud.Services.Runtime.WorkingSet
             foreach (var type in _types)
             {
                 applicationBuilder.RegisterType(type)
-                    .PropertiesAutowired()
+                    .PropertiesAutowired(PropertyWiringFlags.PreserveSetValues)
                     .InstancePerDependency()
                     .ExternallyOwned();
 
