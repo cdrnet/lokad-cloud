@@ -65,7 +65,7 @@ namespace Lokad.Cloud.Services.Runtime
             var host = new ServiceFabricHost();
             host.StartRuntime();
 
-            var completionSource = new TaskCompletionSource<object>(TaskCreationOptions.LongRunning);
+            var completionSource = new TaskCompletionSource<object>();
             cancellationToken.Register(host.ShutdownRuntime);
 
             // Classic thread because the legacy runtime was designed to run in the main thread exclusively
@@ -106,6 +106,7 @@ namespace Lokad.Cloud.Services.Runtime
                     }
                 });
 
+            thread.Name = "Lokad.Cloud Legacy Runtime";
             thread.Start();
 
             return completionSource.Task;
@@ -113,7 +114,7 @@ namespace Lokad.Cloud.Services.Runtime
 
         Task RunRuntime(CancellationToken cancellationToken)
         {
-            var completionSource = new TaskCompletionSource<object>(TaskCreationOptions.LongRunning);
+            var completionSource = new TaskCompletionSource<object>();
 
             // Classic thread for now, can be replaced with main thread once the legacy runtime is dropped
             var thread = new Thread(() =>
@@ -157,6 +158,7 @@ namespace Lokad.Cloud.Services.Runtime
                     }
                 });
 
+            thread.Name = "Lokad.Cloud Runtime";
             thread.Start();
 
             return completionSource.Task;

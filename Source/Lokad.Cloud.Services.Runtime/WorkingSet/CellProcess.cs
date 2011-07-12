@@ -49,7 +49,7 @@ namespace Lokad.Cloud.Services.Runtime.WorkingSet
 
         public Task Run(CancellationToken cancellationToken)
         {
-            var completionSource = new TaskCompletionSource<object>(TaskCreationOptions.LongRunning);
+            var completionSource = new TaskCompletionSource<object>();
 
             var thread = new Thread(() =>
                 {
@@ -121,6 +121,7 @@ namespace Lokad.Cloud.Services.Runtime.WorkingSet
                     completionSource.TrySetCanceled();
                 });
 
+            thread.Name = "Lokad.Cloud Cell Process (" + _cellName + ")";
             thread.Start();
 
             return completionSource.Task;
