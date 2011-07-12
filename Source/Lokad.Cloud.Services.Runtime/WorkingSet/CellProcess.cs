@@ -1,4 +1,9 @@
-﻿using System;
+﻿#region Copyright (c) Lokad 2009-2011
+// This code is released under the terms of the new BSD licence.
+// URL: http://www.lokad.com/
+#endregion
+
+using System;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
@@ -22,7 +27,7 @@ namespace Lokad.Cloud.Services.Runtime.WorkingSet
         private CloudServicesSettings _servicesSettings;
         private byte[] _packageConfig;
 
-        private CellProcessAppDomainEntryPoint _entryPoint;
+        private volatile CellProcessAppDomainEntryPoint _entryPoint;
 
         public CellProcess(
             byte[] packageAssemblies,
@@ -40,52 +45,73 @@ namespace Lokad.Cloud.Services.Runtime.WorkingSet
         {
             var completionSource = new TaskCompletionSource<object>(TaskCreationOptions.LongRunning);
 
-            var domain = AppDomain.CreateDomain("CellAppDomain_" + _cellName, null, AppDomain.CurrentDomain.SetupInformation);
-
-            try
-            {
-                _entryPoint = (CellProcessAppDomainEntryPoint)domain.CreateInstanceAndUnwrap(
-                    Assembly.GetExecutingAssembly().FullName,
-                    typeof(CellProcessAppDomainEntryPoint).FullName);
-            }
-            catch (Exception exception)
-            {
-                AppDomain.Unload(domain);
-                completionSource.TrySetException(exception);
-                return completionSource.Task;
-            }
-
-            // Forward cancellation token to internal token source
-            cancellationToken.Register(_entryPoint.Cancel);
-
-            // Unload the app domain in the end
-            completionSource.Task.ContinueWith(task => AppDomain.Unload(domain));
-
             var thread = new Thread(() =>
                 {
+                    var currentRoundStartTime = DateTimeOffset.UtcNow - FloodFrequencyThreshold;
                     while (!cancellationToken.IsCancellationRequested)
                     {
+                        var lastRoundStartTime = currentRoundStartTime;
+                        currentRoundStartTime = DateTimeOffset.UtcNow;
+
+                        AppDomain domain = AppDomain.CreateDomain("LokadCloudServiceRuntimeCell_" + _cellName, null, AppDomain.CurrentDomain.SetupInformation);
                         try
                         {
-                            _entryPoint.Run(new EntryPointParameters
+                            domain.UnhandledException += (sender, args) =>
                                 {
-                                    PackageAssemblies = _packageAssemblies,
-                                    PackageConfig = _packageConfig,
-                                    CellName = _cellName,
-                                    ServicesSettings = _servicesSettings
-                                });
-                        }
-                        catch (ThreadAbortException)
-                        {
-                            Thread.ResetAbort();
-                        }
-                        catch (Exception)
-                        {
-                            // ...
-                            throw;
-                        }
+                                    // TODO: REPORT UNHANDLER ERROR
+                                };
 
-                        // ...
+                            try
+                            {
+                                _entryPoint = (CellProcessAppDomainEntryPoint)domain.CreateInstanceAndUnwrap(
+                                    Assembly.GetExecutingAssembly().FullName, typeof(CellProcessAppDomainEntryPoint).FullName);
+                            }
+                            catch (Exception exception)
+                            {
+                                // TODO: REPORT ERROR
+
+                                // fatal error, wait a bit until retrial
+                                cancellationToken.WaitHandle.WaitOne(DelayWhenFlooding);
+                                continue;
+                            }
+
+                            // Forward cancellation token to AppDomain-internal cancellation token source
+                            var registration = cancellationToken.Register(_entryPoint.Cancel);
+                            try
+                            {
+                                _entryPoint.Run(_packageAssemblies, _packageConfig, _servicesSettings);
+                            }
+                            catch (Exception exception)
+                            {
+                                _entryPoint = null;
+
+                                // TODO: REPORT UNHANDLED ERROR
+
+                                // restart immediately, but don't flood!
+                                if ((DateTimeOffset.UtcNow - lastRoundStartTime) < FloodFrequencyThreshold)
+                                {
+                                    cancellationToken.WaitHandle.WaitOne(DelayWhenFlooding);
+                                }
+                                continue;
+                            }
+                            finally
+                            {
+                                _entryPoint = null;
+                                registration.Dispose();
+                            }
+                        }
+                        catch (Exception exception)
+                        {
+                            // TODO: REPORT ERROR
+
+                            // fatal error, wait a bit until retrial
+                            cancellationToken.WaitHandle.WaitOne(DelayWhenFlooding);
+                            continue;
+                        }
+                        finally
+                        {
+                            AppDomain.Unload(domain);
+                        }
                     }
 
                     completionSource.TrySetCanceled();
@@ -102,7 +128,10 @@ namespace Lokad.Cloud.Services.Runtime.WorkingSet
             var entryPoint = _entryPoint;
             if (entryPoint != null)
             {
-                entryPoint.Reconfigure(newPackageConfig);
+                entryPoint.ShutdownWait();
+
+                // will automatically re-run with the new configuration (loop in Run-method),
+                // provided there's no unhandled exception and the process is not cancelled yet.
             }
         }
 
@@ -112,7 +141,12 @@ namespace Lokad.Cloud.Services.Runtime.WorkingSet
             var entryPoint = _entryPoint;
             if (entryPoint != null)
             {
-                entryPoint.ApplySettings(newServicesSettings);
+                // TODO: Consider a better, incremental approach
+
+                entryPoint.ShutdownWait();
+
+                // will automatically re-run with the new configuration (loop in Run-method),
+                // provided there's no unhandled exception and the process is not cancelled yet.
             }
         }
     }

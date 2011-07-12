@@ -8,7 +8,7 @@ using Lokad.Cloud.Services.Management.Settings;
 
 namespace Lokad.Cloud.Services.Runtime.Runner
 {
-    internal class ServiceWithSettings<TService, TSettings>
+    public class ServiceWithSettings<TService, TSettings>
         where TService : ICloudService
         where TSettings : CommonServiceSettings
     {

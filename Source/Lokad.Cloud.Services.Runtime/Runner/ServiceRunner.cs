@@ -30,10 +30,12 @@ namespace Lokad.Cloud.Services.Runtime.Runner
     {
         public static TimeSpan IdleTime = TimeSpan.FromSeconds(10);
 
-        /// <param name="services">List of all enabled cloud services, fully populated (e.g. using IoC) but not initialized yet.</param>
         /// <remarks> Only returns on unhandled exceptions or when canceled.</remarks>
-        public void Run(List<ICloudService> services,
-            CloudServicesSettings settings,
+        public void Run(
+            IEnumerable<ServiceWithSettings<UntypedQueuedCloudService, QueuedCloudServiceSettings>> queuedCloudServices,
+            IEnumerable<ServiceWithSettings<ScheduledCloudService, ScheduledCloudServiceSettings>> scheduledCloudServices,
+            IEnumerable<ServiceWithSettings<ScheduledWorkerService, ScheduledWorkerServiceSettings>> scheduledWorkerServices,
+            IEnumerable<ServiceWithSettings<DaemonService, DaemonServiceSettings>> daemonServices,
             CancellationToken cancellationToken)
         {
             if (cancellationToken.IsCancellationRequested)
@@ -46,12 +48,12 @@ namespace Lokad.Cloud.Services.Runtime.Runner
             var cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
             var localCancellationToken = cancellationTokenSource.Token;
 
-            // 2. MATCH AND FILTER ACTIVE SERVICES, BUILD RUNNERS
+            // 2. BUILD SERVICE RUNNERS FOR ENABLED SERVICES
 
-            var queuedCloudServiceRunner = new QueuedCloudServiceRunner(MatchActive(services.OfType<UntypedQueuedCloudService>(), settings.QueuedCloudServices));
-            var scheduledCloudServiceRunner = new ScheduledCloudServiceRunner(MatchActive(services.OfType<ScheduledCloudService>(), settings.ScheduledCloudServices));
-            var scheduledWorkerServiceRunner = new ScheduledWorkerServiceRunner(MatchActive(services.OfType<ScheduledWorkerService>(), settings.ScheduledWorkerServices));
-            var daemonServiceRunner = new DaemonServiceRunner(MatchActive(services.OfType<DaemonService>(), settings.DaemonServices));
+            var queuedCloudServiceRunner = new QueuedCloudServiceRunner(queuedCloudServices.Where(s => !s.Settings.IsDisabled).ToList());
+            var scheduledCloudServiceRunner = new ScheduledCloudServiceRunner(scheduledCloudServices.Where(s => !s.Settings.IsDisabled).ToList());
+            var scheduledWorkerServiceRunner = new ScheduledWorkerServiceRunner(scheduledWorkerServices.Where(s => !s.Settings.IsDisabled).ToList());
+            var daemonServiceRunner = new DaemonServiceRunner(daemonServices.Where(s => !s.Settings.IsDisabled).ToList());
 
             // 3. INITIALIZE SERVICES
 
@@ -75,7 +77,7 @@ namespace Lokad.Cloud.Services.Runtime.Runner
                     daemonServiceRunner.Stop();
                 });
 
-            // 4. RUN REGULAR SERVICES IN MAIN LOOP
+            // 5. RUN REGULAR SERVICES IN MAIN LOOP
 
             try
             {
@@ -97,26 +99,6 @@ namespace Lokad.Cloud.Services.Runtime.Runner
                 cancellationTokenSource.Cancel();
                 cancellationTokenSource.Dispose();
             }
-        }
-
-        /// <summary>
-        /// Matches services with their settings but skip disabled services (globally or for this cell only).
-        /// </summary>
-        private static List<ServiceWithSettings<TService, TSetting>> MatchActive<TService, TSetting>(IEnumerable<TService> services, IEnumerable<TSetting> settings)
-            where TService : ICloudService
-            where TSetting : CommonServiceSettings
-        {
-            var matched = new List<ServiceWithSettings<TService, TSetting>>();
-            var settingsByType = settings.ToDictionary(s => s.TypeName);
-            foreach(var service in services)
-            {
-                TSetting setting;
-                if (settingsByType.TryGetValue(service.GetType().FullName, out setting) && !setting.IsDisabled)
-                {
-                    matched.Add(new ServiceWithSettings<TService, TSetting>(service, setting));
-                }
-            }
-            return matched;
         }
     }
 }

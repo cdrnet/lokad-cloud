@@ -57,6 +57,7 @@
     <Compile Include="Runner\QueuedCloudServiceRunner.cs" />
     <Compile Include="Runner\ScheduledCloudServiceRunner.cs" />
     <Compile Include="Runner\ScheduledWorkerServiceRunner.cs" />
+    <Compile Include="WorkingSet\ServiceContainer.cs" />
     <Compile Include="Runner\ServiceWithSettings.cs" />
     <Compile Include="WorkingSet\CellProcessAppDomainEntryPoint.cs" />
     <Compile Include="WorkingSet\CellArrangement.cs" />

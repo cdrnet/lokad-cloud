@@ -1,7 +1,10 @@
+#region Copyright (c) Lokad 2009-2011
+// This code is released under the terms of the new BSD licence.
+// URL: http://www.lokad.com/
+#endregion
+
 using System;
-using System.Collections.Generic;
 using System.Threading;
-using System.Threading.Tasks;
 using Lokad.Cloud.Services.Framework;
 using Lokad.Cloud.Services.Management.Settings;
 using Lokad.Cloud.Services.Runtime.Runner;
@@ -9,53 +12,41 @@ using Lokad.Cloud.Services.Runtime.Runner;
 namespace Lokad.Cloud.Services.Runtime.WorkingSet
 {
     /// <summary>
-    /// AppDomain Entry Point for the cell process.
+    /// AppDomain Entry Point for the cell process (single use).
     /// </summary>
     internal sealed class CellProcessAppDomainEntryPoint : MarshalByRefObject
     {
-        private readonly object _startStopLock = new object();
-        private CancellationTokenSource _externalCancellationTokenSource;
-        private TaskCompletionSource<object> _completionSource;
+        private readonly CancellationTokenSource _externalCancellationTokenSource = new CancellationTokenSource();
+        private readonly ManualResetEvent _completedWaitHandle = new ManualResetEvent(false);
 
-        public void Run(EntryPointParameters parameters)
+        // NOTE: cancellation tokens and wait handles cannot pass AppDomain borders
+
+        /// <remarks>Never run a cell process entry point more than once per AppDomain.</remarks>
+        public void Run(byte[] packageAssemblies, byte[] packageConfig, CloudServicesSettings servicesSettings)
         {
-            lock (_startStopLock)
-            {
-                _externalCancellationTokenSource = new CancellationTokenSource();
-                _completionSource = new TaskCompletionSource<object>(TaskCreationOptions.LongRunning);
-            }
-
             try
             {
-                while (!_externalCancellationTokenSource.Token.IsCancellationRequested)
+                using (var container = new ServiceContainer(packageAssemblies, packageConfig))
                 {
-                    var runner = new ServiceRunner();
-
-                    try
+                    while (!_externalCancellationTokenSource.Token.IsCancellationRequested)
                     {
-                        runner.Run(new List<ICloudService>(), parameters.ServicesSettings, _externalCancellationTokenSource.Token);
-                    }
-                    catch (Exception)
-                    {
-                        
-                        throw;
+                        var runner = new ServiceRunner();
+                        runner.Run(
+                            container.ResolveServices<UntypedQueuedCloudService, QueuedCloudServiceSettings>(servicesSettings.QueuedCloudServices),
+                            container.ResolveServices<ScheduledCloudService, ScheduledCloudServiceSettings>(servicesSettings.ScheduledCloudServices),
+                            container.ResolveServices<ScheduledWorkerService, ScheduledWorkerServiceSettings>(servicesSettings.ScheduledWorkerServices),
+                            container.ResolveServices<DaemonService, DaemonServiceSettings>(servicesSettings.DaemonServices),
+                            _externalCancellationTokenSource.Token);
                     }
                 }
-
-                // load assemblies and config
-
-                // load and run cell runner (sync)
-
-                _completionSource.TrySetResult(null);
             }
             catch (ThreadAbortException)
             {
-                _completionSource.TrySetCanceled();
                 Thread.ResetAbort();
             }
-            catch (Exception exception)
+            finally
             {
-                _completionSource.TrySetException(exception);
+                _completedWaitHandle.Set();
             }
         }
 
@@ -66,37 +57,9 @@ namespace Lokad.Cloud.Services.Runtime.WorkingSet
 
         public void ShutdownWait()
         {
-            CancellationTokenSource cancellationToken;
-            TaskCompletionSource<object> completionSource;
-
-            lock (_startStopLock)
-            {
-                cancellationToken = _externalCancellationTokenSource;
-                completionSource = _completionSource;
-            }
-
             // TODO: Consider a timeout
-            cancellationToken.Cancel();
-            completionSource.Task.Wait();
+            _externalCancellationTokenSource.Cancel();
+            _completedWaitHandle.WaitOne();
         }
-
-        public void Reconfigure(byte[] newPackageConfig)
-        {
-
-        }
-
-        public void ApplySettings(CloudServicesSettings newServicesSettings)
-        {
-
-        }
-    }
-
-    [Serializable]
-    internal sealed class EntryPointParameters
-    {
-        public byte[] PackageAssemblies { get; set; }
-        public byte[] PackageConfig { get; set; }
-        public string CellName { get; set; }
-        public CloudServicesSettings ServicesSettings { get; set; }
     }
 }

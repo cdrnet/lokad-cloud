@@ -12,6 +12,8 @@ using Lokad.Cloud.Services.Management.Settings;
 
 namespace Lokad.Cloud.Services.Runtime.Runner
 {
+    // TODO: Consider random permutations
+
     internal class QueuedCloudServiceRunner : CommonServiceRunner
     {
         private readonly List<ServiceWithSettings<UntypedQueuedCloudService, QueuedCloudServiceSettings>> _services;
