@@ -35,10 +35,10 @@ namespace Lokad.Cloud.Services.Runtime
         private const string ContainerName = "lokad-cloud-services";
         private const string PackageAssembliesBlobName = "package.assemblies.lokadcloud";
         private const string PackageConfigBlobName = "package.config.lokadcloud";
-        private const string ServiceSettingsBlobName = "services.settings.lokadcloud";
 
         private readonly CloudStorageProviders _storage;
         private readonly ICloudRuntimeObserver _observer;
+        private readonly ServicesSettingsManager _settingsManager;
 
         private string _packageETag, _configETag, _settingsETag;
 
@@ -46,6 +46,7 @@ namespace Lokad.Cloud.Services.Runtime
         {
             _storage = storage;
             _observer = observer;
+            _settingsManager = new ServicesSettingsManager(storage);
         }
 
         public Task Run(CancellationToken cancellationToken)
@@ -171,7 +172,6 @@ namespace Lokad.Cloud.Services.Runtime
             if (!packageAssemblies.HasValue && newPackageETag == null)
             {
                 // NO PACKAGE -> RETRY LATER
-
                 cancellationToken.WaitHandle.WaitOne(TimeSpan.FromMinutes(4));
                 return;
             }
@@ -197,7 +197,6 @@ namespace Lokad.Cloud.Services.Runtime
                 if (!appDefinition.HasValue)
                 {
                     // INSPECTION FAILED (RACE) -> RETRY LATER
-
                     workingSet = RuntimeWorkingSet.Empty;
                     cancellationToken.WaitHandle.WaitOne(TimeSpan.FromMinutes(1));
                     return;
@@ -205,19 +204,10 @@ namespace Lokad.Cloud.Services.Runtime
 
                 applicationDefinition = appDefinition.Value;
 
-                var serviceSettings = _storage.NeutralBlobStorage.UpsertBlobOrSkip<CloudServicesSettings>(ContainerName, ServiceSettingsBlobName,
-                    insert: () => UpdateSettingsFromDefinitionIfNeeded(new CloudServicesSettings(), appDefinition.Value),
-                    update: oldSettings => UpdateSettingsFromDefinitionIfNeeded(oldSettings, appDefinition.Value));
-
-                if (!serviceSettings.HasValue)
-                {
-                    serviceSettings = _storage.NeutralBlobStorage.GetBlob<CloudServicesSettings>(ContainerName, ServiceSettingsBlobName);
-                }
-
+                var serviceSettings = _settingsManager.UpdateAndLoadSettings(appDefinition.Value, out _settingsETag);
                 if (!serviceSettings.HasValue)
                 {
                     // SETTINGS UNAVAILABLE (RACE) -> RETRY LATER
-
                     workingSet = RuntimeWorkingSet.Empty;
                     cancellationToken.WaitHandle.WaitOne(TimeSpan.FromMinutes(1));
                     return;
@@ -257,24 +247,20 @@ namespace Lokad.Cloud.Services.Runtime
                 return;
             }
 
-            string newETag;
-            var blob = _storage.NeutralBlobStorage.GetBlobIfModified<CloudServicesSettings>(ContainerName, ServiceSettingsBlobName, _settingsETag, out newETag);
-            if (blob.HasValue)
+            if (_settingsManager.HaveSettingsChanged(_settingsETag))
             {
-                var serviceSettings = _storage.NeutralBlobStorage.UpsertBlobOrSkip<CloudServicesSettings>(ContainerName, ServiceSettingsBlobName,
-                    insert: () => UpdateSettingsFromDefinitionIfNeeded(new CloudServicesSettings(), applicationDefinition),
-                    update: oldSettings => UpdateSettingsFromDefinitionIfNeeded(oldSettings, applicationDefinition));
-
-                if (serviceSettings.HasValue)
+                // make sure the settings still fit to the application
+                string newEtag;
+                var serviceSettings = _settingsManager.UpdateAndLoadSettings(applicationDefinition, out newEtag);
+                if (!serviceSettings.HasValue)
                 {
-                    // we had to correct the new settings -> process the changes the next time
-                    _observer.TryNotify(() => new CloudRuntimeServiceSettingsCorrectedEvent());
+                    // SETTINGS UNAVAILABLE (RACE) -> RETRY LATER
                     return;
                 }
 
                 _observer.TryNotify(() => new CloudRuntimeServiceSettingsChangedEvent());
                 workingSet.Rearrange(ArrangeCellsFromSettings(serviceSettings.Value));
-                _settingsETag = newETag;
+                _settingsETag = newEtag;
             }
         }
 
@@ -292,92 +278,6 @@ namespace Lokad.Cloud.Services.Runtime
                     serviceSettings.ScheduledCloudServices.Where(s => !s.IsDisabled && s.CellAffinity.Contains(name)).ToArray(),
                     serviceSettings.ScheduledWorkerServices.Where(s => !s.IsDisabled && s.CellAffinity.Contains(name)).ToArray(),
                     serviceSettings.DaemonServices.Where(s => !s.IsDisabled && s.CellAffinity.Contains(name)).ToArray()));
-        }
-
-        static Maybe<CloudServicesSettings> UpdateSettingsFromDefinitionIfNeeded(CloudServicesSettings settings, CloudApplicationDefinition definition)
-        {
-            const string defaultCell = "default";
-            bool changed = false;
-
-            if (settings.QueuedCloudServices == null)
-            {
-                settings.QueuedCloudServices = new List<QueuedCloudServiceSettings>();
-            }
-            foreach (var queuedCloudService in definition.QueuedCloudServices)
-            {
-                if (!settings.QueuedCloudServices.Exists(s => s.TypeName == queuedCloudService.TypeName))
-                {
-                    changed = true;
-                    settings.QueuedCloudServices.Add(new QueuedCloudServiceSettings
-                        {
-                            TypeName = queuedCloudService.TypeName,
-                            CellAffinity = new List<string> { defaultCell },
-                            ProcessingTimeout = new TimeSpan(1, 58, 0),
-                            MessageTypeName = queuedCloudService.MessageTypeName,
-                            QueueName = queuedCloudService.QueueName,
-                            VisibilityTimeout = TimeSpan.FromHours(2),
-                            ContinueProcessingIfMessagesAvailable = TimeSpan.FromMinutes(1),
-                            MaxProcessingTrials = 5
-                        });
-                }
-            }
-
-            if (settings.ScheduledCloudServices == null)
-            {
-                settings.ScheduledCloudServices = new List<ScheduledCloudServiceSettings>();
-            }
-            foreach (var scheduledCloudService in definition.ScheduledCloudServices)
-            {
-                if (!settings.ScheduledCloudServices.Exists(s => s.TypeName == scheduledCloudService.TypeName))
-                {
-                    changed = true;
-                    settings.ScheduledCloudServices.Add(new ScheduledCloudServiceSettings
-                        {
-                            TypeName = scheduledCloudService.TypeName,
-                            CellAffinity = new List<string> { defaultCell },
-                            ProcessingTimeout = new TimeSpan(1, 58, 0),
-                            TriggerInterval = TimeSpan.FromHours(1)
-                        });
-                }
-            }
-
-            if (settings.ScheduledWorkerServices == null)
-            {
-                settings.ScheduledWorkerServices = new List<ScheduledWorkerServiceSettings>();
-            }
-            foreach (var scheduledWorkerService in definition.ScheduledWorkerServices)
-            {
-                if (!settings.ScheduledWorkerServices.Exists(s => s.TypeName == scheduledWorkerService.TypeName))
-                {
-                    changed = true;
-                    settings.ScheduledWorkerServices.Add(new ScheduledWorkerServiceSettings
-                        {
-                            TypeName = scheduledWorkerService.TypeName,
-                            CellAffinity = new List<string> { defaultCell },
-                            ProcessingTimeout = new TimeSpan(1, 58, 0),
-                            TriggerInterval = TimeSpan.FromHours(1)
-                        });
-                }
-            }
-
-            if (settings.DaemonServices == null)
-            {
-                settings.DaemonServices = new List<DaemonServiceSettings>();
-            }
-            foreach (var daemonService in definition.DaemonServices)
-            {
-                if (!settings.DaemonServices.Exists(s => s.TypeName == daemonService.TypeName))
-                {
-                    changed = true;
-                    settings.DaemonServices.Add(new DaemonServiceSettings
-                        {
-                            TypeName = daemonService.TypeName,
-                            CellAffinity = new List<string> { defaultCell }
-                        });
-                }
-            }
-
-            return changed ? settings : Maybe<CloudServicesSettings>.Empty;
         }
     }
 }

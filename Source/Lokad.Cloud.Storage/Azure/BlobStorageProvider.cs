@@ -678,8 +678,6 @@ namespace Lokad.Cloud.Storage.Azure
             var container = _blobStorage.GetContainerReference(containerName);
             var blob = container.GetBlockBlobReference(blobName);
 
-            Maybe<T> output;
-
             var optimisticPolicy = _policies.OptimisticConcurrency();
             TimeSpan retryInterval = TimeSpan.Zero;
             int retryCount = 0;
@@ -744,7 +742,7 @@ namespace Lokad.Cloud.Storage.Azure
 
                 // 2. APPLY UPADTE OR INSERT (DEPENDING ON INPUT)
 
-                output = input.HasValue ? update(input.Value) : insert();
+                var output = input.HasValue ? update(input.Value) : insert();
 
                 // 3. IF EMPTY OUTPUT THEN WE CAN SKIP THE WHOLE OPERATION
 

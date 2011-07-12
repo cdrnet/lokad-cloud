@@ -91,6 +91,7 @@
     <Compile Include="Settings\QueuedCloudServiceSettings.cs" />
     <Compile Include="Settings\ScheduledCloudServiceSettings.cs" />
     <Compile Include="Settings\ScheduledWorkerServiceSettings.cs" />
+    <Compile Include="Settings\ServicesSettingsManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Lokad.Cloud.Provisioning\Lokad.Cloud.Provisioning.csproj">
