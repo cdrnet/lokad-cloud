@@ -8,15 +8,12 @@ using System;
 namespace Lokad.Cloud.Services.Framework.Instrumentation.Events
 {
     /// <summary>
-    /// Raised whenever the runtime scheduler becomes busy.
+    /// Raised whenever the runtime detects any application package assemblies change
     /// </summary>
-    public class CloudRuntimeBusyEvent : ICloudRuntimeEvent
+    public class CloudRuntimeAppPackageChangedEvent : ICloudRuntimeEvent
     {
-        public DateTimeOffset Timestamp { get; private set; }
-
-        public CloudRuntimeBusyEvent(DateTimeOffset timestamp)
+        public CloudRuntimeAppPackageChangedEvent()
         {
-            Timestamp = timestamp;
         }
     }
 }

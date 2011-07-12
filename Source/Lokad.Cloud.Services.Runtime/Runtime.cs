@@ -9,6 +9,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Lokad.Cloud.Services.Framework.Instrumentation;
+using Lokad.Cloud.Services.Framework.Instrumentation.Events;
 using Lokad.Cloud.Services.Management.Application;
 using Lokad.Cloud.Services.Management.Settings;
 using Lokad.Cloud.Services.Runtime.Legacy;
@@ -119,6 +120,8 @@ namespace Lokad.Cloud.Services.Runtime
                 {
                     try
                     {
+                        _observer.TryNotify(() => new CloudRuntimeStartedEvent());
+
                         CloudApplicationDefinition applicationDefinition = null;
                         var workingSet = RuntimeWorkingSet.Empty;
 
@@ -148,6 +151,10 @@ namespace Lokad.Cloud.Services.Runtime
                             completionSource.TrySetException(exception);
                         }
                     }
+                    finally
+                    {
+                        _observer.TryNotify(() => new CloudRuntimeStoppedEvent());
+                    }
                 });
 
             thread.Start();
@@ -169,6 +176,11 @@ namespace Lokad.Cloud.Services.Runtime
             if (packageAssemblies.HasValue)
             {
                 // NEW PACKAGE
+
+                if (_packageETag != null)
+                {
+                    _observer.TryNotify(() => new CloudRuntimeAppPackageChangedEvent());
+                }
 
                 // => STOP
 
@@ -217,7 +229,10 @@ namespace Lokad.Cloud.Services.Runtime
                 workingSet = RuntimeWorkingSet.StartNew(
                     packageAssemblies.Value, packageConfig.GetValue(new byte[0]),
                     ArrangeCellsFromSettings(serviceSettings.Value),
+                    _observer,
                     cancellationToken);
+
+                _observer.TryNotify(() => new CloudRuntimeAppPackageLoadedEvent(appDefinition.Value.Timestamp, appDefinition.Value.PackageETag));
             }
         }
 
@@ -227,6 +242,7 @@ namespace Lokad.Cloud.Services.Runtime
             var blob = _storage.NeutralBlobStorage.GetBlobIfModified<byte[]>(ContainerName, PackageConfigBlobName, _configETag, out newETag);
             if (blob.HasValue)
             {
+                _observer.TryNotify(() => new CloudRuntimeAppConfigChangedEvent());
                 workingSet.Reconfigure(blob.Value);
                 _configETag = newETag;
             }
@@ -250,9 +266,11 @@ namespace Lokad.Cloud.Services.Runtime
                 if (serviceSettings.HasValue)
                 {
                     // we had to correct the new settings -> process the changes the next time
+                    _observer.TryNotify(() => new CloudRuntimeServiceSettingsCorrectedEvent());
                     return;
                 }
 
+                _observer.TryNotify(() => new CloudRuntimeServiceSettingsChangedEvent());
                 workingSet.Rearrange(ArrangeCellsFromSettings(serviceSettings.Value));
                 _settingsETag = newETag;
             }

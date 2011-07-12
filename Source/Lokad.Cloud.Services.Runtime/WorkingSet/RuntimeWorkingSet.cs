@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Lokad.Cloud.Services.Framework.Instrumentation;
 
 namespace Lokad.Cloud.Services.Runtime.WorkingSet
 {
@@ -27,21 +28,23 @@ namespace Lokad.Cloud.Services.Runtime.WorkingSet
         private byte[] _packageConfig;
         private CancellationToken _cancellationToken;
         private Dictionary<string, CellWorkingSet> _cells;
+        private ICloudRuntimeObserver _observer;
 
         private RuntimeWorkingSet() {}
 
         /// <summary>
         /// Create a new runtime working set and start all its cell processes.
         /// </summary>
-        public static RuntimeWorkingSet StartNew(byte[] packageAssemblies, byte[] packageConfig, IEnumerable<CellArrangement> arrangements, CancellationToken cancellationToken)
+        public static RuntimeWorkingSet StartNew(byte[] packageAssemblies, byte[] packageConfig, IEnumerable<CellArrangement> arrangements, ICloudRuntimeObserver observer, CancellationToken cancellationToken)
         {
             return new RuntimeWorkingSet
                 {
                     _packageAssemblies = packageAssemblies,
                     _packageConfig = packageConfig,
                     _cancellationToken = cancellationToken,
+                    _observer = observer,
                     _cells = arrangements
-                        .Select(a => StartNewCell(packageAssemblies, packageConfig, a, cancellationToken))
+                        .Select(a => StartNewCell(packageAssemblies, packageConfig, a, observer, cancellationToken))
                         .ToDictionary(c => c.CellName)
                 };
         }
@@ -145,14 +148,14 @@ namespace Lokad.Cloud.Services.Runtime.WorkingSet
 
             foreach (var arrangement in addedArrangements)
             {
-                _cells.Add(arrangement.CellName, StartNewCell(_packageAssemblies, _packageConfig, arrangement, _cancellationToken));
+                _cells.Add(arrangement.CellName, StartNewCell(_packageAssemblies, _packageConfig, arrangement, _observer, _cancellationToken));
             }
         }
 
-        static CellWorkingSet StartNewCell(byte[] packageAssemblies, byte[] packageConfig, CellArrangement arrangement, CancellationToken cancellationToken)
+        static CellWorkingSet StartNewCell(byte[] packageAssemblies, byte[] packageConfig, CellArrangement arrangement, ICloudRuntimeObserver observer, CancellationToken cancellationToken)
         {
             var cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-            var process = new CellProcess(packageAssemblies, packageConfig, arrangement.CellName, arrangement.ServicesSettings);
+            var process = new CellProcess(packageAssemblies, packageConfig, arrangement.CellName, arrangement.ServicesSettings, observer);
 
             return new CellWorkingSet
                 {

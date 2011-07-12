@@ -7,6 +7,8 @@ using System;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using Lokad.Cloud.Services.Framework.Instrumentation;
+using Lokad.Cloud.Services.Framework.Instrumentation.Events;
 using Lokad.Cloud.Services.Management.Settings;
 
 namespace Lokad.Cloud.Services.Runtime.WorkingSet
@@ -22,6 +24,8 @@ namespace Lokad.Cloud.Services.Runtime.WorkingSet
         private static readonly TimeSpan FloodFrequencyThreshold = TimeSpan.FromMinutes(1);
         private static readonly TimeSpan DelayWhenFlooding = TimeSpan.FromMinutes(5);
 
+        private readonly ICloudRuntimeObserver _observer;
+
         private readonly string _cellName;
         private readonly byte[] _packageAssemblies;
         private CloudServicesSettings _servicesSettings;
@@ -33,12 +37,14 @@ namespace Lokad.Cloud.Services.Runtime.WorkingSet
             byte[] packageAssemblies,
             byte[] packageConfig,
             string cellName,
-            CloudServicesSettings servicesSettings)
+            CloudServicesSettings servicesSettings,
+            ICloudRuntimeObserver observer)
         {
             _packageAssemblies = packageAssemblies;
             _packageConfig = packageConfig;
             _cellName = cellName;
             _servicesSettings = servicesSettings;
+            _observer = observer;
         }
 
         public Task Run(CancellationToken cancellationToken)
@@ -56,10 +62,7 @@ namespace Lokad.Cloud.Services.Runtime.WorkingSet
                         AppDomain domain = AppDomain.CreateDomain("LokadCloudServiceRuntimeCell_" + _cellName, null, AppDomain.CurrentDomain.SetupInformation);
                         try
                         {
-                            domain.UnhandledException += (sender, args) =>
-                                {
-                                    // TODO: REPORT UNHANDLER ERROR
-                                };
+                            domain.UnhandledException += (sender, args) => _observer.TryNotify(() => new CloudRuntimeExceptionProcessRestartingEvent(args.ExceptionObject as Exception, _cellName, false));
 
                             try
                             {
@@ -68,9 +71,8 @@ namespace Lokad.Cloud.Services.Runtime.WorkingSet
                             }
                             catch (Exception exception)
                             {
-                                // TODO: REPORT ERROR
-
-                                // fatal error, wait a bit until retrial
+                                // Fatal Error
+                                _observer.TryNotify(() => new CloudRuntimeFatalErrorProcessRestartEvent(exception, _cellName));
                                 cancellationToken.WaitHandle.WaitOne(DelayWhenFlooding);
                                 continue;
                             }
@@ -79,32 +81,34 @@ namespace Lokad.Cloud.Services.Runtime.WorkingSet
                             var registration = cancellationToken.Register(_entryPoint.Cancel);
                             try
                             {
+                                _observer.TryNotify(() => new CloudRuntimeCellStartedEvent(_cellName));
                                 _entryPoint.Run(_packageAssemblies, _packageConfig, _servicesSettings);
                             }
                             catch (Exception exception)
                             {
                                 _entryPoint = null;
-
-                                // TODO: REPORT UNHANDLED ERROR
-
-                                // restart immediately, but don't flood!
                                 if ((DateTimeOffset.UtcNow - lastRoundStartTime) < FloodFrequencyThreshold)
                                 {
+                                    _observer.TryNotify(() => new CloudRuntimeExceptionProcessRestartingEvent(exception, _cellName, true));
                                     cancellationToken.WaitHandle.WaitOne(DelayWhenFlooding);
+                                }
+                                else
+                                {
+                                    _observer.TryNotify(() => new CloudRuntimeExceptionProcessRestartingEvent(exception, _cellName, false));
                                 }
                                 continue;
                             }
                             finally
                             {
                                 _entryPoint = null;
+                                _observer.TryNotify(() => new CloudRuntimeCellStoppedEvent(_cellName));
                                 registration.Dispose();
                             }
                         }
                         catch (Exception exception)
                         {
-                            // TODO: REPORT ERROR
-
-                            // fatal error, wait a bit until retrial
+                            // Fatal Error
+                            _observer.TryNotify(() => new CloudRuntimeFatalErrorProcessRestartEvent(exception, _cellName));
                             cancellationToken.WaitHandle.WaitOne(DelayWhenFlooding);
                             continue;
                         }

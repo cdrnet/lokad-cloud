@@ -12,6 +12,10 @@ using Lokad.Cloud.Storage.Instrumentation.Events;
 
 namespace Lokad.Cloud.Services.Framework.SystemServices
 {
+    /// <remarks>
+    /// To change logging behavior, simply derive from this class, override the Subscribe method
+    /// and disable this original service.
+    /// </remarks>
     public class CloudStorageLoggingService : DaemonService
     {
         private readonly IObservable<ICloudStorageEvent> _observable;
