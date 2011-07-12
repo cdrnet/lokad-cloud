@@ -41,7 +41,7 @@ namespace Lokad.Cloud.Services.Runtime.WorkingSet
                     _packageConfig = packageConfig,
                     _cancellationToken = cancellationToken,
                     _cells = arrangements
-                        .Select(a => CellWorkingSet.StartNew(packageAssemblies, packageConfig, a.CellName, a.ServicesSettings, cancellationToken))
+                        .Select(a => StartNewCell(packageAssemblies, packageConfig, a, cancellationToken))
                         .ToDictionary(c => c.CellName)
                 };
         }
@@ -68,7 +68,7 @@ namespace Lokad.Cloud.Services.Runtime.WorkingSet
 
             foreach (var cell in _cells)
             {
-                cell.Value.Cancel();
+                cell.Value.CancellationTokenSource.Cancel();
             }
             Task.WaitAll(_cells.Select(c => c.Value.Task).ToArray());
         }
@@ -86,7 +86,7 @@ namespace Lokad.Cloud.Services.Runtime.WorkingSet
             _packageConfig = newPackageConfig;
             foreach (var cell in _cells)
             {
-                cell.Value.Reconfigure(newPackageConfig);
+                cell.Value.Process.Reconfigure(newPackageConfig);
             }
         }
 
@@ -108,45 +108,60 @@ namespace Lokad.Cloud.Services.Runtime.WorkingSet
 
             // 1. ANALYSE CHANGES
 
-            var removedSettings = new Dictionary<string, CellWorkingSet>(_cells);
-            var addedSettings = new List<CellArrangement>();
-            var remainingSettings = new List<CellArrangement>();
+            var removedCells = new Dictionary<string, CellWorkingSet>(_cells);
+            var addedArrangements = new List<CellArrangement>();
+            var remainingArrangements = new List<CellArrangement>();
 
             foreach(var settings in newSettings)
             {
                 if (_cells.ContainsKey(settings.CellName))
                 {
-                    removedSettings.Remove(settings.CellName);
-                    remainingSettings.Add(settings);
+                    removedCells.Remove(settings.CellName);
+                    remainingArrangements.Add(settings);
                 }
                 else
                 {
-                    addedSettings.Add(settings);
+                    addedArrangements.Add(settings);
                 }
             }
 
             // 2. REMOVE
 
-            foreach (var settings in removedSettings)
+            foreach (var cell in removedCells)
             {
-                _cells.Remove(settings.Key);
-                settings.Value.Cancel();
+                _cells.Remove(cell.Key);
+                cell.Value.CancellationTokenSource.Cancel();
             }
-            Task.WaitAll(removedSettings.Select(c => c.Value.Task).ToArray());
+            Task.WaitAll(removedCells.Select(c => c.Value.Task).ToArray());
 
             // 3. CHANGE
 
-            foreach (var settings in remainingSettings)
+            foreach (var arrangement in remainingArrangements)
             {
-                _cells[settings.CellName].ApplySettings(settings.ServicesSettings);
+                _cells[arrangement.CellName].Process.ApplySettings(arrangement.ServicesSettings);
             }
 
             // 4. ADD
 
-            foreach (var settings in addedSettings)
+            foreach (var arrangement in addedArrangements)
             {
-                _cells.Add(settings.CellName, CellWorkingSet.StartNew(_packageAssemblies, _packageConfig, settings.CellName, settings.ServicesSettings, _cancellationToken));
+                _cells.Add(arrangement.CellName, StartNewCell(_packageAssemblies, _packageConfig, arrangement, _cancellationToken));
             }
+        }
+
+        static CellWorkingSet StartNewCell(byte[] packageAssemblies, byte[] packageConfig, CellArrangement arrangement, CancellationToken cancellationToken)
+        {
+            var cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+            var process = new CellProcess(packageAssemblies, packageConfig, arrangement.CellName, arrangement.ServicesSettings);
+
+            return new CellWorkingSet
+                {
+                    CancellationTokenSource = cancellationTokenSource,
+                    Process = process,
+                    CellName = arrangement.CellName,
+                    ServicesSettings = arrangement.ServicesSettings,
+                    Task = process.Run(cancellationTokenSource.Token)
+                };
         }
     }
 }
