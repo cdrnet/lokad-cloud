@@ -182,7 +182,7 @@ namespace Lokad.Cloud.Services.Runtime.Legacy
             {
                 runtime.Stop();
 
-                // note: we DO have to wait until the shut down has finished,
+                // we DO have to wait until the shut down has finished,
                 // or the Azure Fabric will tear us apart early!
                 _stoppedWaitHandle.WaitOne(TimeSpan.FromSeconds(25));
             }

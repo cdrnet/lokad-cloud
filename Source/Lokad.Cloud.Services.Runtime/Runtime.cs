@@ -99,7 +99,7 @@ namespace Lokad.Cloud.Services.Runtime
                             // cancel the other runtime, so we can recycle
                             // (expected behavior of the legacy runtime)
 
-                            // TODO: this might throw
+                            // TODO: this may throw
                             cancelNewRuntime.Cancel();
                         }
                     }
@@ -276,8 +276,7 @@ namespace Lokad.Cloud.Services.Runtime
 
         static Maybe<CloudServicesSettings> UpdateSettingsFromDefinitionIfNeeded(CloudServicesSettings settings, CloudApplicationDefinition definition)
         {
-            // TODO (ruegg, 2011-07-04): simplify, refactor
-
+            const string defaultCell = "default";
             bool changed = false;
 
             if (settings.QueuedCloudServices == null)
@@ -290,16 +289,16 @@ namespace Lokad.Cloud.Services.Runtime
                 {
                     changed = true;
                     settings.QueuedCloudServices.Add(new QueuedCloudServiceSettings
-                    {
-                        TypeName = queuedCloudService.TypeName,
-                        CellAffinity = new List<string> { "default" },
-                        ProcessingTimeout = new TimeSpan(1, 58, 0),
-                        MessageTypeName = queuedCloudService.MessageTypeName,
-                        QueueName = queuedCloudService.QueueName,
-                        VisibilityTimeout = TimeSpan.FromHours(2),
-                        ContinueProcessingIfMessagesAvailable = TimeSpan.FromMinutes(1),
-                        MaxProcessingTrials = 5
-                    });
+                        {
+                            TypeName = queuedCloudService.TypeName,
+                            CellAffinity = new List<string> { defaultCell },
+                            ProcessingTimeout = new TimeSpan(1, 58, 0),
+                            MessageTypeName = queuedCloudService.MessageTypeName,
+                            QueueName = queuedCloudService.QueueName,
+                            VisibilityTimeout = TimeSpan.FromHours(2),
+                            ContinueProcessingIfMessagesAvailable = TimeSpan.FromMinutes(1),
+                            MaxProcessingTrials = 5
+                        });
                 }
             }
 
@@ -313,12 +312,12 @@ namespace Lokad.Cloud.Services.Runtime
                 {
                     changed = true;
                     settings.ScheduledCloudServices.Add(new ScheduledCloudServiceSettings
-                    {
-                        TypeName = scheduledCloudService.TypeName,
-                        CellAffinity = new List<string> { "default" },
-                        ProcessingTimeout = new TimeSpan(1, 58, 0),
-                        TriggerInterval = TimeSpan.FromHours(1)
-                    });
+                        {
+                            TypeName = scheduledCloudService.TypeName,
+                            CellAffinity = new List<string> { defaultCell },
+                            ProcessingTimeout = new TimeSpan(1, 58, 0),
+                            TriggerInterval = TimeSpan.FromHours(1)
+                        });
                 }
             }
 
@@ -332,12 +331,12 @@ namespace Lokad.Cloud.Services.Runtime
                 {
                     changed = true;
                     settings.ScheduledWorkerServices.Add(new ScheduledWorkerServiceSettings
-                    {
-                        TypeName = scheduledWorkerService.TypeName,
-                        CellAffinity = new List<string> { "default" },
-                        ProcessingTimeout = new TimeSpan(1, 58, 0),
-                        TriggerInterval = TimeSpan.FromHours(1)
-                    });
+                        {
+                            TypeName = scheduledWorkerService.TypeName,
+                            CellAffinity = new List<string> { defaultCell },
+                            ProcessingTimeout = new TimeSpan(1, 58, 0),
+                            TriggerInterval = TimeSpan.FromHours(1)
+                        });
                 }
             }
 
@@ -351,10 +350,10 @@ namespace Lokad.Cloud.Services.Runtime
                 {
                     changed = true;
                     settings.DaemonServices.Add(new DaemonServiceSettings
-                    {
-                        TypeName = daemonService.TypeName,
-                        CellAffinity = new List<string> { "default" }
-                    });
+                        {
+                            TypeName = daemonService.TypeName,
+                            CellAffinity = new List<string> { defaultCell }
+                        });
                 }
             }
 

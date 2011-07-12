@@ -56,7 +56,6 @@ namespace Lokad.Cloud.Worker
         {
             _cancellationTokenSource.Cancel();
 
-            // TODO: do we need that? Drop if not.
             var task = _runtimeTask;
             if (task != null)
             {

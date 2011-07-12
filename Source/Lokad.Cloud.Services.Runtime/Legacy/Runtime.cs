@@ -183,8 +183,8 @@ namespace Lokad.Cloud.Services.Runtime.Legacy
             var config = loader.LoadConfiguration();
             if (config.HasValue)
             {
-                // HACK: need to copy settings locally first
-                // HACK: hard-code string for local storage name
+                // the configuration manager expects a file in the file system,
+                // so we need to copy it to a local file first
                 const string fileName = "lokad.cloud.clientapp.config";
                 const string resourceName = "LokadCloudStorage";
 

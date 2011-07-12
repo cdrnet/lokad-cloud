@@ -19,8 +19,6 @@ namespace Lokad.Cloud.Services.Runtime.WorkingSet
         private readonly CancellationTokenSource _externalCancellationTokenSource = new CancellationTokenSource();
         private readonly ManualResetEvent _completedWaitHandle = new ManualResetEvent(false);
 
-        // NOTE: cancellation tokens and wait handles cannot pass AppDomain borders
-
         /// <remarks>Never run a cell process entry point more than once per AppDomain.</remarks>
         public void Run(byte[] packageAssemblies, byte[] packageConfig, CloudServicesSettings servicesSettings)
         {
@@ -57,7 +55,7 @@ namespace Lokad.Cloud.Services.Runtime.WorkingSet
 
         public void ShutdownWait()
         {
-            // TODO: Consider a timeout
+            // TODO: consider timeout
             _externalCancellationTokenSource.Cancel();
             _completedWaitHandle.WaitOne();
         }

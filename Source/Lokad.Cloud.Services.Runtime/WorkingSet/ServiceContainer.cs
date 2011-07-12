@@ -37,8 +37,8 @@ namespace Lokad.Cloud.Services.Runtime.WorkingSet
             // Load Application IoC Configuration and apply it to the builder
             if (config != null && config.Length > 0)
             {
-                // HACK: need to copy settings locally first
-                // HACK: hard-code string for local storage name
+                // the configuration manager expects a file in the file system,
+                // so we need to copy it to a local file first
                 const string fileName = "lokad.cloud.clientapp.config";
                 const string resourceName = "LokadCloudStorage";
 
