@@ -6,6 +6,8 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Lokad.Cloud.Services.Framework.Instrumentation;
+using Lokad.Cloud.Services.Framework.Logging;
 using Lokad.Cloud.Storage;
 using Microsoft.WindowsAzure.ServiceRuntime;
 
@@ -24,10 +26,15 @@ namespace Lokad.Cloud.Worker
                 .ForAzureConnectionString(RoleEnvironment.GetConfigurationSettingValue("DataConnectionString"))
                 .BuildStorageProviders();
 
-            // TODO: inject runtime observer (ctor param) for runtime system events
-
             _cancellationTokenSource = new CancellationTokenSource();
-            _runtime = new Services.Runtime.Runtime(storage);
+
+            var log = new CloudLogWriter(storage);
+            var observer = new CloudRuntimeInstrumentationSubject();
+
+            // TODO: more sensible subscriptions (with text, filtered, throttled)
+            observer.Subscribe(@event => log.DebugFormat("Runtime: {0}", @event.ToString()));
+
+            _runtime = new Services.Runtime.Runtime(storage, observer);
         }
 
         /// <summary>
