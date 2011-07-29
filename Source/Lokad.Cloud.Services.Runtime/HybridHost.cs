@@ -6,19 +6,19 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Lokad.Cloud.Services.Framework.Instrumentation;
+using Lokad.Cloud.AppHost;
+using Lokad.Cloud.AppHost.Framework;
 using Lokad.Cloud.Services.Runtime.Legacy;
-using Lokad.Cloud.Storage;
 
 namespace Lokad.Cloud.Services.Runtime
 {
-    public sealed class HybridRuntime
+    public sealed class HybridHost
     {
-        private readonly Runtime _runtime;
+        private readonly Host _runtime;
 
-        public HybridRuntime(CloudStorageProviders storage, ICloudRuntimeObserver observer = null)
+        public HybridHost(IHostContext hostContext)
         {
-            _runtime = new Runtime(storage, observer);
+            _runtime = new Host(hostContext);
         }
 
         public Task Run(CancellationToken cancellationToken)
@@ -27,7 +27,7 @@ namespace Lokad.Cloud.Services.Runtime
 
             return Task.Factory.ContinueWhenAll(new[]
                 {
-                    _runtime.RunAsync(cancelNewTokenSource.Token),
+                    _runtime.Run(cancelNewTokenSource.Token),
                     RunLegacyRuntime(cancellationToken, cancelNewTokenSource)
                 },
                 tasks => { });

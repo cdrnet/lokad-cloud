@@ -8,7 +8,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Lokad.Cloud.Services.Framework;
-using Lokad.Cloud.Services.Runtime.Internal;
 
 namespace Lokad.Cloud.Services.Runtime.Runner
 {

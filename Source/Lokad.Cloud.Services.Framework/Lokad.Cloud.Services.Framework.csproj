@@ -39,6 +39,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\Autofac.2.5.1.827\lib\NET40\Autofac.Configuration.dll</HintPath>
     </Reference>
+    <Reference Include="Lokad.Cloud.AppHost.Framework, Version=0.3.5.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\Lokad.Cloud.AppHost.Framework.0.3.5\lib\Lokad.Cloud.AppHost.Framework.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.WindowsAzure.ServiceRuntime, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\..\Resource\Library\Microsoft.WindowsAzure.ServiceRuntime.dll</HintPath>
     </Reference>
@@ -144,10 +148,6 @@
     <Compile Include="SystemServices\CloudStorageLoggingService.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Lokad.Cloud.ApplicationHost.Framework\Lokad.Cloud.AppHost.Framework.csproj">
-      <Project>{533B2099-3C96-4D88-8766-8EB24B7FA216}</Project>
-      <Name>Lokad.Cloud.AppHost.Framework</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Lokad.Cloud.Provisioning\Lokad.Cloud.Provisioning.csproj">
       <Project>{B3CA9DCB-04DB-4442-AC0C-6E1F70854DA1}</Project>
       <Name>Lokad.Cloud.Provisioning</Name>

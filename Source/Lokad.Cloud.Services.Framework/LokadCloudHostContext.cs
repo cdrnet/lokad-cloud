@@ -15,6 +15,8 @@ namespace Lokad.Cloud.Services.Framework
         public IDeploymentReader DeploymentReader { get; protected set; }
         public X509Certificate2 SelfManagementCertificate { get; protected set; }
 
+        public IHostObserver Observer { get; set; }
+
         public CloudStorageProviders BuildStorage()
         {
             return CloudStorage.ForAzureConnectionString(DataConnectionString).BuildStorageProviders();

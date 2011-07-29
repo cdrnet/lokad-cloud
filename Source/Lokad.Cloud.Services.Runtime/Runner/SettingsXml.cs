@@ -7,7 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Xml.Linq;
 
-namespace Lokad.Cloud.Services.Runtime.Internal
+namespace Lokad.Cloud.Services.Runtime.Runner
 {
     internal static class SettingsXml
     {
@@ -31,11 +31,6 @@ namespace Lokad.Cloud.Services.Runtime.Internal
             }
 
             return parentElement.Elements(itemElementName);
-        }
-
-        public static string SettingsValue(this XContainer container, string elementName)
-        {
-            return SettingsElement(container, elementName).Value;
         }
 
         public static string SettingsElementAttributeValue(this XContainer container, string elementName, string attributeName)

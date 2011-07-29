@@ -36,7 +36,9 @@ namespace Lokad.Cloud.Worker
             var observer = new HostObserverSubject();
             observer.Subscribe(@event => log.DebugFormat("Runtime: {0}", @event.ToString()));
 
-            _host = new Host(context, observer);
+            context.Observer = observer;
+
+            _host = new Host(context);
         }
 
         /// <summary>

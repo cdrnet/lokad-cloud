@@ -39,6 +39,16 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\Autofac.2.5.1.827\lib\NET40\Autofac.Configuration.dll</HintPath>
     </Reference>
+    <Reference Include="ICSharpCode.SharpZipLib, Version=0.86.0.518, Culture=neutral, PublicKeyToken=1b03e6acf1164f73, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll</HintPath>
+    </Reference>
+    <Reference Include="Lokad.Cloud.AppHost">
+      <HintPath>..\..\packages\Lokad.Cloud.AppHost.0.3.5\lib\Lokad.Cloud.AppHost.dll</HintPath>
+    </Reference>
+    <Reference Include="Lokad.Cloud.AppHost.Framework, Version=0.3.5.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\Lokad.Cloud.AppHost.Framework.0.3.5\lib\Lokad.Cloud.AppHost.Framework.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Microsoft.WindowsAzure.ServiceRuntime, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\..\Resource\Library\Microsoft.WindowsAzure.ServiceRuntime.dll</HintPath>
@@ -56,24 +66,16 @@
     <Compile Include="..\VersionAssemblyInfo.cs">
       <Link>Properties\VersionAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="Agents\DeploymentHeadPollingAgent.cs" />
-    <Compile Include="HybridRuntime.cs" />
-    <Compile Include="Internal\CellHandle.cs" />
+    <Compile Include="HybridHost.cs" />
     <Compile Include="InstrumentationExtensions.cs" />
-    <Compile Include="Internal\RuntimeCellEnvironment.cs" />
-    <Compile Include="Internal\SettingsTools.cs" />
-    <Compile Include="Internal\SettingsXml.cs" />
     <Compile Include="Legacy\AssemblyLoader.cs" />
     <Compile Include="Runner\CommonServiceRunner.cs" />
     <Compile Include="Runner\DaemonServiceRunner.cs" />
     <Compile Include="Runner\QueuedCloudServiceRunner.cs" />
     <Compile Include="Runner\ScheduledCloudServiceRunner.cs" />
     <Compile Include="Runner\ScheduledWorkerServiceRunner.cs" />
-    <Compile Include="Internal\RuntimeHandle.cs" />
-    <Compile Include="WorkingSet\ServiceContainer.cs" />
+    <Compile Include="Runner\SettingsXml.cs" />
     <Compile Include="Runner\ServiceWithSettings.cs" />
-    <Compile Include="WorkingSet\CellProcessAppDomainEntryPoint.cs" />
-    <Compile Include="WorkingSet\CellArrangement.cs" />
     <Compile Include="Runner\ServiceRunner.cs" />
     <Compile Include="Legacy\NoRestartFloodPolicy.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -81,9 +83,6 @@
     <Compile Include="Legacy\Scheduler.cs" />
     <Compile Include="Legacy\ServiceFabricHost.cs" />
     <Compile Include="Legacy\SingleRuntimeHost.cs" />
-    <Compile Include="Runtime.cs" />
-    <Compile Include="WorkingSet\CellProcess.cs" />
-    <Compile Include="WorkingSet\RuntimeWorkingSet.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Lokad.Cloud.Services.Framework\Lokad.Cloud.Services.Framework.csproj">
