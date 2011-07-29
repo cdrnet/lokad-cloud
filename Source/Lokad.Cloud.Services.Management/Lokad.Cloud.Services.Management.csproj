@@ -81,6 +81,11 @@
     <Compile Include="CloudServices.cs" />
     <Compile Include="CloudServiceScheduling.cs" />
     <Compile Include="CloudServiceSchedulingInfo.cs" />
+    <Compile Include="Deployments\ContentBasedNaming.cs" />
+    <Compile Include="Deployments\DeploymentReader.cs" />
+    <Compile Include="Deployments\DeploymentReference.cs" />
+    <Compile Include="Deployments\DeploymentWriter.cs" />
+    <Compile Include="Deployments\IndexManager.cs" />
     <Compile Include="Logging\CloudLogEntry.cs" />
     <Compile Include="Logging\CloudLogReader.cs" />
     <Compile Include="ManagementModule.cs" />
@@ -88,10 +93,11 @@
     <Compile Include="Settings\CloudServicesSettings.cs" />
     <Compile Include="Settings\CommonServiceSettings.cs" />
     <Compile Include="Settings\DaemonServiceSettings.cs" />
+    <Compile Include="Settings\DefaultSettings.cs" />
     <Compile Include="Settings\QueuedCloudServiceSettings.cs" />
     <Compile Include="Settings\ScheduledCloudServiceSettings.cs" />
     <Compile Include="Settings\ScheduledWorkerServiceSettings.cs" />
-    <Compile Include="Settings\ServicesSettingsManager.cs" />
+    <Compile Include="Settings\SettingsManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Lokad.Cloud.Provisioning\Lokad.Cloud.Provisioning.csproj">

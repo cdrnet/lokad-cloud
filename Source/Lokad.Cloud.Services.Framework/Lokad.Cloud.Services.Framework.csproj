@@ -66,6 +66,9 @@
       <Link>Properties\VersionAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="CloudServiceType.cs" />
+    <Compile Include="Commands\ICloudCommand.cs" />
+    <Compile Include="Commands\RuntimeLoadDeploymentCommand.cs" />
+    <Compile Include="Commands\RuntimeLoadCurrentHeadDeploymentCommand.cs" />
     <Compile Include="DaemonService.cs" />
     <Compile Include="ICloudService.cs" />
     <Compile Include="Instrumentation\CloudRuntimeInstrumentationSubject.cs" />
@@ -87,6 +90,19 @@
     <Compile Include="Jobs\Job.cs" />
     <Compile Include="Jobs\JobManager.cs" />
     <Compile Include="Legacy\Threading\WaitFor.cs" />
+    <Compile Include="LokadCloudDeploymentReader.cs" />
+    <Compile Include="LokadCloudHostContext.cs" />
+    <Compile Include="Runner\CellRunner.cs" />
+    <Compile Include="Runner\CommonServiceRunner.cs" />
+    <Compile Include="Runner\DaemonServiceRunner.cs" />
+    <Compile Include="Runner\QueuedCloudServiceRunner.cs" />
+    <Compile Include="Runner\ScheduledCloudServiceRunner.cs" />
+    <Compile Include="Runner\ScheduledWorkerServiceRunner.cs" />
+    <Compile Include="Runner\ServiceContainer.cs" />
+    <Compile Include="Runner\ServiceRunner.cs" />
+    <Compile Include="Runner\ServiceWithSettings.cs" />
+    <Compile Include="Runner\SettingsXml.cs" />
+    <Compile Include="Runtime\ICloudEnvironment.cs" />
     <Compile Include="Storage\BlobCounter.cs" />
     <Compile Include="Legacy\CloudConfigurationModule.cs" />
     <Compile Include="Legacy\CloudEnvironment.cs" />
@@ -128,6 +144,10 @@
     <Compile Include="SystemServices\CloudStorageLoggingService.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Lokad.Cloud.ApplicationHost.Framework\Lokad.Cloud.AppHost.Framework.csproj">
+      <Project>{533B2099-3C96-4D88-8766-8EB24B7FA216}</Project>
+      <Name>Lokad.Cloud.AppHost.Framework</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Lokad.Cloud.Provisioning\Lokad.Cloud.Provisioning.csproj">
       <Project>{B3CA9DCB-04DB-4442-AC0C-6E1F70854DA1}</Project>
       <Name>Lokad.Cloud.Provisioning</Name>

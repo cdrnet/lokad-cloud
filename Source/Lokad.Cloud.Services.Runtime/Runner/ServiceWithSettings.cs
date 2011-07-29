@@ -3,19 +3,18 @@
 // URL: http://www.lokad.com/
 #endregion
 
+using System.Xml.Linq;
 using Lokad.Cloud.Services.Framework;
-using Lokad.Cloud.Services.Management.Settings;
 
 namespace Lokad.Cloud.Services.Runtime.Runner
 {
-    public class ServiceWithSettings<TService, TSettings>
+    public class ServiceWithSettings<TService>
         where TService : ICloudService
-        where TSettings : CommonServiceSettings
     {
         public TService Service { get; private set; }
-        public TSettings Settings { get; private set; }
+        public XElement Settings { get; private set; }
 
-        public ServiceWithSettings(TService service, TSettings settings)
+        public ServiceWithSettings(TService service, XElement settings)
         {
             Service = service;
             Settings = settings;

@@ -7,12 +7,13 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Xml.Linq;
 using Autofac;
 using Autofac.Configuration;
 using Lokad.Cloud.Services.Framework;
+using Lokad.Cloud.Services.Framework.Runtime;
 using Lokad.Cloud.Services.Management;
-using Lokad.Cloud.Services.Management.Application;
-using Lokad.Cloud.Services.Management.Settings;
+using Lokad.Cloud.Services.Runtime.Internal;
 using Lokad.Cloud.Services.Runtime.Runner;
 
 namespace Lokad.Cloud.Services.Runtime.WorkingSet
@@ -22,17 +23,13 @@ namespace Lokad.Cloud.Services.Runtime.WorkingSet
         private readonly IContainer _container;
         private readonly List<Type> _types;
 
-        public ServiceContainer(byte[] assemblies, byte[] config)
+        public ServiceContainer(byte[] config, ICloudEnvironment environment)
         {
             var applicationBuilder = new ContainerBuilder();
             applicationBuilder.RegisterModule(new CloudModule());
             applicationBuilder.RegisterModule(new ManagementModule());
+            applicationBuilder.RegisterInstance(environment).As<ICloudEnvironment>();
             // TODO: applicationBuilder.RegisterInstance(_settings);
-
-            // Load Application Assemblies into the AppDomain
-            var reader = new CloudApplicationPackageReader();
-            var package = reader.ReadPackage(assemblies, false);
-            package.LoadAssemblies();
 
             // Load Application IoC Configuration and apply it to the builder
             if (config != null && config.Length > 0)
@@ -72,17 +69,16 @@ namespace Lokad.Cloud.Services.Runtime.WorkingSet
         /// <summary>
         /// Matches and resolves services with their settings but skip disabled services and services without settings.
         /// </summary>
-        public IEnumerable<ServiceWithSettings<TService, TSetting>> ResolveServices<TService, TSetting>(IEnumerable<TSetting> settings)
+        public IEnumerable<ServiceWithSettings<TService>> ResolveServices<TService>(IEnumerable<XElement> settings)
             where TService : ICloudService
-            where TSetting : CommonServiceSettings
         {
-            var settingsByType = settings.ToDictionary(s => s.TypeName);
+            var settingsByType = settings.ToDictionary(s => s.SettingsElement("ImplementationType").AttributeValue("name"));
             foreach (var type in _types)
             {
-                TSetting setting;
-                if (settingsByType.TryGetValue(type.FullName, out setting) && !setting.IsDisabled)
+                XElement setting;
+                if (settingsByType.TryGetValue(type.FullName, out setting) && setting.AttributeValue("name") != "true")
                 {
-                    yield return new ServiceWithSettings<TService, TSetting>((TService)_container.Resolve(type), setting);
+                    yield return new ServiceWithSettings<TService>((TService)_container.Resolve(type), setting);
                 }
             }
         }

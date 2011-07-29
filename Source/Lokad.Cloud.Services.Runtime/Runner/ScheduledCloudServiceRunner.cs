@@ -8,13 +8,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Lokad.Cloud.Services.Framework;
-using Lokad.Cloud.Services.Management.Settings;
 
 namespace Lokad.Cloud.Services.Runtime.Runner
 {
     internal class ScheduledCloudServiceRunner : CommonServiceRunner
     {
-        public ScheduledCloudServiceRunner(List<ServiceWithSettings<ScheduledCloudService, ScheduledCloudServiceSettings>> services)
+        public ScheduledCloudServiceRunner(List<ServiceWithSettings<ScheduledCloudService>> services)
             : base(services.Select(s => s.Service))
         {
             // TODO: Implement

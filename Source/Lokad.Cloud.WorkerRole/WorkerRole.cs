@@ -6,7 +6,9 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Lokad.Cloud.Services.Framework.Instrumentation;
+using Lokad.Cloud.AppHost;
+using Lokad.Cloud.AppHost.Framework;
+using Lokad.Cloud.Services.Framework;
 using Lokad.Cloud.Services.Framework.Logging;
 using Lokad.Cloud.Storage;
 using Microsoft.WindowsAzure.ServiceRuntime;
@@ -17,24 +19,24 @@ namespace Lokad.Cloud.Worker
     public class WorkerRole : RoleEntryPoint
     {
         private readonly CancellationTokenSource _cancellationTokenSource;
-        private readonly Services.Runtime.Runtime _runtime;
+        private readonly Host _host;
         private Task _runtimeTask;
 
         public WorkerRole()
         {
-            var storage = CloudStorage
-                .ForAzureConnectionString(RoleEnvironment.GetConfigurationSettingValue("DataConnectionString"))
-                .BuildStorageProviders();
-
             _cancellationTokenSource = new CancellationTokenSource();
 
-            var log = new CloudLogWriter(storage);
-            var observer = new CloudRuntimeInstrumentationSubject();
+            // Host Context
+            var context = LokadCloudHostContext.CreateFromRoleEnvironment();
 
+            // Host Observer
             // TODO: more sensible subscriptions (with text, filtered, throttled)
+            var logStorage = CloudStorage.ForAzureConnectionString(context.DataConnectionString).BuildStorageProviders();
+            var log = new CloudLogWriter(logStorage);
+            var observer = new HostObserverSubject();
             observer.Subscribe(@event => log.DebugFormat("Runtime: {0}", @event.ToString()));
 
-            _runtime = new Services.Runtime.Runtime(storage, observer);
+            _host = new Host(context, observer);
         }
 
         /// <summary>
@@ -80,7 +82,7 @@ namespace Lokad.Cloud.Worker
         /// </remarks>
         public override void Run()
         {
-            var task = _runtime.Run(_cancellationTokenSource.Token);
+            var task = _host.Run(_cancellationTokenSource.Token);
             _runtimeTask = task;
 
             task.Wait();

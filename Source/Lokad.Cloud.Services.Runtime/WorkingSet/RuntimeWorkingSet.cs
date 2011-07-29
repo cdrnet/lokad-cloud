@@ -3,11 +3,14 @@
 // URL: http://www.lokad.com/
 #endregion
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Lokad.Cloud.Services.Framework.Commands;
 using Lokad.Cloud.Services.Framework.Instrumentation;
+using Lokad.Cloud.Services.Runtime.Internal;
 
 namespace Lokad.Cloud.Services.Runtime.WorkingSet
 {
@@ -27,24 +30,26 @@ namespace Lokad.Cloud.Services.Runtime.WorkingSet
         private byte[] _packageAssemblies;
         private byte[] _packageConfig;
         private CancellationToken _cancellationToken;
-        private Dictionary<string, CellWorkingSet> _cells;
-        private ICloudRuntimeObserver _observer;
+        private Dictionary<string, CellProcess> _cells;
+        private RuntimeHandle _runtimeHandle;
 
         private RuntimeWorkingSet() {}
 
         /// <summary>
         /// Create a new runtime working set and start all its cell processes.
         /// </summary>
-        public static RuntimeWorkingSet StartNew(byte[] packageAssemblies, byte[] packageConfig, IEnumerable<CellArrangement> arrangements, ICloudRuntimeObserver observer, CancellationToken cancellationToken)
+        internal static RuntimeWorkingSet StartNew(byte[] packageAssemblies, byte[] packageConfig, IEnumerable<CellArrangement> arrangements, ICloudRuntimeObserver observer, Action<ICloudCommand> sendCommand, CancellationToken cancellationToken)
         {
+            var runtimeHandle = new RuntimeHandle(sendCommand, observer);
+
             return new RuntimeWorkingSet
                 {
                     _packageAssemblies = packageAssemblies,
                     _packageConfig = packageConfig,
                     _cancellationToken = cancellationToken,
-                    _observer = observer,
+                    _runtimeHandle = runtimeHandle,
                     _cells = arrangements
-                        .Select(a => StartNewCell(packageAssemblies, packageConfig, a, observer, cancellationToken))
+                        .Select(a => CellProcess.Run(packageAssemblies, packageConfig, a.ServicesSettings, runtimeHandle, new CellHandle(a.CellName), cancellationToken))
                         .ToDictionary(c => c.CellName)
                 };
         }
@@ -52,7 +57,7 @@ namespace Lokad.Cloud.Services.Runtime.WorkingSet
         /// <summary>
         /// Create an empty
         /// </summary>
-        public static RuntimeWorkingSet Empty
+        internal static RuntimeWorkingSet Empty
         {
             get { return new RuntimeWorkingSet(); }
         }
@@ -60,7 +65,7 @@ namespace Lokad.Cloud.Services.Runtime.WorkingSet
         /// <summary>
         /// Cancel all cells of the working set and wait until they shut down.
         /// </summary>
-        public void ShutdownWait()
+        internal void ShutdownWait()
         {
             // TODO: consider timeout
 
@@ -69,9 +74,10 @@ namespace Lokad.Cloud.Services.Runtime.WorkingSet
                 return;
             }
 
+            // TODO: consider cancelling the common cancellation token directly instead.
             foreach (var cell in _cells)
             {
-                cell.Value.CancellationTokenSource.Cancel();
+                cell.Value.Cancel();
             }
             Task.WaitAll(_cells.Select(c => c.Value.Task).ToArray());
         }
@@ -79,7 +85,7 @@ namespace Lokad.Cloud.Services.Runtime.WorkingSet
         /// <summary>
         /// Reconfigure the app package
         /// </summary>
-        public void Reconfigure(byte[] newPackageConfig)
+        internal void Reconfigure(byte[] newPackageConfig)
         {
             if (_cells == null)
             {
@@ -89,7 +95,7 @@ namespace Lokad.Cloud.Services.Runtime.WorkingSet
             _packageConfig = newPackageConfig;
             foreach (var cell in _cells)
             {
-                cell.Value.Process.Reconfigure(newPackageConfig);
+                cell.Value.Reconfigure(newPackageConfig);
             }
         }
 
@@ -100,7 +106,7 @@ namespace Lokad.Cloud.Services.Runtime.WorkingSet
         /// and updating the service settings of the remaining cells.
         /// </summary>
         /// <param name="newSettings"></param>
-        public void Rearrange(IEnumerable<CellArrangement> newSettings)
+        internal void Rearrange(IEnumerable<CellArrangement> newSettings)
         {
             // TODO: consider timeout
 
@@ -111,7 +117,7 @@ namespace Lokad.Cloud.Services.Runtime.WorkingSet
 
             // 1. ANALYSE CHANGES
 
-            var removedCells = new Dictionary<string, CellWorkingSet>(_cells);
+            var removedCells = new Dictionary<string, CellProcess>(_cells);
             var addedArrangements = new List<CellArrangement>();
             var remainingArrangements = new List<CellArrangement>();
 
@@ -133,7 +139,7 @@ namespace Lokad.Cloud.Services.Runtime.WorkingSet
             foreach (var cell in removedCells)
             {
                 _cells.Remove(cell.Key);
-                cell.Value.CancellationTokenSource.Cancel();
+                cell.Value.Cancel();
             }
             Task.WaitAll(removedCells.Select(c => c.Value.Task).ToArray());
 
@@ -141,30 +147,23 @@ namespace Lokad.Cloud.Services.Runtime.WorkingSet
 
             foreach (var arrangement in remainingArrangements)
             {
-                _cells[arrangement.CellName].Process.ApplySettings(arrangement.ServicesSettings);
+                _cells[arrangement.CellName].ApplySettings(arrangement.ServicesSettings);
             }
 
             // 4. ADD
 
             foreach (var arrangement in addedArrangements)
             {
-                _cells.Add(arrangement.CellName, StartNewCell(_packageAssemblies, _packageConfig, arrangement, _observer, _cancellationToken));
+                _cells.Add(
+                    arrangement.CellName,
+                    CellProcess.Run(
+                        _packageAssemblies,
+                        _packageConfig,
+                        arrangement.ServicesSettings,
+                        _runtimeHandle,
+                        new CellHandle(arrangement.CellName),
+                        _cancellationToken));
             }
-        }
-
-        static CellWorkingSet StartNewCell(byte[] packageAssemblies, byte[] packageConfig, CellArrangement arrangement, ICloudRuntimeObserver observer, CancellationToken cancellationToken)
-        {
-            var cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-            var process = new CellProcess(packageAssemblies, packageConfig, arrangement.CellName, arrangement.ServicesSettings, observer);
-
-            return new CellWorkingSet
-                {
-                    CancellationTokenSource = cancellationTokenSource,
-                    Process = process,
-                    CellName = arrangement.CellName,
-                    ServicesSettings = arrangement.ServicesSettings,
-                    Task = process.Run(cancellationTokenSource.Token)
-                };
         }
     }
 }

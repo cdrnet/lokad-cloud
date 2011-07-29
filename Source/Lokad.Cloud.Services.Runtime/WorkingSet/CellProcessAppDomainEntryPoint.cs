@@ -4,9 +4,12 @@
 #endregion
 
 using System;
+using System.Linq;
 using System.Threading;
+using System.Xml.Linq;
 using Lokad.Cloud.Services.Framework;
-using Lokad.Cloud.Services.Management.Settings;
+using Lokad.Cloud.Services.Management.Application;
+using Lokad.Cloud.Services.Runtime.Internal;
 using Lokad.Cloud.Services.Runtime.Runner;
 
 namespace Lokad.Cloud.Services.Runtime.WorkingSet
@@ -17,34 +20,29 @@ namespace Lokad.Cloud.Services.Runtime.WorkingSet
     internal sealed class CellProcessAppDomainEntryPoint : MarshalByRefObject
     {
         private readonly CancellationTokenSource _externalCancellationTokenSource = new CancellationTokenSource();
-        private readonly ManualResetEvent _completedWaitHandle = new ManualResetEvent(false);
 
         /// <remarks>Never run a cell process entry point more than once per AppDomain.</remarks>
-        public void Run(byte[] packageAssemblies, byte[] packageConfig, CloudServicesSettings servicesSettings)
+        public void Run(byte[] packageAssemblies, byte[] packageConfig, string servicesSettingsXml, RuntimeCellEnvironment environment)
         {
-            try
+            // Load Application Assemblies into the AppDomain
+            var reader = new CloudApplicationPackageReader();
+            var package = reader.ReadPackage(packageAssemblies, false);
+            package.LoadAssemblies();
+
+            // Build IoC container, resolve all cloud services and run them.
+            var servicesSettings = XElement.Parse(servicesSettingsXml).Elements("Service").ToLookup(service => service.AttributeValue("type"));
+            using (var container = new ServiceContainer(packageConfig, environment))
             {
-                using (var container = new ServiceContainer(packageAssemblies, packageConfig))
+                while (!_externalCancellationTokenSource.Token.IsCancellationRequested)
                 {
-                    while (!_externalCancellationTokenSource.Token.IsCancellationRequested)
-                    {
-                        var runner = new ServiceRunner();
-                        runner.Run(
-                            container.ResolveServices<UntypedQueuedCloudService, QueuedCloudServiceSettings>(servicesSettings.QueuedCloudServices),
-                            container.ResolveServices<ScheduledCloudService, ScheduledCloudServiceSettings>(servicesSettings.ScheduledCloudServices),
-                            container.ResolveServices<ScheduledWorkerService, ScheduledWorkerServiceSettings>(servicesSettings.ScheduledWorkerServices),
-                            container.ResolveServices<DaemonService, DaemonServiceSettings>(servicesSettings.DaemonServices),
-                            _externalCancellationTokenSource.Token);
-                    }
+                    var runner = new ServiceRunner();
+                    runner.Run(
+                        container.ResolveServices<UntypedQueuedCloudService>(servicesSettings["QueuedCloudService"]),
+                        container.ResolveServices<ScheduledCloudService>(servicesSettings["ScheduledCloudService"]),
+                        container.ResolveServices<ScheduledWorkerService>(servicesSettings["ScheduledWorkerService"]),
+                        container.ResolveServices<DaemonService>(servicesSettings["DaemonService"]),
+                        _externalCancellationTokenSource.Token);
                 }
-            }
-            catch (ThreadAbortException)
-            {
-                Thread.ResetAbort();
-            }
-            finally
-            {
-                _completedWaitHandle.Set();
             }
         }
 
@@ -53,11 +51,16 @@ namespace Lokad.Cloud.Services.Runtime.WorkingSet
             _externalCancellationTokenSource.Cancel();
         }
 
-        public void ShutdownWait()
+        public void Reconfigure(byte[] newPackageConfig)
         {
-            // TODO: consider timeout
-            _externalCancellationTokenSource.Cancel();
-            _completedWaitHandle.WaitOne();
+            // reconfigure means that we have new IoC modules to load, hence we need to rebuild the service container.
+
+            throw new NotImplementedException();
+        }
+
+        public void ApplySettings(string newServicesSettingsXml)
+        {
+            throw new NotImplementedException();
         }
     }
 }

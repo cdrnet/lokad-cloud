@@ -5,10 +5,12 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading;
+using System.Xml.Linq;
 using Lokad.Cloud.Services.Framework;
-using Lokad.Cloud.Services.Management.Settings;
+using Lokad.Cloud.Services.Runtime.Internal;
 
 namespace Lokad.Cloud.Services.Runtime.Runner
 {
@@ -17,7 +19,7 @@ namespace Lokad.Cloud.Services.Runtime.Runner
         private readonly SortedSet<DateTimeOffset> _triggers;
         private readonly List<ScheduledWorkerServiceContext> _services;
 
-        public ScheduledWorkerServiceRunner(List<ServiceWithSettings<ScheduledWorkerService, ScheduledWorkerServiceSettings>> services)
+        public ScheduledWorkerServiceRunner(List<ServiceWithSettings<ScheduledWorkerService>> services)
             : base(services.Select(s => s.Service))
         {
             var now = DateTimeOffset.UtcNow;
@@ -39,7 +41,7 @@ namespace Lokad.Cloud.Services.Runtime.Runner
             {
                 var service = services[0];
 
-                service.NextRun = trigger + service.Settings.TriggerInterval;
+                service.NextRun = trigger + service.TriggerInterval;
                 _triggers.Add(service.NextRun);
                 if (services.Count == 1)
                 {
@@ -56,17 +58,16 @@ namespace Lokad.Cloud.Services.Runtime.Runner
 
         class ScheduledWorkerServiceContext
         {
-            public ScheduledWorkerService Service { get; set; }
-            public ScheduledWorkerServiceSettings Settings { get; set; }
+            public ScheduledWorkerService Service { get; private set; }
+            public TimeSpan TriggerInterval { get; private set; }
             public DateTimeOffset NextRun { get; set; }
 
-            public ScheduledWorkerServiceContext(ScheduledWorkerService service, ScheduledWorkerServiceSettings settings, DateTimeOffset now)
+            public ScheduledWorkerServiceContext(ScheduledWorkerService service, XElement settings, DateTimeOffset now)
             {
                 Service = service;
-                Settings = settings;
-                NextRun = now + settings.TriggerInterval;
+                TriggerInterval = TimeSpan.Parse(settings.SettingsElementAttributeValue("Trigger", "interval"));
+                NextRun = now + TriggerInterval;
             }
         }
-
     }
 }

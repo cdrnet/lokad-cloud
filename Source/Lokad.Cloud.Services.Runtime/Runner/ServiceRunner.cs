@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Lokad.Cloud.Services.Framework;
-using Lokad.Cloud.Services.Management.Settings;
+using Lokad.Cloud.Services.Runtime.Internal;
 
 namespace Lokad.Cloud.Services.Runtime.Runner
 {
@@ -32,10 +32,10 @@ namespace Lokad.Cloud.Services.Runtime.Runner
 
         /// <remarks> Only returns on unhandled exceptions or when canceled.</remarks>
         public void Run(
-            IEnumerable<ServiceWithSettings<UntypedQueuedCloudService, QueuedCloudServiceSettings>> queuedCloudServices,
-            IEnumerable<ServiceWithSettings<ScheduledCloudService, ScheduledCloudServiceSettings>> scheduledCloudServices,
-            IEnumerable<ServiceWithSettings<ScheduledWorkerService, ScheduledWorkerServiceSettings>> scheduledWorkerServices,
-            IEnumerable<ServiceWithSettings<DaemonService, DaemonServiceSettings>> daemonServices,
+            IEnumerable<ServiceWithSettings<UntypedQueuedCloudService>> queuedCloudServices,
+            IEnumerable<ServiceWithSettings<ScheduledCloudService>> scheduledCloudServices,
+            IEnumerable<ServiceWithSettings<ScheduledWorkerService>> scheduledWorkerServices,
+            IEnumerable<ServiceWithSettings<DaemonService>> daemonServices,
             CancellationToken cancellationToken)
         {
             if (cancellationToken.IsCancellationRequested)
@@ -50,10 +50,10 @@ namespace Lokad.Cloud.Services.Runtime.Runner
 
             // 2. BUILD SERVICE RUNNERS FOR ENABLED SERVICES
 
-            var queuedCloudServiceRunner = new QueuedCloudServiceRunner(queuedCloudServices.Where(s => !s.Settings.IsDisabled).ToList());
-            var scheduledCloudServiceRunner = new ScheduledCloudServiceRunner(scheduledCloudServices.Where(s => !s.Settings.IsDisabled).ToList());
-            var scheduledWorkerServiceRunner = new ScheduledWorkerServiceRunner(scheduledWorkerServices.Where(s => !s.Settings.IsDisabled).ToList());
-            var daemonServiceRunner = new DaemonServiceRunner(daemonServices.Where(s => !s.Settings.IsDisabled).ToList());
+            var queuedCloudServiceRunner = new QueuedCloudServiceRunner(queuedCloudServices.Where(s => s.Settings.AttributeValue("disabled") != "true").ToList());
+            var scheduledCloudServiceRunner = new ScheduledCloudServiceRunner(scheduledCloudServices.Where(s => s.Settings.AttributeValue("disabled") != "true").ToList());
+            var scheduledWorkerServiceRunner = new ScheduledWorkerServiceRunner(scheduledWorkerServices.Where(s => s.Settings.AttributeValue("disabled") != "true").ToList());
+            var daemonServiceRunner = new DaemonServiceRunner(daemonServices.Where(s => s.Settings.AttributeValue("disabled") != "true").ToList());
 
             // 3. INITIALIZE SERVICES
 

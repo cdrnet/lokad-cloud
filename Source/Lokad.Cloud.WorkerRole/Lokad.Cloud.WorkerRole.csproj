@@ -75,6 +75,14 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Lokad.Cloud.ApplicationHost.Framework\Lokad.Cloud.AppHost.Framework.csproj">
+      <Project>{533B2099-3C96-4D88-8766-8EB24B7FA216}</Project>
+      <Name>Lokad.Cloud.AppHost.Framework</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Lokad.Cloud.ApplicationHost\Lokad.Cloud.AppHost.csproj">
+      <Project>{89D98EC0-6959-4B20-A8F4-9BF19B4BCF49}</Project>
+      <Name>Lokad.Cloud.AppHost</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Lokad.Cloud.Services.Framework\Lokad.Cloud.Services.Framework.csproj">
       <Project>{BA1AC04C-5DE2-4E40-8FC9-8EBF31C1B0F3}</Project>
       <Name>Lokad.Cloud.Services.Framework</Name>

@@ -5,10 +5,12 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading;
+using System.Xml.Linq;
 using Lokad.Cloud.Services.Framework;
-using Lokad.Cloud.Services.Management.Settings;
+using Lokad.Cloud.Services.Runtime.Internal;
 
 namespace Lokad.Cloud.Services.Runtime.Runner
 {
@@ -16,13 +18,13 @@ namespace Lokad.Cloud.Services.Runtime.Runner
 
     internal class QueuedCloudServiceRunner : CommonServiceRunner
     {
-        private readonly List<ServiceWithSettings<UntypedQueuedCloudService, QueuedCloudServiceSettings>> _services;
+        private readonly List<QueuedCloudServiceContext> _services;
         private int _nextIndex;
 
-        public QueuedCloudServiceRunner(List<ServiceWithSettings<UntypedQueuedCloudService, QueuedCloudServiceSettings>> services)
+        public QueuedCloudServiceRunner(List<ServiceWithSettings<UntypedQueuedCloudService>> services)
             : base(services.Select(s => s.Service))
         {
-            _services = services;
+            _services = services.Select(s => new QueuedCloudServiceContext(s.Service, s.Settings)).ToList();
         }
 
         public bool RunSingle(CancellationToken cancellationToken)
@@ -37,9 +39,9 @@ namespace Lokad.Cloud.Services.Runtime.Runner
 
             var start = DateTimeOffset.UtcNow;
             var hadAnyMessage = false;
-            while (!cancellationToken.IsCancellationRequested && DateTimeOffset.UtcNow.Subtract(start) < service.Settings.ContinueProcessingIfMessagesAvailable)
+            while (!cancellationToken.IsCancellationRequested && DateTimeOffset.UtcNow.Subtract(start) < service.ContinueProcessingIfMessagesAvailable)
             {
-                var hadMessage = service.Service.TryGetMessageAndProcess(service.Settings.QueueName, service.Settings.VisibilityTimeout, service.Settings.MaxProcessingTrials, cancellationToken);
+                var hadMessage = service.Service.TryGetMessageAndProcess(service.QueueName, service.VisibilityTimeout, service.MaxProcessingTrials, cancellationToken);
                 hadAnyMessage |= hadMessage;
                 if (!hadMessage)
                 {
@@ -48,6 +50,24 @@ namespace Lokad.Cloud.Services.Runtime.Runner
             }
 
             return hadAnyMessage;
+        }
+
+        class QueuedCloudServiceContext
+        {
+            public UntypedQueuedCloudService Service { get; private set; }
+            public string QueueName { get; private set; }
+            public TimeSpan VisibilityTimeout { get; private set; }
+            public TimeSpan ContinueProcessingIfMessagesAvailable { get; private set; }
+            public int MaxProcessingTrials { get; private set; }
+
+            public QueuedCloudServiceContext(UntypedQueuedCloudService service, XElement settings)
+            {
+                Service = service;
+                QueueName = settings.SettingsElementAttributeValue("Queue", "name");
+                VisibilityTimeout = TimeSpan.Parse(settings.SettingsElementAttributeValue("Timing", "invisibility"));
+                ContinueProcessingIfMessagesAvailable = TimeSpan.Parse(settings.SettingsElementAttributeValue("Timing", "continueFor"));
+                MaxProcessingTrials = Int32.Parse(settings.SettingsElementAttributeValue("Quarantine", "maxTrials"));
+            }
         }
     }
 }

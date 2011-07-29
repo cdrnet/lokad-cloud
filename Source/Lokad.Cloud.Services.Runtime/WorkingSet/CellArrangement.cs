@@ -3,33 +3,19 @@
 // URL: http://www.lokad.com/
 #endregion
 
-using System;
-using System.Collections.Generic;
-using Lokad.Cloud.Services.Management.Settings;
+using System.Xml.Linq;
 
 namespace Lokad.Cloud.Services.Runtime.WorkingSet
 {
-    [Serializable]
     internal sealed class CellArrangement
     {
-        public string CellName { get; private set; }
-        public CloudServicesSettings ServicesSettings { get; private set; }
+        internal string CellName { get; private set; }
+        internal XElement ServicesSettings { get; private set; }
 
-        public CellArrangement(
-            string cellName,
-            IEnumerable<QueuedCloudServiceSettings> queuedCloudServices,
-            IEnumerable<ScheduledCloudServiceSettings> scheduledCloudServices,
-            IEnumerable<ScheduledWorkerServiceSettings> scheduledWorkerServices,
-            IEnumerable<DaemonServiceSettings> daemonServices)
+        internal CellArrangement(string cellName, XElement serviceSettings)
         {
             CellName = cellName;
-            ServicesSettings = new CloudServicesSettings
-                {
-                    QueuedCloudServices = new List<QueuedCloudServiceSettings>(queuedCloudServices),
-                    ScheduledCloudServices = new List<ScheduledCloudServiceSettings>(scheduledCloudServices),
-                    ScheduledWorkerServices = new List<ScheduledWorkerServiceSettings>(scheduledWorkerServices),
-                    DaemonServices = new List<DaemonServiceSettings>(daemonServices)
-                };
+            ServicesSettings = serviceSettings;
         }
     }
 }

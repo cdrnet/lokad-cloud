@@ -39,12 +39,15 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\Autofac.2.5.1.827\lib\NET40\Autofac.Configuration.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.CSharp" />
     <Reference Include="Microsoft.WindowsAzure.ServiceRuntime, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\..\Resource\Library\Microsoft.WindowsAzure.ServiceRuntime.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\GlobalAssemblyInfo.cs">
@@ -53,13 +56,20 @@
     <Compile Include="..\VersionAssemblyInfo.cs">
       <Link>Properties\VersionAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="Agents\DeploymentHeadPollingAgent.cs" />
+    <Compile Include="HybridRuntime.cs" />
+    <Compile Include="Internal\CellHandle.cs" />
     <Compile Include="InstrumentationExtensions.cs" />
+    <Compile Include="Internal\RuntimeCellEnvironment.cs" />
+    <Compile Include="Internal\SettingsTools.cs" />
+    <Compile Include="Internal\SettingsXml.cs" />
     <Compile Include="Legacy\AssemblyLoader.cs" />
     <Compile Include="Runner\CommonServiceRunner.cs" />
     <Compile Include="Runner\DaemonServiceRunner.cs" />
     <Compile Include="Runner\QueuedCloudServiceRunner.cs" />
     <Compile Include="Runner\ScheduledCloudServiceRunner.cs" />
     <Compile Include="Runner\ScheduledWorkerServiceRunner.cs" />
+    <Compile Include="Internal\RuntimeHandle.cs" />
     <Compile Include="WorkingSet\ServiceContainer.cs" />
     <Compile Include="Runner\ServiceWithSettings.cs" />
     <Compile Include="WorkingSet\CellProcessAppDomainEntryPoint.cs" />
@@ -73,7 +83,6 @@
     <Compile Include="Legacy\SingleRuntimeHost.cs" />
     <Compile Include="Runtime.cs" />
     <Compile Include="WorkingSet\CellProcess.cs" />
-    <Compile Include="WorkingSet\CellWorkingSet.cs" />
     <Compile Include="WorkingSet\RuntimeWorkingSet.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -92,6 +101,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="_ServiceSettingsFormat.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

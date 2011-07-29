@@ -6,13 +6,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using Lokad.Cloud.Services.Framework;
-using Lokad.Cloud.Services.Management.Settings;
 
 namespace Lokad.Cloud.Services.Runtime.Runner
 {
     internal class DaemonServiceRunner : CommonServiceRunner
     {
-        public DaemonServiceRunner(IEnumerable<ServiceWithSettings<DaemonService, DaemonServiceSettings>> services)
+        public DaemonServiceRunner(IEnumerable<ServiceWithSettings<DaemonService>> services)
             : base(services.Select(s => s.Service))
         {
         }

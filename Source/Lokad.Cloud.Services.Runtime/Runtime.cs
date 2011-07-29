@@ -4,15 +4,15 @@
 #endregion
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
+using Lokad.Cloud.Services.Framework.Commands;
 using Lokad.Cloud.Services.Framework.Instrumentation;
 using Lokad.Cloud.Services.Framework.Instrumentation.Events;
-using Lokad.Cloud.Services.Management.Application;
-using Lokad.Cloud.Services.Management.Settings;
-using Lokad.Cloud.Services.Runtime.Legacy;
+using Lokad.Cloud.Services.Management.Deployments;
+using Lokad.Cloud.Services.Runtime.Agents;
+using Lokad.Cloud.Services.Runtime.Internal;
 using Lokad.Cloud.Services.Runtime.WorkingSet;
 using Lokad.Cloud.Storage;
 
@@ -21,61 +21,67 @@ namespace Lokad.Cloud.Services.Runtime
     /// <summary>
     /// Fully managed storage-based entry point for cloud service hosting.
     /// </summary>
-    /// <remarks>
-    /// Primary responsibility of this class: To build and manage a runtime working set
-    /// based on the app package and settings in the storage, to update or rebuild settings
-    /// to match the app, and to update the working set if anything changes from the outside
-    /// (new package, changed config, changed service settings).
-    /// </remarks>
     public sealed class Runtime
     {
-        // The current implementation hosts this new runtime but also the old
-        // legacy runtime (in a separte thread); the latter will be dropped in the future.
-
-        private const string ContainerName = "lokad-cloud-services";
-        private const string PackageAssembliesBlobName = "package.assemblies.lokadcloud";
-        private const string PackageConfigBlobName = "package.config.lokadcloud";
-
         private readonly CloudStorageProviders _storage;
         private readonly ICloudRuntimeObserver _observer;
-        private readonly ServicesSettingsManager _settingsManager;
+        private readonly DeploymentHeadPollingAgent _deploymentPollingAgent;
+        private readonly DeploymentReader _deploymentReader;
+        private readonly ConcurrentQueue<ICloudCommand> _commandQueue;
 
-        private string _packageETag, _configETag, _settingsETag;
+        // only accessed inside of the new runtime thread
+        private DeploymentReference _currentDeployment;
 
         public Runtime(CloudStorageProviders storage, ICloudRuntimeObserver observer = null)
         {
             _storage = storage;
             _observer = observer;
-            _settingsManager = new ServicesSettingsManager(storage);
+            _deploymentReader = new DeploymentReader(storage);
+            _commandQueue = new ConcurrentQueue<ICloudCommand>();
+            _deploymentPollingAgent = new DeploymentHeadPollingAgent(storage, AcceptCommand);
         }
 
-        public Task Run(CancellationToken cancellationToken)
+        public void Run(CancellationToken cancellationToken)
         {
-            var cancelNewTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+            _observer.TryNotify(() => new CloudRuntimeStartedEvent());
 
-            return Task.Factory.ContinueWhenAll(
-                new[] { RunRuntime(cancelNewTokenSource.Token), RunLegacyRuntime(cancellationToken, cancelNewTokenSource) },
-                tasks => { });
+            var workingSet = RuntimeWorkingSet.Empty;
+
+            try
+            {
+                while (!cancellationToken.IsCancellationRequested)
+                {
+                    // 1. run agents
+                    _deploymentPollingAgent.PollForChanges(_currentDeployment.Name);
+
+                    // 2. apply commands
+                    ICloudCommand command;
+                    if (_commandQueue.TryDequeue(out command))
+                    {
+                        // dynamic dispatch, good enough for now
+                        ApplyCommand((dynamic)command, ref workingSet, cancellationToken);
+                    }
+
+                    // 3. repeat, but throttled
+                    cancellationToken.WaitHandle.WaitOne(TimeSpan.FromSeconds(30));
+                }
+            }
+            finally
+            {
+                _observer.TryNotify(() => new CloudRuntimeStoppedEvent());
+            }
         }
 
-        [Obsolete]
-        Task RunLegacyRuntime(CancellationToken cancellationToken, CancellationTokenSource cancelNewRuntime)
+        public Task RunAsync(CancellationToken cancellationToken)
         {
-            // TODO: refactor -> simplify -> drop
-
-            var host = new ServiceFabricHost();
-            host.StartRuntime();
-
             var completionSource = new TaskCompletionSource<object>();
-            cancellationToken.Register(host.ShutdownRuntime);
 
-            // Classic thread because the legacy runtime was designed to run in the main thread exclusively
+            // Classic thread for now
             var thread = new Thread(() =>
                 {
                     try
                     {
-                        host.Run();
-                        completionSource.TrySetResult(null);
+                        Run(cancellationToken);
                     }
                     catch (ThreadAbortException)
                     {
@@ -93,69 +99,6 @@ namespace Lokad.Cloud.Services.Runtime
                         {
                             completionSource.TrySetException(exception);
                         }
-                    }
-                    finally
-                    {
-                        if (!cancellationToken.IsCancellationRequested)
-                        {
-                            // cancel the other runtime, so we can recycle
-                            // (expected behavior of the legacy runtime)
-
-                            // TODO: this may throw
-                            cancelNewRuntime.Cancel();
-                        }
-                    }
-                });
-
-            thread.Name = "Lokad.Cloud Legacy Runtime";
-            thread.Start();
-
-            return completionSource.Task;
-        }
-
-        Task RunRuntime(CancellationToken cancellationToken)
-        {
-            var completionSource = new TaskCompletionSource<object>();
-
-            // Classic thread for now, can be replaced with main thread once the legacy runtime is dropped
-            var thread = new Thread(() =>
-                {
-                    try
-                    {
-                        _observer.TryNotify(() => new CloudRuntimeStartedEvent());
-
-                        CloudApplicationDefinition applicationDefinition = null;
-                        var workingSet = RuntimeWorkingSet.Empty;
-
-                        while (!cancellationToken.IsCancellationRequested)
-                        {
-                            UpdatePackageAssembliesIfModified(cancellationToken, ref workingSet, ref applicationDefinition);
-                            UpdatePackageConfigIfModified(workingSet);
-                            UpdateServiceSettingsIfModified(workingSet, applicationDefinition);
-
-                            cancellationToken.WaitHandle.WaitOne(TimeSpan.FromMinutes(1));
-                        }
-                    }
-                    catch (ThreadAbortException)
-                    {
-                        Thread.ResetAbort();
-                        completionSource.TrySetCanceled();
-                    }
-                    catch (Exception exception)
-                    {
-                        if (cancellationToken.IsCancellationRequested)
-                        {
-                            // assuming the exception was caused by the cancellation
-                            completionSource.TrySetCanceled();
-                        }
-                        else
-                        {
-                            completionSource.TrySetException(exception);
-                        }
-                    }
-                    finally
-                    {
-                        _observer.TryNotify(() => new CloudRuntimeStoppedEvent());
                     }
                 });
 
@@ -165,119 +108,102 @@ namespace Lokad.Cloud.Services.Runtime
             return completionSource.Task;
         }
 
-        void UpdatePackageAssembliesIfModified(CancellationToken cancellationToken, ref RuntimeWorkingSet workingSet, ref CloudApplicationDefinition applicationDefinition)
+        // NOTE: simplified command handling, can easily be refactored later if necessary
+
+        public void AcceptCommand(ICloudCommand command)
         {
-            string newPackageETag;
-            var packageAssemblies = _storage.NeutralBlobStorage.GetBlobIfModified<byte[]>(ContainerName, PackageAssembliesBlobName, _packageETag, out newPackageETag);
-            if (!packageAssemblies.HasValue && newPackageETag == null)
+            _commandQueue.Enqueue(command);
+        }
+
+        void ApplyCommand(RuntimeLoadCurrentHeadDeploymentCommand command, ref RuntimeWorkingSet workingSet, CancellationToken cancellationToken)
+        {
+            if (cancellationToken.IsCancellationRequested)
             {
-                // NO PACKAGE -> RETRY LATER
-                cancellationToken.WaitHandle.WaitOne(TimeSpan.FromMinutes(4));
                 return;
             }
-            if (packageAssemblies.HasValue)
+
+            _deploymentPollingAgent.PollForChanges(_currentDeployment.Name);
+        }
+
+        void ApplyCommand(RuntimeLoadDeploymentCommand command, ref RuntimeWorkingSet workingSet, CancellationToken cancellationToken)
+        {
+            if (cancellationToken.IsCancellationRequested)
             {
-                // NEW PACKAGE
+                return;
+            }
 
-                if (_packageETag != null)
+            var current = _currentDeployment;
+            if (current != null && command.DeploymentName == current.Name)
+            {
+                // already on requested deployment
+                return;
+            }
+
+            var requestedBlob = _deploymentReader.GetDeployment(command.DeploymentName);
+            if (!requestedBlob.HasValue)
+            {
+                // TODO: NOTIFY/LOG invalid deployment
+                return;
+            }
+
+            var requested = requestedBlob.Value;
+
+            // CASE A: Assemblies have changed -> FULL RESTART
+            if (current == null || requested.AssembliesName != current.AssembliesName)
+            {
+                var assembliesBytes = _deploymentReader.GetBytes(requested.AssembliesName);
+                var configBytes = _deploymentReader.GetBytes(requested.ConfigName);
+                var settingsXml = _deploymentReader.GetXml(requested.SettingsName);
+                if (!assembliesBytes.HasValue || !configBytes.HasValue || !settingsXml.HasValue)
                 {
-                    _observer.TryNotify(() => new CloudRuntimeAppPackageChangedEvent());
+                    // TODO: NOTIFY/LOG invalid deployment
+                    return;
                 }
-
-                // => STOP
 
                 // TODO: this may throw
                 workingSet.ShutdownWait();
 
-                // => REBUILD
-
-                var inspector = new CloudApplicationInspector(_storage);
-                var appDefinition = inspector.Inspect();
-
-                if (!appDefinition.HasValue)
-                {
-                    // INSPECTION FAILED (RACE) -> RETRY LATER
-                    workingSet = RuntimeWorkingSet.Empty;
-                    cancellationToken.WaitHandle.WaitOne(TimeSpan.FromMinutes(1));
-                    return;
-                }
-
-                applicationDefinition = appDefinition.Value;
-
-                var serviceSettings = _settingsManager.UpdateAndLoadSettings(appDefinition.Value, out _settingsETag);
-                if (!serviceSettings.HasValue)
-                {
-                    // SETTINGS UNAVAILABLE (RACE) -> RETRY LATER
-                    workingSet = RuntimeWorkingSet.Empty;
-                    cancellationToken.WaitHandle.WaitOne(TimeSpan.FromMinutes(1));
-                    return;
-                }
-
-                // => START
-
-                var packageConfig = _storage.NeutralBlobStorage.GetBlob<byte[]>(ContainerName, PackageConfigBlobName, out _configETag);
-                _packageETag = newPackageETag;
-
+                _currentDeployment = requested;
                 workingSet = RuntimeWorkingSet.StartNew(
-                    packageAssemblies.Value, packageConfig.GetValue(new byte[0]),
-                    ArrangeCellsFromSettings(serviceSettings.Value),
+                    assembliesBytes.Value,
+                    configBytes.Value,
+                    SettingsTools.DenormalizeSettingsByCell(settingsXml.Value),
                     _observer,
+                    AcceptCommand,
                     cancellationToken);
 
-                _observer.TryNotify(() => new CloudRuntimeAppPackageLoadedEvent(appDefinition.Value.Timestamp, appDefinition.Value.PackageETag));
-            }
-        }
+                //_observer.TryNotify(() => new CloudRuntimeAppPackageLoadedEvent(appDefinition.Value.Timestamp, appDefinition.Value.PackageETag));
 
-        void UpdatePackageConfigIfModified(RuntimeWorkingSet workingSet)
-        {
-            string newETag;
-            var blob = _storage.NeutralBlobStorage.GetBlobIfModified<byte[]>(ContainerName, PackageConfigBlobName, _configETag, out newETag);
-            if (blob.HasValue)
-            {
-                _observer.TryNotify(() => new CloudRuntimeAppConfigChangedEvent());
-                workingSet.Reconfigure(blob.Value);
-                _configETag = newETag;
-            }
-        }
-
-        void UpdateServiceSettingsIfModified(RuntimeWorkingSet workingSet, CloudApplicationDefinition applicationDefinition)
-        {
-            if (applicationDefinition == null)
-            {
                 return;
             }
 
-            if (_settingsManager.HaveSettingsChanged(_settingsETag))
+            // CASE B 1) IoC Config has changed -> Reconfigure
+            if (requested.ConfigName != current.ConfigName)
             {
-                // make sure the settings still fit to the application
-                string newEtag;
-                var serviceSettings = _settingsManager.UpdateAndLoadSettings(applicationDefinition, out newEtag);
-                if (!serviceSettings.HasValue)
+                var configBytes = _deploymentReader.GetBytes(requested.ConfigName);
+                if (!configBytes.HasValue)
                 {
-                    // SETTINGS UNAVAILABLE (RACE) -> RETRY LATER
+                    // TODO: NOTIFY/LOG invalid deployment
                     return;
                 }
 
-                _observer.TryNotify(() => new CloudRuntimeServiceSettingsChangedEvent());
-                workingSet.Rearrange(ArrangeCellsFromSettings(serviceSettings.Value));
-                _settingsETag = newEtag;
+                workingSet.Reconfigure(configBytes.Value);
+                _observer.TryNotify(() => new CloudRuntimeAppConfigChangedEvent());
             }
-        }
 
-        static IEnumerable<CellArrangement> ArrangeCellsFromSettings(CloudServicesSettings serviceSettings)
-        {
-            var cellAffinities = new List<string>();
-            cellAffinities.AddRange(serviceSettings.QueuedCloudServices.SelectMany(s => s.CellAffinity));
-            cellAffinities.AddRange(serviceSettings.ScheduledCloudServices.SelectMany(s => s.CellAffinity));
-            cellAffinities.AddRange(serviceSettings.ScheduledWorkerServices.SelectMany(s => s.CellAffinity));
-            cellAffinities.AddRange(serviceSettings.DaemonServices.SelectMany(s => s.CellAffinity));
+            // CASE B 2) Service Settings have changed -> Rearrange
+            if (requested.SettingsName != current.SettingsName)
+            {
+                var settingsXml = _deploymentReader.GetXml(requested.SettingsName);
+                if (!settingsXml.HasValue)
+                {
+                    // TODO: NOTIFY/LOG invalid deployment
+                    return;
+                }
 
-            return cellAffinities.Distinct().ToList().Select(name =>
-                new CellArrangement(name,
-                    serviceSettings.QueuedCloudServices.Where(s => !s.IsDisabled && s.CellAffinity.Contains(name)).ToArray(),
-                    serviceSettings.ScheduledCloudServices.Where(s => !s.IsDisabled && s.CellAffinity.Contains(name)).ToArray(),
-                    serviceSettings.ScheduledWorkerServices.Where(s => !s.IsDisabled && s.CellAffinity.Contains(name)).ToArray(),
-                    serviceSettings.DaemonServices.Where(s => !s.IsDisabled && s.CellAffinity.Contains(name)).ToArray()));
+                workingSet.Rearrange(SettingsTools.DenormalizeSettingsByCell(settingsXml.Value));
+                _observer.TryNotify(() => new CloudRuntimeServiceSettingsChangedEvent());
+            }
         }
     }
 }

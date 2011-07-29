@@ -1,0 +1,22 @@
+﻿Expected Service Settings Format:
+
+<Services>
+	<Service disabled="false" type="DaemonService">
+		<ImplementationType name="Namespace.Type, AssemblyName" />
+		<Settings>... custom settings ...</Settings>
+	</Service>
+	<Service disabled="false" type="ScheduledCloudService">
+		<ImplementationType name="Namespace.Type, AssemblyName" />
+		<Trigger interval="00:05:00" />
+	</Service>
+	<Service disabled="false" type="ScheduledWorkerService">
+		<ImplementationType name="Namespace.Type, AssemblyName" />
+		<Trigger interval="00:05:00" />
+	</Service>
+	<Service disabled="true" type="QueuedCloudService">
+		<ImplementationType name="Namespace.Type, AssemblyName" />
+		<Queue name="queueName" />
+		<Timing invisibility="00:30:00" continueFor="00:00:30" />
+		<Quarantine maxTrials="5" />
+	</Service>
+</Services>
