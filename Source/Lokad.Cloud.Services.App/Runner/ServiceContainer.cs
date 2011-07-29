@@ -11,9 +11,10 @@ using System.Xml.Linq;
 using Autofac;
 using Autofac.Configuration;
 using Lokad.Cloud.AppHost.Framework;
+using Lokad.Cloud.Services.Framework;
 using Lokad.Cloud.Services.Framework.Runtime;
 
-namespace Lokad.Cloud.Services.Framework.Runner
+namespace Lokad.Cloud.Services.Runtime.Runner
 {
     public class ServiceContainer : IDisposable
     {
@@ -66,7 +67,7 @@ namespace Lokad.Cloud.Services.Framework.Runner
         /// <summary>
         /// Matches and resolves services with their settings but skip disabled services and services without settings.
         /// </summary>
-        public IEnumerable<ServiceWithSettings<TService>> ResolveServices<TService>(IEnumerable<XElement> settings)
+        public IEnumerable<Framework.Runner.ServiceWithSettings<TService>> ResolveServices<TService>(IEnumerable<XElement> settings)
             where TService : ICloudService
         {
             var settingsByType = settings.ToDictionary(s => s.SettingsElement("ImplementationType").AttributeValue("name"));
@@ -75,7 +76,7 @@ namespace Lokad.Cloud.Services.Framework.Runner
                 XElement setting;
                 if (settingsByType.TryGetValue(type.FullName, out setting) && setting.AttributeValue("name") != "true")
                 {
-                    yield return new ServiceWithSettings<TService>((TService)_container.Resolve(type), setting);
+                    yield return new Framework.Runner.ServiceWithSettings<TService>((TService)_container.Resolve(type), setting);
                 }
             }
         }

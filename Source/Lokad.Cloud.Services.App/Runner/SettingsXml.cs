@@ -33,6 +33,11 @@ namespace Lokad.Cloud.Services.Runtime.Runner
             return parentElement.Elements(itemElementName);
         }
 
+        public static string SettingsValue(this XContainer container, string elementName)
+        {
+            return SettingsElement(container, elementName).Value;
+        }
+
         public static string SettingsElementAttributeValue(this XContainer container, string elementName, string attributeName)
         {
             var element = container.Element(elementName);

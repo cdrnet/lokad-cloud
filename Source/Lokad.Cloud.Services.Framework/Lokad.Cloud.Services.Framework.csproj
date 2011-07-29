@@ -94,15 +94,11 @@
     <Compile Include="Jobs\Job.cs" />
     <Compile Include="Jobs\JobManager.cs" />
     <Compile Include="Legacy\Threading\WaitFor.cs" />
-    <Compile Include="LokadCloudDeploymentReader.cs" />
-    <Compile Include="LokadCloudHostContext.cs" />
-    <Compile Include="Runner\CellRunner.cs" />
     <Compile Include="Runner\CommonServiceRunner.cs" />
     <Compile Include="Runner\DaemonServiceRunner.cs" />
     <Compile Include="Runner\QueuedCloudServiceRunner.cs" />
     <Compile Include="Runner\ScheduledCloudServiceRunner.cs" />
     <Compile Include="Runner\ScheduledWorkerServiceRunner.cs" />
-    <Compile Include="Runner\ServiceContainer.cs" />
     <Compile Include="Runner\ServiceRunner.cs" />
     <Compile Include="Runner\ServiceWithSettings.cs" />
     <Compile Include="Runner\SettingsXml.cs" />

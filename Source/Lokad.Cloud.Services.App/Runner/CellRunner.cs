@@ -3,8 +3,10 @@ using System.Linq;
 using System.Threading;
 using System.Xml.Linq;
 using Lokad.Cloud.AppHost.Framework;
+using Lokad.Cloud.Services.Framework;
+using Lokad.Cloud.Services.Framework.Runner;
 
-namespace Lokad.Cloud.Services.Framework.Runner
+namespace Lokad.Cloud.Services.Runtime.Runner
 {
     public class CellRunner : ICellRunner
     {
@@ -20,7 +22,7 @@ namespace Lokad.Cloud.Services.Framework.Runner
             {
                 while (!cancellationToken.IsCancellationRequested)
                 {
-                    var runner = new ServiceRunner();
+                    var runner = new Framework.Runner.ServiceRunner();
                     runner.Run(
                         container.ResolveServices<UntypedQueuedCloudService>(servicesSettings["QueuedCloudService"]),
                         container.ResolveServices<ScheduledCloudService>(servicesSettings["ScheduledCloudService"]),
