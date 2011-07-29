@@ -4,7 +4,6 @@ using System.Threading;
 using System.Xml.Linq;
 using Lokad.Cloud.AppHost.Framework;
 using Lokad.Cloud.Services.Framework;
-using Lokad.Cloud.Services.Framework.Runner;
 
 namespace Lokad.Cloud.Services.Runtime.Runner
 {

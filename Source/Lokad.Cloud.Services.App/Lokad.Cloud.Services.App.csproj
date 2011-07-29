@@ -42,9 +42,6 @@
     <Reference Include="ICSharpCode.SharpZipLib, Version=0.86.0.518, Culture=neutral, PublicKeyToken=1b03e6acf1164f73, processorArchitecture=MSIL">
       <HintPath>..\..\packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll</HintPath>
     </Reference>
-    <Reference Include="Lokad.Cloud.AppHost">
-      <HintPath>..\..\packages\Lokad.Cloud.AppHost.0.3.5\lib\Lokad.Cloud.AppHost.dll</HintPath>
-    </Reference>
     <Reference Include="Lokad.Cloud.AppHost.Framework, Version=0.3.5.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\Lokad.Cloud.AppHost.Framework.0.3.5\lib\Lokad.Cloud.AppHost.Framework.dll</HintPath>
@@ -66,20 +63,14 @@
     <Compile Include="..\VersionAssemblyInfo.cs">
       <Link>Properties\VersionAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="HybridHost.cs" />
+    <Compile Include="EnvironmentAdapter.cs" />
     <Compile Include="InstrumentationExtensions.cs" />
-    <Compile Include="Legacy\AssemblyLoader.cs" />
     <Compile Include="LokadCloudDeploymentReader.cs" />
     <Compile Include="LokadCloudHostContext.cs" />
     <Compile Include="Runner\CellRunner.cs" />
     <Compile Include="Runner\ServiceContainer.cs" />
     <Compile Include="Runner\SettingsXml.cs" />
-    <Compile Include="Legacy\NoRestartFloodPolicy.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Legacy\Runtime.cs" />
-    <Compile Include="Legacy\Scheduler.cs" />
-    <Compile Include="Legacy\ServiceFabricHost.cs" />
-    <Compile Include="Legacy\SingleRuntimeHost.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Lokad.Cloud.Services.Framework\Lokad.Cloud.Services.Framework.csproj">
@@ -100,6 +91,9 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="_ServiceSettingsFormat.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Legacy\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

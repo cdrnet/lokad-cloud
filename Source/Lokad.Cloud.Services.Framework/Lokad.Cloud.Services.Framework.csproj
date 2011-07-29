@@ -102,7 +102,7 @@
     <Compile Include="Runner\ServiceRunner.cs" />
     <Compile Include="Runner\ServiceWithSettings.cs" />
     <Compile Include="Runner\SettingsXml.cs" />
-    <Compile Include="Runtime\ICloudEnvironment.cs" />
+    <Compile Include="ICloudEnvironment.cs" />
     <Compile Include="Storage\BlobCounter.cs" />
     <Compile Include="Legacy\CloudConfigurationModule.cs" />
     <Compile Include="Legacy\CloudEnvironment.cs" />

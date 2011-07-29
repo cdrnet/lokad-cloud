@@ -12,7 +12,7 @@ using Autofac;
 using Autofac.Configuration;
 using Lokad.Cloud.AppHost.Framework;
 using Lokad.Cloud.Services.Framework;
-using Lokad.Cloud.Services.Framework.Runtime;
+using Lokad.Cloud.Services.Management;
 
 namespace Lokad.Cloud.Services.Runtime.Runner
 {
@@ -25,8 +25,8 @@ namespace Lokad.Cloud.Services.Runtime.Runner
         {
             var applicationBuilder = new ContainerBuilder();
             applicationBuilder.RegisterModule(new CloudModule());
-            // TODO: applicationBuilder.RegisterModule(new ManagementModule());
-            applicationBuilder.RegisterInstance(environment).As<ICloudEnvironment>();
+            applicationBuilder.RegisterModule(new ManagementModule());
+            applicationBuilder.RegisterInstance(new EnvironmentAdapter(environment)).As<ICloudEnvironment>();
             // TODO: applicationBuilder.RegisterInstance(_settings);
 
             // Load Application IoC Configuration and apply it to the builder

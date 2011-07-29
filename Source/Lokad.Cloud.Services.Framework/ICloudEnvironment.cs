@@ -5,7 +5,7 @@
 
 using Lokad.Cloud.Services.Framework.Commands;
 
-namespace Lokad.Cloud.Services.Framework.Runtime
+namespace Lokad.Cloud.Services.Framework
 {
     public interface ICloudEnvironment
     {
@@ -20,7 +20,5 @@ namespace Lokad.Cloud.Services.Framework.Runtime
 
         void ProvisionWorkerInstances(int numberOfInstances);
         void ProvisionWorkerInstancesAtLeast(int minNumberOfInstances);
-
-        void SendCommand(ICloudCommand command);
     }
 }
