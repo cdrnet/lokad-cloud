@@ -1,8 +1,13 @@
-﻿using System;
+﻿#region Copyright (c) Lokad 2009-2011
+// This code is released under the terms of the new BSD licence.
+// URL: http://www.lokad.com/
+#endregion
+
+using System;
 using Lokad.Cloud.Services.Framework.Instrumentation;
 using Lokad.Cloud.Services.Framework.Instrumentation.Events;
 
-namespace Lokad.Cloud.Services.Runtime
+namespace Lokad.Cloud.Services.App.Util
 {
     internal static class InstrumentationExtensions
     {

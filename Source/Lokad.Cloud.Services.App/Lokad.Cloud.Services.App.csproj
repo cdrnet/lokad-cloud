@@ -8,8 +8,8 @@
     <ProjectGuid>{07B4D344-AAFD-43B1-B329-18B6242A6C54}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Lokad.Cloud.Services.Runtime</RootNamespace>
-    <AssemblyName>Lokad.Cloud.Services.Runtime</AssemblyName>
+    <RootNamespace>Lokad.Cloud.Services.App</RootNamespace>
+    <AssemblyName>Lokad.Cloud.Services.App</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -64,12 +64,12 @@
       <Link>Properties\VersionAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="EnvironmentAdapter.cs" />
-    <Compile Include="InstrumentationExtensions.cs" />
-    <Compile Include="LokadCloudDeploymentReader.cs" />
+    <Compile Include="Util\InstrumentationExtensions.cs" />
+    <Compile Include="DeploymentReader.cs" />
     <Compile Include="LokadCloudHostContext.cs" />
-    <Compile Include="Runner\CellRunner.cs" />
-    <Compile Include="Runner\ServiceContainer.cs" />
-    <Compile Include="Runner\SettingsXml.cs" />
+    <Compile Include="CellRunner.cs" />
+    <Compile Include="ServiceContainer.cs" />
+    <Compile Include="Util\SettingsXml.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -92,9 +92,7 @@
   <ItemGroup>
     <Content Include="_ServiceSettingsFormat.txt" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Legacy\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

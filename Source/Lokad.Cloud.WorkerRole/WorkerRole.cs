@@ -8,7 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Lokad.Cloud.AppHost;
 using Lokad.Cloud.AppHost.Framework;
-using Lokad.Cloud.Services.Framework;
+using Lokad.Cloud.Services.App;
 using Lokad.Cloud.Services.Framework.Logging;
 using Lokad.Cloud.Storage;
 using Microsoft.WindowsAzure.ServiceRuntime;

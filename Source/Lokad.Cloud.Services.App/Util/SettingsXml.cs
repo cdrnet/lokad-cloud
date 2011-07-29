@@ -7,7 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Xml.Linq;
 
-namespace Lokad.Cloud.Services.Runtime.Runner
+namespace Lokad.Cloud.Services.App.Util
 {
     internal static class SettingsXml
     {

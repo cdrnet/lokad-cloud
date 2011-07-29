@@ -6,7 +6,7 @@
 using Lokad.Cloud.AppHost.Framework;
 using Lokad.Cloud.Services.Framework;
 
-namespace Lokad.Cloud.Services.Runtime
+namespace Lokad.Cloud.Services.App
 {
     internal class EnvironmentAdapter : ICloudEnvironment
     {

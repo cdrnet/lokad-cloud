@@ -1,10 +1,15 @@
-﻿using System;
+﻿#region Copyright (c) Lokad 2009-2011
+// This code is released under the terms of the new BSD licence.
+// URL: http://www.lokad.com/
+#endregion
+
+using System;
 using System.Security.Cryptography.X509Certificates;
 using Lokad.Cloud.AppHost.Framework;
 using Lokad.Cloud.Storage;
 using Microsoft.WindowsAzure.ServiceRuntime;
 
-namespace Lokad.Cloud.Services.Framework
+namespace Lokad.Cloud.Services.App
 {
     [Serializable]
     public class LokadCloudHostContext : IHostContext
@@ -52,7 +57,7 @@ namespace Lokad.Cloud.Services.Framework
                 context.SelfManagementCertificate = SafeGet(() => GetCertificate(thumbprint));
             }
 
-            context.DeploymentReader = new LokadCloudDeploymentReader(context.DataConnectionString);
+            context.DeploymentReader = new DeploymentReader(context.DataConnectionString);
 
             return context;
         }

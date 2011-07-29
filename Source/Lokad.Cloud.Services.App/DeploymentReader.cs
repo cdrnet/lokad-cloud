@@ -1,13 +1,18 @@
-﻿using System;
+﻿#region Copyright (c) Lokad 2009-2011
+// This code is released under the terms of the new BSD licence.
+// URL: http://www.lokad.com/
+#endregion
+
+using System;
 using System.IO;
 using System.Xml.Linq;
 using Lokad.Cloud.AppHost.Framework;
 using Lokad.Cloud.Storage;
 
-namespace Lokad.Cloud.Services.Framework
+namespace Lokad.Cloud.Services.App
 {
     [Serializable]
-    public class LokadCloudDeploymentReader : IDeploymentReader
+    public class DeploymentReader : IDeploymentReader
     {
         private const string ContainerName = "lokad-cloud-services-deployments";
         private const string HeadName = "HEAD.lokadcloud";
@@ -15,7 +20,7 @@ namespace Lokad.Cloud.Services.Framework
 
         [NonSerialized] CloudStorageProviders _storage;
 
-        public LokadCloudDeploymentReader(string storageConnectionString)
+        public DeploymentReader(string storageConnectionString)
         {
             _connectionString = storageConnectionString;
         }
