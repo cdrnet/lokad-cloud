@@ -58,13 +58,13 @@
     <Reference Include="ICSharpCode.SharpZipLib, Version=0.86.0.518, Culture=neutral, PublicKeyToken=1b03e6acf1164f73, processorArchitecture=MSIL">
       <HintPath>..\..\packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll</HintPath>
     </Reference>
-    <Reference Include="Lokad.Cloud.AppHost, Version=0.3.5.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Lokad.Cloud.AppHost, Version=0.3.6.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Lokad.Cloud.AppHost.0.3.5\lib\Lokad.Cloud.AppHost.dll</HintPath>
+      <HintPath>..\..\packages\Lokad.Cloud.AppHost.0.3.6\lib\Lokad.Cloud.AppHost.dll</HintPath>
     </Reference>
-    <Reference Include="Lokad.Cloud.AppHost.Framework, Version=0.3.5.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Lokad.Cloud.AppHost.Framework, Version=0.3.6.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Lokad.Cloud.AppHost.Framework.0.3.5\lib\Lokad.Cloud.AppHost.Framework.dll</HintPath>
+      <HintPath>..\..\packages\Lokad.Cloud.AppHost.Framework.0.3.6\lib\Lokad.Cloud.AppHost.Framework.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.WindowsAzure.ServiceRuntime">
       <SpecificVersion>False</SpecificVersion>

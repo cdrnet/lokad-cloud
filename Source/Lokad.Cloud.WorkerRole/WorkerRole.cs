@@ -27,7 +27,7 @@ namespace Lokad.Cloud.Worker
             _cancellationTokenSource = new CancellationTokenSource();
 
             // Host Context
-            var context = LokadCloudHostContext.CreateFromRoleEnvironment();
+            var context = HostContext.CreateFromRoleEnvironment();
 
             // Host Observer
             // TODO: more sensible subscriptions (with text, filtered, throttled)

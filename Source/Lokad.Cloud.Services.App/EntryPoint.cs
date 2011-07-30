@@ -13,7 +13,7 @@ using Lokad.Cloud.Services.Framework;
 
 namespace Lokad.Cloud.Services.App
 {
-    public class CellRunner : ICellRunner
+    public class EntryPoint : IApplicationEntryPoint
     {
         public void Run(XElement settings, IDeploymentReader deploymentReader, IApplicationEnvironment environment, CancellationToken cancellationToken)
         {

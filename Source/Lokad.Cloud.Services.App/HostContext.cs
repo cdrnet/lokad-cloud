@@ -4,6 +4,7 @@
 #endregion
 
 using System;
+using System.IO;
 using System.Security.Cryptography.X509Certificates;
 using Lokad.Cloud.AppHost.Framework;
 using Lokad.Cloud.Storage;
@@ -12,7 +13,7 @@ using Microsoft.WindowsAzure.ServiceRuntime;
 namespace Lokad.Cloud.Services.App
 {
     [Serializable]
-    public class LokadCloudHostContext : IHostContext
+    public class HostContext : IHostContext
     {
         public string AzureDeploymentId { get; protected set; }
         public string DataConnectionString { get; protected set; }
@@ -27,24 +28,46 @@ namespace Lokad.Cloud.Services.App
             return CloudStorage.ForAzureConnectionString(DataConnectionString).BuildStorageProviders();
         }
 
+        public string GetSettingValue(string settingName)
+        {
+            return SafeGet(() => RoleEnvironment.GetConfigurationSettingValue(settingName));
+        }
+
+        public X509Certificate2 GetCertificate(string thumbprint)
+        {
+            return GetCertificateInternal(thumbprint);
+        }
+
+        public string GetLocalResourcePath(string resourceName)
+        {
+            var path = SafeGet(() => RoleEnvironment.GetLocalResource(resourceName).RootPath);
+            if (path == null)
+            {
+                path = Path.Combine(Path.GetTempPath(), resourceName);
+                Directory.CreateDirectory(path);
+            }
+
+            return path;
+        }
+
         public int CurrentWorkerInstanceCount
         {
             get { return SafeGet(() => RoleEnvironment.CurrentRoleInstance.Role.Instances.Count); }
         }
 
-        public string GetConfigurationSettingValue(string settingName)
+        public void ProvisionWorkerInstances(int numberOfInstances)
         {
-            return SafeGet(() => RoleEnvironment.GetConfigurationSettingValue(settingName));
+            throw new NotImplementedException();
         }
 
-        public X509Certificate2 GetConfigurationCertificate(string thumbprint)
+        public void ProvisionWorkerInstancesAtLeast(int minNumberOfInstances)
         {
-            return GetCertificate(thumbprint);
+            throw new NotImplementedException();
         }
 
-        public static LokadCloudHostContext CreateFromRoleEnvironment()
+        public static HostContext CreateFromRoleEnvironment()
         {
-            var context = new LokadCloudHostContext
+            var context = new HostContext
             {
                 AzureDeploymentId = SafeGet(() => RoleEnvironment.DeploymentId),
                 DataConnectionString = SafeGet(() => RoleEnvironment.GetConfigurationSettingValue("DataConnectionString")),
@@ -54,7 +77,7 @@ namespace Lokad.Cloud.Services.App
             var thumbprint = SafeGet(() => RoleEnvironment.GetConfigurationSettingValue("SelfManagementCertificateThumbprint"));
             if (thumbprint != null)
             {
-                context.SelfManagementCertificate = SafeGet(() => GetCertificate(thumbprint));
+                context.SelfManagementCertificate = SafeGet(() => GetCertificateInternal(thumbprint));
             }
 
             context.DeploymentReader = new DeploymentReader(context.DataConnectionString);
@@ -62,7 +85,7 @@ namespace Lokad.Cloud.Services.App
             return context;
         }
 
-        static  X509Certificate2 GetCertificate(string thumbprint)
+        static X509Certificate2 GetCertificateInternal(string thumbprint)
         {
             var store = new X509Store(StoreName.My, StoreLocation.CurrentUser);
             try

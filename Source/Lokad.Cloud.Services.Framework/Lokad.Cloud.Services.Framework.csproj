@@ -39,9 +39,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\Autofac.2.5.1.827\lib\NET40\Autofac.Configuration.dll</HintPath>
     </Reference>
-    <Reference Include="Lokad.Cloud.AppHost.Framework, Version=0.3.5.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Lokad.Cloud.AppHost.Framework, Version=0.3.6.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Lokad.Cloud.AppHost.Framework.0.3.5\lib\Lokad.Cloud.AppHost.Framework.dll</HintPath>
+      <HintPath>..\..\packages\Lokad.Cloud.AppHost.Framework.0.3.6\lib\Lokad.Cloud.AppHost.Framework.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.WindowsAzure.ServiceRuntime, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\..\Resource\Library\Microsoft.WindowsAzure.ServiceRuntime.dll</HintPath>
