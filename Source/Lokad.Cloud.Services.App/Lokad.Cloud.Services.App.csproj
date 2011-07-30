@@ -88,6 +88,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <None Include="ReadMe.markdown" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="_ServiceSettingsFormat.txt" />

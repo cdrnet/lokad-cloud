@@ -17,12 +17,11 @@ namespace Lokad.Cloud.Services.App
     {
         public void Run(XElement settings, IDeploymentReader deploymentReader, IApplicationEnvironment environment, CancellationToken cancellationToken)
         {
-            // TODO: For now included directly in the settings xml -> move out to separate hash-named blobs (read using deploymentReader)
+            var config = ReadConfig(settings, deploymentReader);
+            var servicesSettings = ReadServicesSettings(settings, deploymentReader);
 
-            var config = Convert.FromBase64String(settings.SettingsValue("Config"));
-
-            // Build IoC container, resolve all cloud services and run them.
-            var servicesSettings = settings.SettingsElements("ServiceSettings", "Service")
+            var servicesSettingsByType = servicesSettings
+                .Elements("Service")
                 .ToLookup(service => service.AttributeValue("type"));
 
             using (var container = new ServiceContainer(config, environment))
@@ -31,10 +30,10 @@ namespace Lokad.Cloud.Services.App
                 {
                     var runner = new Framework.Runner.ServiceRunner();
                     runner.Run(
-                        container.ResolveServices<UntypedQueuedCloudService>(servicesSettings["QueuedCloudService"]),
-                        container.ResolveServices<ScheduledCloudService>(servicesSettings["ScheduledCloudService"]),
-                        container.ResolveServices<ScheduledWorkerService>(servicesSettings["ScheduledWorkerService"]),
-                        container.ResolveServices<DaemonService>(servicesSettings["DaemonService"]),
+                        container.ResolveServices<UntypedQueuedCloudService>(servicesSettingsByType["QueuedCloudService"]),
+                        container.ResolveServices<ScheduledCloudService>(servicesSettingsByType["ScheduledCloudService"]),
+                        container.ResolveServices<ScheduledWorkerService>(servicesSettingsByType["ScheduledWorkerService"]),
+                        container.ResolveServices<DaemonService>(servicesSettingsByType["DaemonService"]),
                         cancellationToken);
                 }
             }
@@ -43,6 +42,52 @@ namespace Lokad.Cloud.Services.App
         public void ApplyChangedSettings(XElement newSettings)
         {
             
+        }
+
+        byte[] ReadConfig(XElement settings, IDeploymentReader reader)
+        {
+            var tag = settings.Element("Config");
+            if (tag == null)
+            {
+                return new byte[0];
+            }
+
+            var name = tag.Attribute("name");
+            if (name != null)
+            {
+                return reader.GetItem<byte[]>(name.Value);
+            }
+
+            var value = tag.Value;
+            if (!string.IsNullOrEmpty(value))
+            {
+                return Convert.FromBase64String(value.Trim());
+            }
+
+            return new byte[0];
+        }
+
+        XElement ReadServicesSettings(XElement settings, IDeploymentReader reader)
+        {
+            var tag = settings.Element("ServiceSettings");
+            if (tag == null)
+            {
+                return new XElement("Services");
+            }
+
+            var name = tag.Attribute("name");
+            if (name != null)
+            {
+                return reader.GetItem<XElement>(name.Value);
+            }
+
+            var child = tag.Element("Services");
+            if (child != null)
+            {
+                return child;
+            }
+
+            return new XElement("Services");
         }
     }
 }
