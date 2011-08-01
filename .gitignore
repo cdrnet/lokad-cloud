@@ -1,5 +1,6 @@
 _ReSharper*
 *.user
 *.suo
+*.docstates
 Thumbs.db
 .hg
