@@ -5,14 +5,16 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using System.Xml.Linq;
 
 namespace Lokad.Cloud.Services.Framework.Runner
 {
-    internal class CommonServiceRunner
+    internal class CommonServiceRunner<TService>
+        where TService : ICloudService
     {
-        private readonly List<ICloudService> _services;
+        private readonly List<ServiceWithSettings<TService>> _services;
 
-        public CommonServiceRunner(IEnumerable<ICloudService> services)
+        public CommonServiceRunner(IEnumerable<ServiceWithSettings<TService>> services)
         {
             _services = services.ToList();
         }
@@ -21,7 +23,7 @@ namespace Lokad.Cloud.Services.Framework.Runner
         {
             foreach (var service in _services)
             {
-                service.Initialize();
+                service.Service.Initialize(service.ServiceXml.Element("UserSettings") ?? new XElement("UserSettings"));
             }
         }
 
@@ -29,7 +31,7 @@ namespace Lokad.Cloud.Services.Framework.Runner
         {
             foreach (var service in _services)
             {
-                service.OnStart();
+                service.Service.OnStart();
             }
         }
 
@@ -37,7 +39,7 @@ namespace Lokad.Cloud.Services.Framework.Runner
         {
             foreach (var service in _services)
             {
-                service.OnStop();
+                service.Service.OnStop();
             }
         }
     }

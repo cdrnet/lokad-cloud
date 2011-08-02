@@ -5,6 +5,7 @@
 
 using System;
 using System.Threading;
+using System.Xml.Linq;
 using Lokad.Cloud.Storage;
 
 namespace Lokad.Cloud.Services.Framework
@@ -12,7 +13,7 @@ namespace Lokad.Cloud.Services.Framework
     public abstract class ScheduledWorkerService : ICloudService
     {
         // Actions to be implemented by implementors
-        public virtual void Initialize() { }
+        public virtual void Initialize(XElement userSettings) { }
         public virtual void OnStart() { }
         public virtual void OnStop() { }
         public abstract void OnSchedule(DateTimeOffset scheduledTime, CancellationToken cancellationToken);

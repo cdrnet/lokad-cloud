@@ -3,6 +3,7 @@
 // URL: http://www.lokad.com/
 #endregion
 
+using System.Xml.Linq;
 using Lokad.Cloud.Storage;
 
 namespace Lokad.Cloud.Services.Framework
@@ -10,7 +11,7 @@ namespace Lokad.Cloud.Services.Framework
     public interface ICloudService
     {
         CloudServiceType ServiceType { get; }
-        void Initialize();
+        void Initialize(XElement userSettings);
         void OnStart();
         void OnStop();
 

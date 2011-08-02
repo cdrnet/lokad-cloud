@@ -10,10 +10,10 @@ using System.Threading;
 
 namespace Lokad.Cloud.Services.Framework.Runner
 {
-    internal class ScheduledCloudServiceRunner : CommonServiceRunner
+    internal class ScheduledCloudServiceRunner : CommonServiceRunner<ScheduledCloudService>
     {
         public ScheduledCloudServiceRunner(List<ServiceWithSettings<ScheduledCloudService>> services)
-            : base(services.Select(s => s.Service))
+            : base(services)
         {
             // TODO: Implement
 

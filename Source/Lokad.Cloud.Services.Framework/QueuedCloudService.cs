@@ -6,6 +6,7 @@
 using System;
 using System.Linq;
 using System.Threading;
+using System.Xml.Linq;
 using Lokad.Cloud.Storage;
 
 namespace Lokad.Cloud.Services.Framework
@@ -39,7 +40,7 @@ namespace Lokad.Cloud.Services.Framework
     public abstract class UntypedQueuedCloudService : ICloudService
     {
         // Actions to be implemented by implementors
-        public virtual void Initialize() { }
+        public virtual void Initialize(XElement userSettings) { }
         public virtual void OnStart() { }
         public virtual void OnStop() { }
         public abstract bool TryGetMessageAndProcess(string queueName, TimeSpan visibilityTimeout, int maxProcessingTrials, CancellationToken cancellationToken);

@@ -48,10 +48,10 @@ namespace Lokad.Cloud.Services.Framework.Runner
 
             // 2. BUILD SERVICE RUNNERS FOR ENABLED SERVICES
 
-            var queuedCloudServiceRunner = new QueuedCloudServiceRunner(queuedCloudServices.Where(s => s.Settings.AttributeValue("disabled") != "true").ToList());
-            var scheduledCloudServiceRunner = new ScheduledCloudServiceRunner(scheduledCloudServices.Where(s => s.Settings.AttributeValue("disabled") != "true").ToList());
-            var scheduledWorkerServiceRunner = new ScheduledWorkerServiceRunner(scheduledWorkerServices.Where(s => s.Settings.AttributeValue("disabled") != "true").ToList());
-            var daemonServiceRunner = new DaemonServiceRunner(daemonServices.Where(s => s.Settings.AttributeValue("disabled") != "true").ToList());
+            var queuedCloudServiceRunner = new QueuedCloudServiceRunner(queuedCloudServices.Where(s => s.ServiceXml.AttributeValue("disabled") != "true").ToList());
+            var scheduledCloudServiceRunner = new ScheduledCloudServiceRunner(scheduledCloudServices.Where(s => s.ServiceXml.AttributeValue("disabled") != "true").ToList());
+            var scheduledWorkerServiceRunner = new ScheduledWorkerServiceRunner(scheduledWorkerServices.Where(s => s.ServiceXml.AttributeValue("disabled") != "true").ToList());
+            var daemonServiceRunner = new DaemonServiceRunner(daemonServices.Where(s => s.ServiceXml.AttributeValue("disabled") != "true").ToList());
 
             // 3. INITIALIZE SERVICES
 

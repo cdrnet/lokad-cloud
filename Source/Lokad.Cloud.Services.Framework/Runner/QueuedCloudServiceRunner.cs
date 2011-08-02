@@ -13,15 +13,15 @@ namespace Lokad.Cloud.Services.Framework.Runner
 {
     // TODO: Consider random permutations
 
-    internal class QueuedCloudServiceRunner : CommonServiceRunner
+    internal class QueuedCloudServiceRunner : CommonServiceRunner<UntypedQueuedCloudService>
     {
         private readonly List<QueuedCloudServiceContext> _services;
         private int _nextIndex;
 
         public QueuedCloudServiceRunner(List<ServiceWithSettings<UntypedQueuedCloudService>> services)
-            : base(services.Select(s => s.Service))
+            : base(services)
         {
-            _services = services.Select(s => new QueuedCloudServiceContext(s.Service, s.Settings)).ToList();
+            _services = services.Select(s => new QueuedCloudServiceContext(s.Service, s.ServiceXml)).ToList();
         }
 
         public bool RunSingle(CancellationToken cancellationToken)
@@ -57,13 +57,13 @@ namespace Lokad.Cloud.Services.Framework.Runner
             public TimeSpan ContinueProcessingIfMessagesAvailable { get; private set; }
             public int MaxProcessingTrials { get; private set; }
 
-            public QueuedCloudServiceContext(UntypedQueuedCloudService service, XElement settings)
+            public QueuedCloudServiceContext(UntypedQueuedCloudService service, XElement serviceSettings)
             {
                 Service = service;
-                QueueName = settings.SettingsElementAttributeValue("Queue", "name");
-                VisibilityTimeout = TimeSpan.Parse(settings.SettingsElementAttributeValue("Timing", "invisibility"));
-                ContinueProcessingIfMessagesAvailable = TimeSpan.Parse(settings.SettingsElementAttributeValue("Timing", "continueFor"));
-                MaxProcessingTrials = Int32.Parse(settings.SettingsElementAttributeValue("Quarantine", "maxTrials"));
+                QueueName = serviceSettings.SettingsElementAttributeValue("Queue", "name");
+                VisibilityTimeout = TimeSpan.Parse(serviceSettings.SettingsElementAttributeValue("Timing", "invisibility"));
+                ContinueProcessingIfMessagesAvailable = TimeSpan.Parse(serviceSettings.SettingsElementAttributeValue("Timing", "continueFor"));
+                MaxProcessingTrials = Int32.Parse(serviceSettings.SettingsElementAttributeValue("Quarantine", "maxTrials"));
             }
         }
     }

@@ -15,13 +15,16 @@ namespace Lokad.Cloud.Services.App
 {
     public class EntryPoint : IApplicationEntryPoint
     {
+        private IDeploymentReader _deploymentReader;
+
         public void Run(XElement settings, IDeploymentReader deploymentReader, IApplicationEnvironment environment, CancellationToken cancellationToken)
         {
-            var config = ReadConfig(settings, deploymentReader);
-            var servicesSettings = ReadServicesSettings(settings, deploymentReader);
+            _deploymentReader = deploymentReader;
 
-            var servicesSettingsByType = servicesSettings
-                .Elements("Service")
+            var config = ReadConfig(settings, deploymentReader);
+            var servicesXml = ReadServicesXml(settings, deploymentReader);
+
+            var serviceXmlsByType = servicesXml.Elements("Service")
                 .ToLookup(service => service.AttributeValue("type"));
 
             using (var container = new ServiceContainer(config, environment))
@@ -30,10 +33,10 @@ namespace Lokad.Cloud.Services.App
                 {
                     var runner = new Framework.Runner.ServiceRunner();
                     runner.Run(
-                        container.ResolveServices<UntypedQueuedCloudService>(servicesSettingsByType["QueuedCloudService"]),
-                        container.ResolveServices<ScheduledCloudService>(servicesSettingsByType["ScheduledCloudService"]),
-                        container.ResolveServices<ScheduledWorkerService>(servicesSettingsByType["ScheduledWorkerService"]),
-                        container.ResolveServices<DaemonService>(servicesSettingsByType["DaemonService"]),
+                        container.ResolveServices<UntypedQueuedCloudService>(serviceXmlsByType["QueuedCloudService"]),
+                        container.ResolveServices<ScheduledCloudService>(serviceXmlsByType["ScheduledCloudService"]),
+                        container.ResolveServices<ScheduledWorkerService>(serviceXmlsByType["ScheduledWorkerService"]),
+                        container.ResolveServices<DaemonService>(serviceXmlsByType["DaemonService"]),
                         cancellationToken);
                 }
             }
@@ -41,7 +44,10 @@ namespace Lokad.Cloud.Services.App
 
         public void ApplyChangedSettings(XElement newSettings)
         {
+            var newConfig = ReadConfig(newSettings, _deploymentReader);
+            var newServicesXml = ReadServicesXml(newSettings, _deploymentReader);
             
+            // TODO: implement
         }
 
         byte[] ReadConfig(XElement settings, IDeploymentReader reader)
@@ -67,9 +73,9 @@ namespace Lokad.Cloud.Services.App
             return new byte[0];
         }
 
-        XElement ReadServicesSettings(XElement settings, IDeploymentReader reader)
+        XElement ReadServicesXml(XElement settings, IDeploymentReader reader)
         {
-            var tag = settings.Element("ServiceSettings");
+            var tag = settings.Element("Services");
             if (tag == null)
             {
                 return new XElement("Services");
@@ -81,13 +87,7 @@ namespace Lokad.Cloud.Services.App
                 return reader.GetItem<XElement>(name.Value);
             }
 
-            var child = tag.Element("Services");
-            if (child != null)
-            {
-                return child;
-            }
-
-            return new XElement("Services");
+            return tag;
         }
     }
 }

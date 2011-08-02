@@ -8,10 +8,10 @@ using System.Linq;
 
 namespace Lokad.Cloud.Services.Framework.Runner
 {
-    internal class DaemonServiceRunner : CommonServiceRunner
+    internal class DaemonServiceRunner : CommonServiceRunner<DaemonService>
     {
         public DaemonServiceRunner(IEnumerable<ServiceWithSettings<DaemonService>> services)
-            : base(services.Select(s => s.Service))
+            : base(services)
         {
         }
     }

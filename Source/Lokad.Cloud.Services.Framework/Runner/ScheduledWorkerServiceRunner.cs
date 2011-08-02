@@ -11,16 +11,16 @@ using System.Xml.Linq;
 
 namespace Lokad.Cloud.Services.Framework.Runner
 {
-    internal class ScheduledWorkerServiceRunner : CommonServiceRunner
+    internal class ScheduledWorkerServiceRunner : CommonServiceRunner<ScheduledWorkerService>
     {
         private readonly SortedSet<DateTimeOffset> _triggers;
         private readonly List<ScheduledWorkerServiceContext> _services;
 
         public ScheduledWorkerServiceRunner(List<ServiceWithSettings<ScheduledWorkerService>> services)
-            : base(services.Select(s => s.Service))
+            : base(services)
         {
             var now = DateTimeOffset.UtcNow;
-            _services = services.Select(s => new ScheduledWorkerServiceContext(s.Service, s.Settings, now)).ToList();
+            _services = services.Select(s => new ScheduledWorkerServiceContext(s.Service, s.ServiceXml, now)).ToList();
             _triggers = new SortedSet<DateTimeOffset>(_services.Select(c => c.NextRun));
         }
 

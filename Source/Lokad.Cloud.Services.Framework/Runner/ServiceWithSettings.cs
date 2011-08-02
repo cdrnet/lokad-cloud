@@ -11,12 +11,12 @@ namespace Lokad.Cloud.Services.Framework.Runner
         where TService : ICloudService
     {
         public TService Service { get; private set; }
-        public XElement Settings { get; private set; }
+        public XElement ServiceXml { get; private set; }
 
-        public ServiceWithSettings(TService service, XElement settings)
+        public ServiceWithSettings(TService service, XElement serviceXml)
         {
             Service = service;
-            Settings = settings;
+            ServiceXml = serviceXml;
         }
     }
 }

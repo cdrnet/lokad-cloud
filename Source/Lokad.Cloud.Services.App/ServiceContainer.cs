@@ -68,16 +68,16 @@ namespace Lokad.Cloud.Services.App
         /// <summary>
         /// Matches and resolves services with their settings but skip disabled services and services without settings.
         /// </summary>
-        public IEnumerable<Framework.Runner.ServiceWithSettings<TService>> ResolveServices<TService>(IEnumerable<XElement> settings)
+        public IEnumerable<Framework.Runner.ServiceWithSettings<TService>> ResolveServices<TService>(IEnumerable<XElement> serviceXmls)
             where TService : ICloudService
         {
-            var settingsByType = settings.ToDictionary(s => s.SettingsElement("ImplementationType").AttributeValue("name"));
+            var serviceXmlByImpTypeName = serviceXmls.ToDictionary(s => s.SettingsElement("ImplementationType").AttributeValue("name"));
             foreach (var type in _types)
             {
-                XElement setting;
-                if (settingsByType.TryGetValue(type.FullName, out setting) && setting.AttributeValue("name") != "true")
+                XElement serviceXml;
+                if (serviceXmlByImpTypeName.TryGetValue(type.FullName, out serviceXml) && serviceXml.AttributeValue("disabled") != "true")
                 {
-                    yield return new Framework.Runner.ServiceWithSettings<TService>((TService)_container.Resolve(type), setting);
+                    yield return new Framework.Runner.ServiceWithSettings<TService>((TService)_container.Resolve(type), serviceXml);
                 }
             }
         }

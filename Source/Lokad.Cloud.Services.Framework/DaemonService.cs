@@ -3,6 +3,7 @@
 // URL: http://www.lokad.com/
 #endregion
 
+using System.Xml.Linq;
 using Lokad.Cloud.Storage;
 
 namespace Lokad.Cloud.Services.Framework
@@ -10,7 +11,7 @@ namespace Lokad.Cloud.Services.Framework
     public abstract class DaemonService : ICloudService
     {
         // Actions to be implemented by implementors
-        public virtual void Initialize() { }
+        public virtual void Initialize(XElement userSettings) { }
         public abstract void OnStart();
         public abstract void OnStop();
 
