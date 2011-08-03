@@ -4,9 +4,7 @@
 #endregion
 
 using System;
-using System.IO;
 using System.Net;
-using System.Security.Cryptography.X509Certificates;
 using Lokad.Cloud.Storage;
 using Microsoft.WindowsAzure.ServiceRuntime;
 
@@ -68,73 +66,6 @@ namespace Lokad.Cloud
             get { return _partitionKey ?? (_partitionKey = Dns.GetHostName()); }
         }
 
-        /// <summary>
-        /// ID of the Cloud Worker Instances
-        /// </summary>
-        public static Maybe<string> AzureCurrentInstanceId
-        {
-            get { return IsAvailable ? RoleEnvironment.CurrentRoleInstance.Id : Maybe<string>.Empty; }
-        }
-
-        public static Maybe<string> AzureDeploymentId
-        {
-            get { return IsAvailable ? RoleEnvironment.DeploymentId : Maybe<string>.Empty; }
-        }
-
-        public static Maybe<int> AzureWorkerInstanceCount
-        {
-            get
-            {
-                if (!IsAvailable)
-                {
-                    return Maybe<int>.Empty;
-                }
-
-                Role workerRole;
-                if(!RoleEnvironment.Roles.TryGetValue("Lokad.Cloud.WorkerRole", out workerRole))
-                {
-                    return Maybe<int>.Empty;
-                }
-
-                return workerRole.Instances.Count;
-            }
-        }
-
-        /// <summary>
-        /// Retrieves the root path of a named local resource.
-        /// </summary>
-        public static string GetLocalStoragePath(string resourceName)
-        {
-            if (IsAvailable)
-            {
-                return RoleEnvironment.GetLocalResource(resourceName).RootPath;
-            }
-
-            var dir = Path.Combine(Path.GetTempPath(), resourceName);
-            Directory.CreateDirectory(dir);
-            return dir;
-        }
-
-        public static Maybe<X509Certificate2> GetCertificate(string thumbprint)
-        {
-            var store = new X509Store(StoreName.My, StoreLocation.CurrentUser);
-            try
-            {
-                store.Open(OpenFlags.ReadOnly);
-                var certs = store.Certificates.Find(X509FindType.FindByThumbprint, thumbprint, false);
-                if(certs.Count != 1)
-                {
-                    return Maybe<X509Certificate2>.Empty;
-                }
-
-                return certs[0];
-            }
-            finally
-            {
-                store.Close();
-            }
-        }
-
         ///<summary>
         /// Retreives the configuration setting from the <see cref="RoleEnvironment"/>.
         ///</summary>
@@ -166,16 +97,6 @@ namespace Lokad.Cloud
                 // setting was removed from the csdef, skip
                 // (logging is usually not available at that stage)
             }
-        }
-
-        public static bool HasSecureEndpoint()
-        {
-            if (!IsAvailable)
-            {
-                return false;
-            }
-
-            return RoleEnvironment.CurrentRoleInstance.InstanceEndpoints.ContainsKey("HttpsIn");
         }
     }
 }
