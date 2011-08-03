@@ -16,6 +16,7 @@ namespace Lokad.Cloud.Services.Framework
         void OnStop();
 
         // Injected by Runtime
+        ICloudEnvironment CloudEnvironment { get; set; }
         IBlobStorageProvider Blobs { get; set; }
         IQueueStorageProvider Queues { get; set; }
         ITableStorageProvider Tables { get; set; }

@@ -46,6 +46,7 @@ namespace Lokad.Cloud.Services.Framework
         public abstract bool TryGetMessageAndProcess(string queueName, TimeSpan visibilityTimeout, int maxProcessingTrials, CancellationToken cancellationToken);
 
         // Injected by Runtime
+        public ICloudEnvironment CloudEnvironment { get; set; }
         public IBlobStorageProvider Blobs { get; set; }
         public IQueueStorageProvider Queues { get; set; }
         public ITableStorageProvider Tables { get; set; }

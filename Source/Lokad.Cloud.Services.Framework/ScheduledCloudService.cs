@@ -19,6 +19,7 @@ namespace Lokad.Cloud.Services.Framework
         public abstract void OnSchedule(DateTimeOffset scheduledTime, CancellationToken cancellationToken);
 
         // Injected by Runtime
+        public ICloudEnvironment CloudEnvironment { get; set; }
         public IBlobStorageProvider Blobs { get; set; }
         public IQueueStorageProvider Queues { get; set; }
         public ITableStorageProvider Tables { get; set; }

@@ -70,7 +70,7 @@ namespace Lokad.Cloud.Services.Framework.SystemServices
                     foreach (var group in events.GroupBy(e => e.Policy))
                     {
                         TryLog(string.Format("Storage: {0} retries per hour for the {1} policy on {2}. {3}",
-                            group.Count(), group.Key, CloudEnvironment.PartitionKey,
+                            group.Count(), group.Key, CloudEnvironment.MachineName,
                             string.Join(", ", group.Where(e => e.Exception != null).Select(e => e.Exception.GetType().Name).Distinct().ToArray())),
                             level: LogLevel.Debug);
                     }

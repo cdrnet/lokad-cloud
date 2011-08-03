@@ -38,7 +38,7 @@ namespace Lokad.Cloud.Services.App
                 const string fileName = "lokad.cloud.clientapp.config";
                 const string resourceName = "LokadCloudStorage";
 
-                var pathToFile = Path.Combine(CloudEnvironment.GetLocalStoragePath(resourceName), fileName);
+                var pathToFile = Path.Combine(environment.GetLocalResourcePath(resourceName), fileName);
                 File.WriteAllBytes(pathToFile, config);
                 applicationBuilder.RegisterModule(new ConfigurationSettingsReader("autofac", pathToFile));
             }
