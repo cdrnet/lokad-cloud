@@ -65,7 +65,6 @@
     </Compile>
     <Compile Include="CloudProvisioning.cs" />
     <Compile Include="EnvironmentAdapter.cs" />
-    <Compile Include="Util\InstrumentationExtensions.cs" />
     <Compile Include="DeploymentReader.cs" />
     <Compile Include="HostContext.cs" />
     <Compile Include="EntryPoint.cs" />
