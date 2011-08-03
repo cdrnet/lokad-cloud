@@ -70,9 +70,6 @@
       <Link>Properties\VersionAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="CloudServiceType.cs" />
-    <Compile Include="Commands\ICloudCommand.cs" />
-    <Compile Include="Commands\RuntimeLoadDeploymentCommand.cs" />
-    <Compile Include="Commands\RuntimeLoadCurrentHeadDeploymentCommand.cs" />
     <Compile Include="DaemonService.cs" />
     <Compile Include="ICloudService.cs" />
     <Compile Include="Jobs\Job.cs" />
