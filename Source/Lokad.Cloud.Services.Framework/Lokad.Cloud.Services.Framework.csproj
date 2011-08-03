@@ -118,14 +118,9 @@
     <Compile Include="ScheduledWorkerService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="QueuedCloudService.cs" />
-    <Compile Include="SystemServices\CloudProvisioningLoggingService.cs" />
     <Compile Include="SystemServices\CloudStorageLoggingService.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Lokad.Cloud.Provisioning\Lokad.Cloud.Provisioning.csproj">
-      <Project>{B3CA9DCB-04DB-4442-AC0C-6E1F70854DA1}</Project>
-      <Name>Lokad.Cloud.Provisioning</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Lokad.Cloud.Storage\Lokad.Cloud.Storage.csproj">
       <Project>{0F9244AB-3B7C-4F98-9D44-E46FBC65522C}</Project>
       <Name>Lokad.Cloud.Storage</Name>
