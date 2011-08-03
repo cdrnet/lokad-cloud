@@ -10,6 +10,7 @@ using System.Xml.Linq;
 using Lokad.Cloud.AppHost.Framework;
 using Lokad.Cloud.Services.App.Util;
 using Lokad.Cloud.Services.Framework;
+using Lokad.Cloud.Services.Framework.Runner;
 
 namespace Lokad.Cloud.Services.App
 {
@@ -31,7 +32,7 @@ namespace Lokad.Cloud.Services.App
             {
                 while (!cancellationToken.IsCancellationRequested)
                 {
-                    var runner = new Framework.Runner.ServiceRunner();
+                    var runner = new ServiceRunner();
                     runner.Run(
                         container.ResolveServices<UntypedQueuedCloudService>(serviceXmlsByType["QueuedCloudService"]),
                         container.ResolveServices<ScheduledCloudService>(serviceXmlsByType["ScheduledCloudService"]),
