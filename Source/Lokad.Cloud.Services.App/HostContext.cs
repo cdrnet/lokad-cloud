@@ -11,30 +11,42 @@ using System.Threading;
 using Lokad.Cloud.AppHost.Framework;
 using Lokad.Cloud.Provisioning.Instrumentation;
 using Lokad.Cloud.Services.Framework.Logging;
+using Lokad.Cloud.Storage;
 using Microsoft.WindowsAzure.ServiceRuntime;
 
 namespace Lokad.Cloud.Services.App
 {
-    [Serializable]
     public class HostContext : IHostContext
     {
-        public string DataConnectionString { get; protected set; }
-
-        public string AzureDeploymentId { get; protected set; }
-        public string AzureSubscriptionId { get; protected set; }
-        public X509Certificate2 AzureManagementCertificate { get; protected set; }
+        readonly string _dataConnectionString;
+        readonly Lazy<CloudProvisioning> _provisioning;
 
         public IDeploymentReader DeploymentReader { get; protected set; }
 
+        // Optional:
+        // TODO: Get rid of direct logging (use system events instead)
         public ILogWriter Log { get; set; }
         public IHostObserver Observer { get; set; }
         public ICloudProvisioningObserver ProvisioningObserver { get; set; }
 
-        private readonly Lazy<CloudProvisioning> _provisioning;
-
         public HostContext()
         {
-            _provisioning = new Lazy<CloudProvisioning>(() => new CloudProvisioning(AzureSubscriptionId, AzureDeploymentId, AzureManagementCertificate, Dns.GetHostName(), Log, ProvisioningObserver));
+            _dataConnectionString = SafeGet(() => RoleEnvironment.GetConfigurationSettingValue("DataConnectionString"));
+
+            _provisioning = new Lazy<CloudProvisioning>(() => new CloudProvisioning(
+                SafeGet(() => RoleEnvironment.GetConfigurationSettingValue("SelfManagementSubscriptionId")),
+                SafeGet(() => RoleEnvironment.DeploymentId),
+                SafeGet(() => GetCertificateInternal(RoleEnvironment.GetConfigurationSettingValue("SelfManagementCertificateThumbprint"))),
+                Dns.GetHostName(),
+                Log,
+                ProvisioningObserver));
+
+            var logStorage = CloudStorage.ForAzureConnectionString(_dataConnectionString).BuildStorageProviders();
+            Log = new CloudLogWriter(logStorage);
+
+            // we have to pass the connection string instead of storage providers because
+            // DeploymentReader must be serializable (to cross AppDomains)
+            DeploymentReader = new DeploymentReader(_dataConnectionString);
         }
 
         public string GetSettingValue(string settingName)
@@ -72,6 +84,8 @@ namespace Lokad.Cloud.Services.App
                 return;
             }
 
+            // faulted case is already handled and logged by CloudProvisioning
+            // TODO: cleanup
             provisioning.SetWorkerInstanceCount(numberOfInstances, CancellationToken.None);
         }
 
@@ -85,28 +99,13 @@ namespace Lokad.Cloud.Services.App
             ProvisionWorkerInstances(minNumberOfInstances);
         }
 
-        public static HostContext CreateFromRoleEnvironment()
-        {
-            var context = new HostContext
-                {
-                    AzureDeploymentId = SafeGet(() => RoleEnvironment.DeploymentId),
-                    DataConnectionString = SafeGet(() => RoleEnvironment.GetConfigurationSettingValue("DataConnectionString")),
-                    AzureSubscriptionId = SafeGet(() => RoleEnvironment.GetConfigurationSettingValue("SelfManagementSubscriptionId"))
-                };
-
-            var thumbprint = SafeGet(() => RoleEnvironment.GetConfigurationSettingValue("SelfManagementCertificateThumbprint"));
-            if (thumbprint != null)
-            {
-                context.AzureManagementCertificate = SafeGet(() => GetCertificateInternal(thumbprint));
-            }
-
-            context.DeploymentReader = new DeploymentReader(context.DataConnectionString);
-
-            return context;
-        }
-
         static X509Certificate2 GetCertificateInternal(string thumbprint)
         {
+            if (string.IsNullOrWhiteSpace(thumbprint))
+            {
+                return null;
+            }
+
             var store = new X509Store(StoreName.My, StoreLocation.CurrentUser);
             try
             {

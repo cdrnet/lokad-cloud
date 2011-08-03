@@ -14,7 +14,6 @@ using Lokad.Cloud.Provisioning.Instrumentation;
 using Lokad.Cloud.Provisioning.Instrumentation.Events;
 using Lokad.Cloud.Services.App;
 using Lokad.Cloud.Services.Framework.Logging;
-using Lokad.Cloud.Storage;
 using Microsoft.WindowsAzure.ServiceRuntime;
 
 namespace Lokad.Cloud.Worker
@@ -24,34 +23,40 @@ namespace Lokad.Cloud.Worker
     {
         private readonly CancellationTokenSource _cancellationTokenSource;
         private readonly Host _host;
-        private readonly Lazy<string> _hostName = new Lazy<string>(Dns.GetHostName); 
         private Task _runtimeTask;
 
         public WorkerRole()
         {
             _cancellationTokenSource = new CancellationTokenSource();
 
-            // Host Context
-            var context = HostContext.CreateFromRoleEnvironment();
-
-            // Host Observer
-            // TODO: more sensible subscriptions (with text, filtered, throttled)
-            var logStorage = CloudStorage.ForAzureConnectionString(context.DataConnectionString).BuildStorageProviders();
-            var log = new CloudLogWriter(logStorage);
-
-            var observer = new HostObserverSubject();
-            observer.Subscribe(@event => log.DebugFormat("Runtime: {0}", @event.ToString()));
-
-            var provisioningObserver = new CloudProvisioningInstrumentationSubject();
-            provisioningObserver.OfType<ProvisioningOperationRetriedEvent>().Throttle(TimeSpan.FromMinutes(5))
-                .Subscribe(@event => log.DebugFormat(@event.Exception, "Provisioning: Retried for the {1} policy on {2}: {3}",
-                    @event.Policy, _hostName.Value, (@event.Exception != null) ? @event.Exception.Message : "reason unknown"));
-
-            context.Log = log;
-            context.Observer = observer;
-            context.ProvisioningObserver = provisioningObserver;
+            var context = new HostContext();
+            context.Observer = BuildHostObserver(context.Log);
+            context.ProvisioningObserver = BuildProvisioningObserver(context.Log);
 
             _host = new Host(context);
+        }
+
+        static IHostObserver BuildHostObserver(ILogWriter log)
+        {
+            var subject = new HostObserverSubject();
+
+            // TODO: more sensible subscriptions (with text, filtered, throttled)
+            subject.Subscribe(@event => log.DebugFormat("Runtime: {0}", @event.ToString()));
+
+            return subject;
+        }
+
+        static ICloudProvisioningObserver BuildProvisioningObserver(ILogWriter log)
+        {
+            var hostName = Dns.GetHostName();
+            var subject = new CloudProvisioningInstrumentationSubject();
+
+            subject.OfType<ProvisioningOperationRetriedEvent>()
+                .Throttle(TimeSpan.FromMinutes(5))
+                .Subscribe(@event => log.DebugFormat(@event.Exception, "Provisioning: Retried for the {1} policy on {2}: {3}",
+                    @event.Policy, hostName, (@event.Exception != null) ? @event.Exception.Message : "reason unknown"));
+
+            return subject;
         }
 
         /// <summary>
