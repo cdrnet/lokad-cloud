@@ -102,8 +102,6 @@
     <Compile Include="Legacy\ServiceFabric\ScheduledServiceSettingsAttribute.cs" />
     <Compile Include="Legacy\ServiceFabric\ServiceExecutionFeedback.cs" />
     <Compile Include="Legacy\ServiceFabric\SynchronizationLeaseState.cs" />
-    <Compile Include="Legacy\Services\AssemblyConfigurationUpdateService.cs" />
-    <Compile Include="Legacy\Services\AssemblyLoader.cs" />
     <Compile Include="Legacy\Services\DelayedQueueService.cs" />
     <Compile Include="Legacy\Services\GarbageCollectorService.cs" />
     <Compile Include="Storage\StorageModule.cs" />
