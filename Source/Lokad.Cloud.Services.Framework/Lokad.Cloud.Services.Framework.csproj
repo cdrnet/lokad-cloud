@@ -94,7 +94,6 @@
     <Compile Include="Legacy\RoleConfigurationSettings.cs" />
     <Compile Include="Legacy\ServiceFabric\CloudService.cs" />
     <Compile Include="Legacy\ServiceFabric\CloudServiceSettingsAttribute.cs" />
-    <Compile Include="Legacy\ServiceFabric\IInitializable.cs" />
     <Compile Include="Legacy\ServiceFabric\QueueService.cs" />
     <Compile Include="Legacy\ServiceFabric\QueueServiceSettingsAttribute.cs" />
     <Compile Include="Legacy\ServiceFabric\RuntimeFinalizer.cs" />

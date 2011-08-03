@@ -59,7 +59,7 @@ namespace Lokad.Cloud.ServiceFabric
     /// <summary>Base class for cloud services.</summary>
     /// <remarks>Do not inherit directly from <see cref="CloudService"/>, inherit from
     /// <see cref="QueueService{T}"/> or <see cref="ScheduledService"/> instead.</remarks>
-    public abstract class CloudService : IInitializable
+    public abstract class CloudService
     {
         /// <summary>Name of the container associated to temporary items. Each blob
         /// is prefixed with his lifetime expiration date.</summary>
