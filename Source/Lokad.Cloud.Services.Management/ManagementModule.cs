@@ -9,6 +9,7 @@ using System.Linq;
 using Autofac;
 using Lokad.Cloud.Provisioning.Instrumentation;
 using Lokad.Cloud.Provisioning.Instrumentation.Events;
+using Lokad.Cloud.Services.Framework;
 using Lokad.Cloud.Services.Framework.Logging;
 using Lokad.Cloud.Services.Framework.Provisioning;
 using Lokad.Cloud.Services.Management.Logging;
@@ -28,7 +29,8 @@ namespace Lokad.Cloud.Services.Management
             // will not be available. That's ok, since in this case Provisioning is not
             // available anyway and there's no need to make Provisioning resolveable.
             builder.Register(c => new CloudProvisioning(
-                    c.Resolve<ICloudConfigurationSettings>(), 
+                    c.Resolve<ICloudEnvironment>(),
+                    c.Resolve<ICloudConfigurationSettings>(),
                     c.Resolve<ILogWriter>()))
                 .As<CloudProvisioning, IProvisioningProvider>()
                 .SingleInstance();

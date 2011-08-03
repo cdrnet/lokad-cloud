@@ -11,12 +11,12 @@ using System.Threading.Tasks;
 using Lokad.Cloud.Provisioning;
 using Lokad.Cloud.Provisioning.Instrumentation;
 using Lokad.Cloud.Services.Framework.Logging;
-using Lokad.Cloud.Storage;
+using Lokad.Cloud.Services.Framework.Provisioning;
 
-namespace Lokad.Cloud.Services.Framework.Provisioning
+namespace Lokad.Cloud.Services.App
 {
     /// <summary>Azure Management API Provider, Provisioning Provider.</summary>
-    public class CloudProvisioning : IProvisioningProvider
+    internal class CloudProvisioning : IProvisioningProvider
     {
         private readonly ILogWriter _log;
 
@@ -24,41 +24,27 @@ namespace Lokad.Cloud.Services.Framework.Provisioning
         private readonly AzureProvisioning _provisioning;
 
         /// <summary>IoC constructor.</summary>
-        public CloudProvisioning(ICloudEnvironment environment, ICloudConfigurationSettings settings, ILogWriter log, ICloudProvisioningObserver provisioningObserver = null)
+        public CloudProvisioning(string subscriptionId, string deploymentId, X509Certificate2 certificate, string hostName, ILogWriter log, ICloudProvisioningObserver observer)
         {
             _log = log;
 
-            // try get settings and certificate
-            if (!CloudEnvironment.IsAvailable)
-            {
-                _log.WarnFormat("Provisioning: RoleEnvironment not available on worker {0}.", environment.MachineName);
-                return;
-            }
-
-            var currentDeploymentPrivateId = CloudEnvironment.AzureDeploymentId;
-            Maybe<X509Certificate2> certificate = Maybe<X509Certificate2>.Empty;
-            if (!String.IsNullOrWhiteSpace(settings.SelfManagementCertificateThumbprint))
-            {
-                certificate = environment.GetCertificate(settings.SelfManagementCertificateThumbprint);
-            }
-
             // early evaluate management status for intrinsic fault states, to skip further processing
-            if (!currentDeploymentPrivateId.HasValue || !certificate.HasValue || string.IsNullOrWhiteSpace(settings.SelfManagementSubscriptionId))
+            if (string.IsNullOrWhiteSpace(deploymentId) || string.IsNullOrWhiteSpace(subscriptionId) || certificate == null)
             {
-                _log.DebugFormat("Provisioning: Not available because either the certificate or the subscription was not provided correctly on worker {0}.", environment.MachineName);
+                _log.DebugFormat("Provisioning: Not available because either the certificate or the subscription was not provided correctly on worker {0}.", hostName);
                 return;
             }
 
             // detect dev fabric
-            if (currentDeploymentPrivateId.Value.StartsWith("deployment("))
+            if (deploymentId.StartsWith("deployment("))
             {
                 _log.Debug("Provisioning: Not available in dev fabric.");
                 return;
             }
 
             // ok
-            _provisioning = new AzureProvisioning(settings.SelfManagementSubscriptionId, certificate.Value, provisioningObserver);
-            _currentDeployment = new AzureCurrentDeployment(currentDeploymentPrivateId.Value, settings.SelfManagementSubscriptionId, certificate.Value, provisioningObserver);
+            _provisioning = new AzureProvisioning(subscriptionId, certificate, observer);
+            _currentDeployment = new AzureCurrentDeployment(deploymentId, subscriptionId, certificate, observer);
 
             _currentDeployment.Discover(CancellationToken.None).ContinueWith(t =>
                 {
@@ -77,7 +63,7 @@ namespace Lokad.Cloud.Services.Framework.Provisioning
                         {
                             case HttpStatusCode.Forbidden:
                                 _log.WarnFormat(baseException, "Provisioning: Initial discovery failed with HTTP 403 Forbidden. We tried using subscription '{0}' and certificate '{1}' ({2}) {3} a private key.",
-                                    settings.SelfManagementSubscriptionId, certificate.Value.SubjectName.Name, certificate.Value.Thumbprint, certificate.Value.HasPrivateKey ? "with" : "without");
+                                    subscriptionId, certificate.SubjectName.Name, certificate.Thumbprint, certificate.HasPrivateKey ? "with" : "without");
                                 return;
                             default:
                                 _log.WarnFormat(baseException, "Provisioning: Initial discovery failed with a permanent HTTP {0} {1} error.", (int)httpStatus, httpStatus);

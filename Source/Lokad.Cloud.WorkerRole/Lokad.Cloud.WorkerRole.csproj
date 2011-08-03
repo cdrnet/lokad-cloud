@@ -86,6 +86,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Lokad.Cloud.Provisioning\Lokad.Cloud.Provisioning.csproj">
+      <Project>{B3CA9DCB-04DB-4442-AC0C-6E1F70854DA1}</Project>
+      <Name>Lokad.Cloud.Provisioning</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Lokad.Cloud.Services.App\Lokad.Cloud.Services.App.csproj">
       <Project>{07B4D344-AAFD-43B1-B329-18B6242A6C54}</Project>
       <Name>Lokad.Cloud.Services.App</Name>

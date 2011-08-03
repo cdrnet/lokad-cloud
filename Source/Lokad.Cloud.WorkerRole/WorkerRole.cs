@@ -4,10 +4,14 @@
 #endregion
 
 using System;
+using System.Net;
+using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Lokad.Cloud.AppHost;
 using Lokad.Cloud.AppHost.Framework;
+using Lokad.Cloud.Provisioning.Instrumentation;
+using Lokad.Cloud.Provisioning.Instrumentation.Events;
 using Lokad.Cloud.Services.App;
 using Lokad.Cloud.Services.Framework.Logging;
 using Lokad.Cloud.Storage;
@@ -20,6 +24,7 @@ namespace Lokad.Cloud.Worker
     {
         private readonly CancellationTokenSource _cancellationTokenSource;
         private readonly Host _host;
+        private readonly Lazy<string> _hostName = new Lazy<string>(Dns.GetHostName); 
         private Task _runtimeTask;
 
         public WorkerRole()
@@ -33,10 +38,18 @@ namespace Lokad.Cloud.Worker
             // TODO: more sensible subscriptions (with text, filtered, throttled)
             var logStorage = CloudStorage.ForAzureConnectionString(context.DataConnectionString).BuildStorageProviders();
             var log = new CloudLogWriter(logStorage);
+
             var observer = new HostObserverSubject();
             observer.Subscribe(@event => log.DebugFormat("Runtime: {0}", @event.ToString()));
 
+            var provisioningObserver = new CloudProvisioningInstrumentationSubject();
+            provisioningObserver.OfType<ProvisioningOperationRetriedEvent>().Throttle(TimeSpan.FromMinutes(5))
+                .Subscribe(@event => log.DebugFormat(@event.Exception, "Provisioning: Retried for the {1} policy on {2}: {3}",
+                    @event.Policy, _hostName.Value, (@event.Exception != null) ? @event.Exception.Message : "reason unknown"));
+
+            context.Log = log;
             context.Observer = observer;
+            context.ProvisioningObserver = provisioningObserver;
 
             _host = new Host(context);
         }
