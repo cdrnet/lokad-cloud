@@ -109,10 +109,7 @@
     <Compile Include="CloudModule.cs" />
     <Compile Include="Instrumentation\InstrumentationModule.cs" />
     <Compile Include="Logging\LoggingModule.cs" />
-    <Compile Include="Provisioning\NullProvisioningProvider.cs" />
     <Compile Include="Storage\NullStorageModule.cs" />
-    <Compile Include="Provisioning\CloudProvisioning.cs" />
-    <Compile Include="Provisioning\IProvisioningProvider.cs" />
     <Compile Include="Legacy\RoleConfigurationSettings.cs" />
     <Compile Include="Legacy\ServiceFabric\CloudService.cs" />
     <Compile Include="Legacy\ServiceFabric\CloudServiceSettingsAttribute.cs" />

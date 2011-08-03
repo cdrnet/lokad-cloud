@@ -5,7 +5,6 @@
 
 using Autofac;
 using Lokad.Cloud.Services.Framework.Logging;
-using Lokad.Cloud.Services.Framework.Provisioning;
 using Lokad.Cloud.Storage;
 using Lokad.Cloud.Storage.InMemory;
 
@@ -23,7 +22,6 @@ namespace Lokad.Cloud.Services.Framework.Storage
             builder.Register(c => new MemoryTableStorageProvider()).As<ITableStorageProvider>();
 
             builder.Register(c => new NullLogWriter()).As<ILogWriter>();
-            builder.Register(c => new NullProvisioningProvider()).As<IProvisioningProvider>();
         }
     }
 }

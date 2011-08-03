@@ -11,12 +11,11 @@ using System.Threading.Tasks;
 using Lokad.Cloud.Provisioning;
 using Lokad.Cloud.Provisioning.Instrumentation;
 using Lokad.Cloud.Services.Framework.Logging;
-using Lokad.Cloud.Services.Framework.Provisioning;
 
 namespace Lokad.Cloud.Services.App
 {
     /// <summary>Azure Management API Provider, Provisioning Provider.</summary>
-    internal class CloudProvisioning : IProvisioningProvider
+    internal class CloudProvisioning
     {
         private readonly ILogWriter _log;
 
