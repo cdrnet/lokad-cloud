@@ -7,7 +7,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Autofac;
-using Lokad.Cloud.Services.Framework.Instrumentation.Events;
 using Lokad.Cloud.Storage.Instrumentation;
 using Lokad.Cloud.Storage.Instrumentation.Events;
 
@@ -18,19 +17,9 @@ namespace Lokad.Cloud.Services.Framework.Instrumentation
     {
         protected override void Load(ContainerBuilder builder)
         {
-            builder.Register(RuntimeObserver)
-                .As<ICloudRuntimeObserver, IObservable<ICloudRuntimeEvent>>()
-                .SingleInstance();
-
             builder.Register(StorageObserver)
                 .As<ICloudStorageObserver, IObservable<ICloudStorageEvent>>()
                 .SingleInstance();
-        }
-
-        static CloudRuntimeInstrumentationSubject RuntimeObserver(IComponentContext c)
-        {
-            // will include any registered storage event observers, if there are any, as fixed subscriptions
-            return new CloudRuntimeInstrumentationSubject(c.Resolve<IEnumerable<IObserver<ICloudRuntimeEvent>>>().ToArray());
         }
 
         static CloudStorageInstrumentationSubject StorageObserver(IComponentContext c)
