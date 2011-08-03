@@ -103,7 +103,6 @@
     <Compile Include="Legacy\ServiceFabric\ServiceExecutionFeedback.cs" />
     <Compile Include="Legacy\ServiceFabric\SynchronizationLeaseState.cs" />
     <Compile Include="Legacy\Services\DelayedQueueService.cs" />
-    <Compile Include="Legacy\Services\GarbageCollectorService.cs" />
     <Compile Include="Storage\StorageModule.cs" />
     <Compile Include="Storage\DelayedQueue.cs" />
     <Compile Include="Legacy\TriggerRestartException.cs" />
@@ -117,6 +116,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="QueuedCloudService.cs" />
     <Compile Include="SystemServices\CloudStorageLoggingService.cs" />
+    <Compile Include="SystemServices\GarbageCollectorService.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Lokad.Cloud.Storage\Lokad.Cloud.Storage.csproj">
