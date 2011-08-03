@@ -9,10 +9,10 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Lokad.Cloud.Services.Runtime")]
+[assembly: AssemblyTitle("Lokad.Cloud.Services.AppContext")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyCopyright("Copyright © Lokad 2011")]
 [assembly: AssemblyTrademark("")]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("919bb6bd-5ce4-46d4-a2a3-0de9daac7456")]
+[assembly: Guid("fe919164-4ad3-4765-9cf2-46afa71f0f4a")]

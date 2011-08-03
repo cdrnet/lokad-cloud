@@ -11,11 +11,11 @@ using System.Xml.Linq;
 using Autofac;
 using Autofac.Configuration;
 using Lokad.Cloud.AppHost.Framework;
-using Lokad.Cloud.Services.App.Util;
+using Lokad.Cloud.Services.AppEntryPoint.Util;
 using Lokad.Cloud.Services.Framework;
 using Lokad.Cloud.Services.Management;
 
-namespace Lokad.Cloud.Services.App
+namespace Lokad.Cloud.Services.AppEntryPoint
 {
     internal class ServiceContainer : IDisposable
     {

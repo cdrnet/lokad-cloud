@@ -8,8 +8,8 @@
     <ProjectGuid>{07B4D344-AAFD-43B1-B329-18B6242A6C54}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Lokad.Cloud.Services.App</RootNamespace>
-    <AssemblyName>Lokad.Cloud.Services.App</AssemblyName>
+    <RootNamespace>Lokad.Cloud.Services.AppEntryPoint</RootNamespace>
+    <AssemblyName>Lokad.Cloud.Services.AppEntryPoint</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -39,9 +39,6 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\Autofac.2.5.1.827\lib\NET40\Autofac.Configuration.dll</HintPath>
     </Reference>
-    <Reference Include="ICSharpCode.SharpZipLib, Version=0.86.0.518, Culture=neutral, PublicKeyToken=1b03e6acf1164f73, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll</HintPath>
-    </Reference>
     <Reference Include="Lokad.Cloud.AppHost.Framework, Version=0.3.6.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\Lokad.Cloud.AppHost.Framework.0.3.6\lib\Lokad.Cloud.AppHost.Framework.dll</HintPath>
@@ -63,20 +60,13 @@
     <Compile Include="..\VersionAssemblyInfo.cs">
       <Link>Properties\VersionAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="CloudProvisioning.cs" />
     <Compile Include="EnvironmentAdapter.cs" />
-    <Compile Include="DeploymentReader.cs" />
-    <Compile Include="HostContext.cs" />
     <Compile Include="EntryPoint.cs" />
     <Compile Include="ServiceContainer.cs" />
     <Compile Include="Util\SettingsXml.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Lokad.Cloud.Provisioning\Lokad.Cloud.Provisioning.csproj">
-      <Project>{B3CA9DCB-04DB-4442-AC0C-6E1F70854DA1}</Project>
-      <Name>Lokad.Cloud.Provisioning</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Lokad.Cloud.Services.Framework\Lokad.Cloud.Services.Framework.csproj">
       <Project>{BA1AC04C-5DE2-4E40-8FC9-8EBF31C1B0F3}</Project>
       <Name>Lokad.Cloud.Services.Framework</Name>
@@ -93,9 +83,6 @@
   <ItemGroup>
     <None Include="packages.config" />
     <None Include="ReadMe.markdown" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="_ServiceSettingsFormat.txt" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

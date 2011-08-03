@@ -8,11 +8,11 @@ using System.Linq;
 using System.Threading;
 using System.Xml.Linq;
 using Lokad.Cloud.AppHost.Framework;
-using Lokad.Cloud.Services.App.Util;
+using Lokad.Cloud.Services.AppEntryPoint.Util;
 using Lokad.Cloud.Services.Framework;
 using Lokad.Cloud.Services.Framework.Runner;
 
-namespace Lokad.Cloud.Services.App
+namespace Lokad.Cloud.Services.AppEntryPoint
 {
     public class EntryPoint : IApplicationEntryPoint
     {

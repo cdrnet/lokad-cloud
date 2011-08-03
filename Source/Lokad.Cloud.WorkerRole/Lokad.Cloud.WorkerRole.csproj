@@ -90,9 +90,9 @@
       <Project>{B3CA9DCB-04DB-4442-AC0C-6E1F70854DA1}</Project>
       <Name>Lokad.Cloud.Provisioning</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Lokad.Cloud.Services.App\Lokad.Cloud.Services.App.csproj">
-      <Project>{07B4D344-AAFD-43B1-B329-18B6242A6C54}</Project>
-      <Name>Lokad.Cloud.Services.App</Name>
+    <ProjectReference Include="..\Lokad.Cloud.Services.AppContext\Lokad.Cloud.Services.AppContext.csproj">
+      <Project>{5956C070-E406-4A70-9A8F-C4987A98393B}</Project>
+      <Name>Lokad.Cloud.Services.AppContext</Name>
     </ProjectReference>
     <ProjectReference Include="..\Lokad.Cloud.Services.Framework\Lokad.Cloud.Services.Framework.csproj">
       <Project>{BA1AC04C-5DE2-4E40-8FC9-8EBF31C1B0F3}</Project>

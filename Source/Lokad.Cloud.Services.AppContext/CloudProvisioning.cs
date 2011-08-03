@@ -12,7 +12,7 @@ using Lokad.Cloud.Provisioning;
 using Lokad.Cloud.Provisioning.Instrumentation;
 using Lokad.Cloud.Services.Framework.Logging;
 
-namespace Lokad.Cloud.Services.App
+namespace Lokad.Cloud.Services.AppContext
 {
     /// <summary>Azure Management API Provider, Provisioning Provider.</summary>
     internal class CloudProvisioning

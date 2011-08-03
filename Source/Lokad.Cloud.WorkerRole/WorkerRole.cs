@@ -12,7 +12,7 @@ using Lokad.Cloud.AppHost;
 using Lokad.Cloud.AppHost.Framework;
 using Lokad.Cloud.Provisioning.Instrumentation;
 using Lokad.Cloud.Provisioning.Instrumentation.Events;
-using Lokad.Cloud.Services.App;
+using Lokad.Cloud.Services.AppContext;
 using Lokad.Cloud.Services.Framework.Logging;
 using Microsoft.WindowsAzure.ServiceRuntime;
 

@@ -14,7 +14,7 @@ using Lokad.Cloud.Services.Framework.Logging;
 using Lokad.Cloud.Storage;
 using Microsoft.WindowsAzure.ServiceRuntime;
 
-namespace Lokad.Cloud.Services.App
+namespace Lokad.Cloud.Services.AppContext
 {
     public class HostContext : IHostContext
     {

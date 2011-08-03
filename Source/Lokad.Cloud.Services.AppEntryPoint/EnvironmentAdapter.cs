@@ -7,7 +7,7 @@ using System.Security.Cryptography.X509Certificates;
 using Lokad.Cloud.AppHost.Framework;
 using Lokad.Cloud.Services.Framework;
 
-namespace Lokad.Cloud.Services.App
+namespace Lokad.Cloud.Services.AppEntryPoint
 {
     /// <summary>
     /// Adapting AppHost IApplicationEnvironment to Services ICloudEnvornment

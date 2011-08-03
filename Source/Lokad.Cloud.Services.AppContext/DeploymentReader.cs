@@ -9,7 +9,7 @@ using System.Xml.Linq;
 using Lokad.Cloud.AppHost.Framework;
 using Lokad.Cloud.Storage;
 
-namespace Lokad.Cloud.Services.App
+namespace Lokad.Cloud.Services.AppContext
 {
     [Serializable]
     public class DeploymentReader : IDeploymentReader
