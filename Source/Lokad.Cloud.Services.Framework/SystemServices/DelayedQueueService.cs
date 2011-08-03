@@ -6,6 +6,7 @@
 using System;
 using System.Threading;
 using Lokad.Cloud.ServiceFabric;
+using Lokad.Cloud.Services.Framework.Logging;
 using Lokad.Cloud.Services.Framework.Storage;
 using Lokad.Cloud.Storage;
 
@@ -39,7 +40,7 @@ namespace Lokad.Cloud.Services.Framework.SystemServices
                 var dm = Blobs.GetBlob(parsedName);
                 if (!dm.HasValue)
                 {
-                    //Log.WarnFormat("Deserialization failed for delayed message {0}, message was dropped.", parsedName.Identifier);
+                    Log.WarnFormat("Deserialization failed for delayed message {0}, message was dropped.", parsedName.Identifier);
                     continue;
                 }
 

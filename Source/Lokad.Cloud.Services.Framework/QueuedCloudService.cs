@@ -7,6 +7,7 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Xml.Linq;
+using Lokad.Cloud.Services.Framework.Logging;
 using Lokad.Cloud.Storage;
 
 namespace Lokad.Cloud.Services.Framework
@@ -47,6 +48,7 @@ namespace Lokad.Cloud.Services.Framework
 
         // Injected by Runtime
         public ICloudEnvironment CloudEnvironment { get; set; }
+        public ILogWriter Log { get; set; }
         public IBlobStorageProvider Blobs { get; set; }
         public IQueueStorageProvider Queues { get; set; }
         public ITableStorageProvider Tables { get; set; }

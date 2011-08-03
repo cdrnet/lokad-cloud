@@ -4,6 +4,7 @@
 #endregion
 
 using System.Xml.Linq;
+using Lokad.Cloud.Services.Framework.Logging;
 using Lokad.Cloud.Storage;
 
 namespace Lokad.Cloud.Services.Framework
@@ -17,6 +18,7 @@ namespace Lokad.Cloud.Services.Framework
 
         // Injected by Runtime
         ICloudEnvironment CloudEnvironment { get; set; }
+        ILogWriter Log { get; set; }
         IBlobStorageProvider Blobs { get; set; }
         IQueueStorageProvider Queues { get; set; }
         ITableStorageProvider Tables { get; set; }
