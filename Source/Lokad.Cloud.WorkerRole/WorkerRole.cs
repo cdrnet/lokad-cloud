@@ -14,6 +14,7 @@ using Lokad.Cloud.Provisioning.Instrumentation;
 using Lokad.Cloud.Provisioning.Instrumentation.Events;
 using Lokad.Cloud.Services.AppContext;
 using Lokad.Cloud.Services.Framework.Logging;
+using Lokad.Cloud.Storage;
 using Microsoft.WindowsAzure.ServiceRuntime;
 
 namespace Lokad.Cloud.Worker
@@ -30,8 +31,11 @@ namespace Lokad.Cloud.Worker
             _cancellationTokenSource = new CancellationTokenSource();
 
             var context = new HostContext();
-            context.Observer = BuildHostObserver(context.Log);
-            context.ProvisioningObserver = BuildProvisioningObserver(context.Log);
+
+            var logStorage = CloudStorage.ForAzureConnectionString(context.DataConnectionString).BuildStorageProviders();
+            var log = new CloudLogWriter(logStorage);
+            context.Observer = BuildHostObserver(log);
+            context.ProvisioningObserver = BuildProvisioningObserver(log);
 
             _host = new Host(context);
         }

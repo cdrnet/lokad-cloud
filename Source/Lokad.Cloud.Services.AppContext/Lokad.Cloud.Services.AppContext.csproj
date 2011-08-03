@@ -65,15 +65,12 @@
       <Project>{B3CA9DCB-04DB-4442-AC0C-6E1F70854DA1}</Project>
       <Name>Lokad.Cloud.Provisioning</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Lokad.Cloud.Services.Framework\Lokad.Cloud.Services.Framework.csproj">
-      <Project>{BA1AC04C-5DE2-4E40-8FC9-8EBF31C1B0F3}</Project>
-      <Name>Lokad.Cloud.Services.Framework</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Lokad.Cloud.Storage\Lokad.Cloud.Storage.csproj">
       <Project>{0F9244AB-3B7C-4F98-9D44-E46FBC65522C}</Project>
       <Name>Lokad.Cloud.Storage</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

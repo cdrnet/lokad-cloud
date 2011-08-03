@@ -10,34 +10,22 @@ using System.Threading;
 using System.Threading.Tasks;
 using Lokad.Cloud.Provisioning;
 using Lokad.Cloud.Provisioning.Instrumentation;
-using Lokad.Cloud.Services.Framework.Logging;
 
 namespace Lokad.Cloud.Services.AppContext
 {
     /// <summary>Azure Management API Provider, Provisioning Provider.</summary>
     internal class CloudProvisioning
     {
-        private readonly ILogWriter _log;
-
         private readonly AzureCurrentDeployment _currentDeployment;
         private readonly AzureProvisioning _provisioning;
 
         /// <summary>IoC constructor.</summary>
-        public CloudProvisioning(string subscriptionId, string deploymentId, X509Certificate2 certificate, string hostName, ILogWriter log, ICloudProvisioningObserver observer)
+        public CloudProvisioning(string subscriptionId, string deploymentId, X509Certificate2 certificate, ICloudProvisioningObserver observer)
         {
-            _log = log;
-
-            // early evaluate management status for intrinsic fault states, to skip further processing
-            if (string.IsNullOrWhiteSpace(deploymentId) || string.IsNullOrWhiteSpace(subscriptionId) || certificate == null)
+            // skip further processing on intrinsic fault states
+            if (string.IsNullOrWhiteSpace(deploymentId) || deploymentId.StartsWith("deployment(")
+                || string.IsNullOrWhiteSpace(subscriptionId) || certificate == null)
             {
-                _log.DebugFormat("Provisioning: Not available because either the certificate or the subscription was not provided correctly on worker {0}.", hostName);
-                return;
-            }
-
-            // detect dev fabric
-            if (deploymentId.StartsWith("deployment("))
-            {
-                _log.Debug("Provisioning: Not available in dev fabric.");
                 return;
             }
 
@@ -51,7 +39,7 @@ namespace Lokad.Cloud.Services.AppContext
 
                     if (ProvisioningErrorHandling.IsTransientError(baseException))
                     {
-                        _log.DebugFormat(baseException, "Provisioning: Initial discovery failed with a transient error.");
+                        //_log.DebugFormat(baseException, "Provisioning: Initial discovery failed with a transient error.");
                         return;
                     }
 
@@ -61,16 +49,16 @@ namespace Lokad.Cloud.Services.AppContext
                         switch(httpStatus)
                         {
                             case HttpStatusCode.Forbidden:
-                                _log.WarnFormat(baseException, "Provisioning: Initial discovery failed with HTTP 403 Forbidden. We tried using subscription '{0}' and certificate '{1}' ({2}) {3} a private key.",
-                                    subscriptionId, certificate.SubjectName.Name, certificate.Thumbprint, certificate.HasPrivateKey ? "with" : "without");
+                                //_log.WarnFormat(baseException, "Provisioning: Initial discovery failed with HTTP 403 Forbidden. We tried using subscription '{0}' and certificate '{1}' ({2}) {3} a private key.",
+                                //    subscriptionId, certificate.SubjectName.Name, certificate.Thumbprint, certificate.HasPrivateKey ? "with" : "without");
                                 return;
                             default:
-                                _log.WarnFormat(baseException, "Provisioning: Initial discovery failed with a permanent HTTP {0} {1} error.", (int)httpStatus, httpStatus);
+                                //_log.WarnFormat(baseException, "Provisioning: Initial discovery failed with a permanent HTTP {0} {1} error.", (int)httpStatus, httpStatus);
                                 return;
                         }
                     }
 
-                    _log.WarnFormat(baseException, "Provisioning: Initial discovery failed with a permanent error.");
+                    //_log.WarnFormat(baseException, "Provisioning: Initial discovery failed with a permanent error.");
                 }, TaskContinuationOptions.OnlyOnFaulted);
         }
 
@@ -96,11 +84,11 @@ namespace Lokad.Cloud.Services.AppContext
                         {
                             if (ProvisioningErrorHandling.IsTransientError(t.Exception))
                             {
-                                _log.DebugFormat(task.Exception.GetBaseException(), "Provisioning: Getting the current worker instance count failed with a transient error.");
+                                //_log.DebugFormat(task.Exception.GetBaseException(), "Provisioning: Getting the current worker instance count failed with a transient error.");
                             }
                             else
                             {
-                                _log.WarnFormat(task.Exception.GetBaseException(), "Provisioning: Getting the current worker instance count failed with a permanent error.");
+                                //_log.WarnFormat(task.Exception.GetBaseException(), "Provisioning: Getting the current worker instance count failed with a permanent error.");
                             }
                         }
                     }
@@ -124,7 +112,7 @@ namespace Lokad.Cloud.Services.AppContext
                 throw new ArgumentOutOfRangeException("count");
             }
 
-            _log.InfoFormat("Provisioning: Updating the worker instance count to {0}.", count);
+            //_log.InfoFormat("Provisioning: Updating the worker instance count to {0}.", count);
 
             var task = _provisioning.UpdateCurrentLokadCloudWorkerCount(_currentDeployment, count, cancellationToken);
 
@@ -141,20 +129,20 @@ namespace Lokad.Cloud.Services.AppContext
                                 switch(httpStatus)
                                 {
                                     case HttpStatusCode.Conflict:
-                                        _log.DebugFormat("Provisioning: Updating the worker instance count to {0} failed because another deployment update is already in progress.", count);
+                                        //_log.DebugFormat("Provisioning: Updating the worker instance count to {0} failed because another deployment update is already in progress.", count);
                                         break;
                                     default:
-                                        _log.DebugFormat("Provisioning: Updating the worker instance count failed with HTTP Status {0} ({1}).", httpStatus, (int)httpStatus);
+                                        //_log.DebugFormat("Provisioning: Updating the worker instance count failed with HTTP Status {0} ({1}).", httpStatus, (int)httpStatus);
                                         break;
                                 }
                             }
                             else if (ProvisioningErrorHandling.IsTransientError(t.Exception))
                             {
-                                _log.DebugFormat(task.Exception.GetBaseException(), "Provisioning: Updating the worker instance count failed with a transient error.");
+                                //_log.DebugFormat(task.Exception.GetBaseException(), "Provisioning: Updating the worker instance count failed with a transient error.");
                             }
                             else
                             {
-                                _log.WarnFormat(task.Exception.GetBaseException(), "Provisioning: Updating the worker instance count failed with a permanent error.");
+                                //_log.WarnFormat(task.Exception.GetBaseException(), "Provisioning: Updating the worker instance count failed with a permanent error.");
                             }
                         }
                     }
