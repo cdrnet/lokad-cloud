@@ -3,12 +3,7 @@
 // URL: http://www.lokad.com/
 #endregion
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Autofac;
-using Lokad.Cloud.Provisioning.Instrumentation;
-using Lokad.Cloud.Provisioning.Instrumentation.Events;
 using Lokad.Cloud.Services.Management.Logging;
 
 namespace Lokad.Cloud.Services.Management
@@ -21,17 +16,6 @@ namespace Lokad.Cloud.Services.Management
         protected override void Load(ContainerBuilder builder)
         {
             builder.RegisterType<CloudLogReader>();
-
-            // Provisioning Observer Subject
-            builder.Register(ProvisioningObserver)
-                .As<ICloudProvisioningObserver, IObservable<ICloudProvisioningEvent>>()
-                .SingleInstance();
-        }
-
-        static CloudProvisioningInstrumentationSubject ProvisioningObserver(IComponentContext c)
-        {
-            // will include any registered storage event observers, if there are any, as fixed subscriptions
-            return new CloudProvisioningInstrumentationSubject(c.Resolve<IEnumerable<IObserver<ICloudProvisioningEvent>>>().ToArray());
         }
     }
 }
