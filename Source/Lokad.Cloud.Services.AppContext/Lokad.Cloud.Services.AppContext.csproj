@@ -52,7 +52,6 @@
     <Compile Include="..\VersionAssemblyInfo.cs">
       <Link>Properties\VersionAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="CloudProvisioning.cs" />
     <Compile Include="DeploymentReader.cs" />
     <Compile Include="HostContext.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

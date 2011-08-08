@@ -60,6 +60,30 @@ namespace Lokad.Cloud.Worker
                 .Subscribe(@event => log.DebugFormat(@event.Exception, "Provisioning: Retried for the {1} policy on {2}: {3}",
                     @event.Policy, hostName, (@event.Exception != null) ? @event.Exception.Message : "reason unknown"));
 
+            subject.OfType<ProvisioningFailedBecauseOfConflictEvent>()
+                .Throttle(TimeSpan.FromMinutes(5))
+                .Subscribe(@event => log.Debug("Provisioning: Updating the worker instance count failed because another deployment update is already in progress."));
+
+            subject.OfType<ProvisioningFailedTransientEvent>()
+                .Throttle(TimeSpan.FromMinutes(5))
+                .Subscribe(@event => log.DebugFormat(@event.Exception.GetBaseException(), "Provisioning: Failed with a transient error {0} ({1})",
+                    @event.HttpStatus, (int)@event.HttpStatus));
+
+            subject.OfType<ProvisioningFailedPermanentEvent>()
+                .Throttle(TimeSpan.FromMinutes(5))
+                .Subscribe(@event => log.WarnFormat(@event.Exception.GetBaseException(), "Provisioning: Failed with a permanent error {0} ({1})",
+                    @event.HttpStatus, (int)@event.HttpStatus));
+
+            subject.OfType<DiscoveryFailedTransientEvent>()
+                .Throttle(TimeSpan.FromMinutes(5))
+                .Subscribe(@event => log.DebugFormat(@event.Exception.GetBaseException(), "Provisioning: Discovery failed with a transient error {0} ({1})",
+                    @event.HttpStatus, (int)@event.HttpStatus));
+
+            subject.OfType<DiscoveryFailedPermanentEvent>()
+                .Throttle(TimeSpan.FromMinutes(5))
+                .Subscribe(@event => log.WarnFormat(@event.Exception.GetBaseException(), "Provisioning: Discovery failed with a permanent error {0} ({1})",
+                    @event.HttpStatus, (int)@event.HttpStatus));
+
             return subject;
         }
 
