@@ -71,40 +71,6 @@ namespace Lokad.Cloud.Services.AppContext
         /// Logs exceptions, hence failing to handle a task fault at the calling side
         /// will not cause an unhandled exception at finalization
         /// </remarks>
-        public Task<int> GetWorkerInstanceCount(CancellationToken cancellationToken)
-        {
-            var task = _provisioning.GetCurrentLokadCloudWorkerCount(_currentDeployment, cancellationToken);
-
-            // TODO (ruegg, 2011-05-30): Replace with system events
-            task.ContinueWith(t =>
-                {
-                    try
-                    {
-                        if (t.IsFaulted)
-                        {
-                            if (ProvisioningErrorHandling.IsTransientError(t.Exception))
-                            {
-                                //_log.DebugFormat(task.Exception.GetBaseException(), "Provisioning: Getting the current worker instance count failed with a transient error.");
-                            }
-                            else
-                            {
-                                //_log.WarnFormat(task.Exception.GetBaseException(), "Provisioning: Getting the current worker instance count failed with a permanent error.");
-                            }
-                        }
-                    }
-                    catch (Exception)
-                    {
-                        // We don't really care, it's only logging that failed
-                    }
-                }, TaskContinuationOptions.ExecuteSynchronously);
-
-            return task;
-        }
-
-        /// <remarks>
-        /// Logs exceptions, hence failing to handle a task fault at the calling side
-        /// will not cause an unhandled exception at finalization
-        /// </remarks>
         public Task SetWorkerInstanceCount(int count, CancellationToken cancellationToken)
         {
             if (count <= 0 && count > 500)
