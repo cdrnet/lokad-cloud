@@ -19,5 +19,16 @@ namespace Lokad.Cloud.Services.Management.Build
 
             return attribute.Value;
         }
+
+        public static XElement GetCreateElement(this XElement container, string elementName)
+        {
+            var element = container.Element(elementName);
+            if (element == null)
+            {
+                container.Add(element = new XElement(elementName));
+            }
+
+            return element;
+        }
     }
 }

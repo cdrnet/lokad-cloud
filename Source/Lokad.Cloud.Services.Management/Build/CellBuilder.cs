@@ -52,13 +52,7 @@ namespace Lokad.Cloud.Services.Management.Build
 
         public void ExistingAssemblies(string assembliesName)
         {
-            var assemblies = _xml.Element("Assemblies");
-            if (assemblies == null)
-            {
-                _xml.Add(assemblies = new XElement("Assemblies"));
-            }
-
-            assemblies.SetAttributeValue("name", assembliesName);
+            _xml.GetCreateElement("Assemblies").SetAttributeValue("name", assembliesName);
         }
 
         /// <summary>
@@ -99,13 +93,7 @@ namespace Lokad.Cloud.Services.Management.Build
 
         public void EntryPoint(string typeName)
         {
-            var entryPoint = _xml.Element("EntryPoint");
-            if (entryPoint == null)
-            {
-                _xml.Add(entryPoint = new XElement("EntryPoint"));
-            }
-
-            entryPoint.SetAttributeValue("typeName", typeName);
+            _xml.GetCreateElement("EntryPoint").SetAttributeValue("typeName", typeName);
         }
 
         public void EntryPoint(Type type)
@@ -120,50 +108,17 @@ namespace Lokad.Cloud.Services.Management.Build
 
         public void Settings(Action<XElement> configure)
         {
-            var settings = _xml.Element("Settings");
-            if (settings == null)
-            {
-                _xml.Add(settings = new XElement("Settings"));
-            }
-
-            configure(settings);
+            configure(_xml.GetCreateElement("Settings"));
         }
 
         public void CloudServicesAutofacConfig(Action<AutofacConfigBuilder> configure)
         {
-            Settings(settings =>
-                {
-                    var config = settings.Element("Config");
-                    if (config == null)
-                    {
-                        settings.Add(config = new XElement("Config"));
-                    }
-
-                    var builder = new AutofacConfigBuilder(this, _writer, config);
-                    configure(builder);
-                });
+            Settings(settings => configure(new AutofacConfigBuilder(this, _writer, settings.GetCreateElement("Config"))));
         }
 
         public void CloudServicesSettings(Action<CloudServicesBuilder> configure)
         {
-            Settings(settings =>
-                {
-                    var config = settings.Element("Services");
-                    if (config == null)
-                    {
-                        settings.Add(config = new XElement("Services"));
-                    }
-
-                    var builder = new CloudServicesBuilder(this, _writer, config);
-                    configure(builder);
-                });
-        }
-
-        public void CloudServices(Action<CloudServicesBuilder> services, Action<AutofacConfigBuilder> config)
-        {
-            CloudServicesEntryPoint();
-            CloudServicesAutofacConfig(config);
-            CloudServicesSettings(services);
+            Settings(settings => configure(new CloudServicesBuilder(this, _writer, settings.GetCreateElement("Services"))));
         }
     }
 }
