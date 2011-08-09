@@ -4,10 +4,10 @@
 <h1>Service Manager</h1>
 <p>All initialized cloud services are listed below. Enable or disable a service by clicking its status icon.</p>
 
-@if (Model.QueueServices.Any()) {
-<h2>Queue Services</h2>
+@if (Model.QueuedCloudServices.Any()) {
+<h2>Queued Cloud Services</h2>
 <table class="table">
-	@foreach (var item in Model.QueueServices) {
+	@foreach (var item in Model.QueuedCloudServices) {
 		<tr>
 			<td>@Html.StartStopIconButton(item.IsStarted, item.ServiceName)</td>
 			<td><b>@item.ServiceName</b><br />
@@ -18,10 +18,10 @@
 </table>
 }
 
-@if (Model.ScheduledServices.Any()) {
-<h2>Scheduled Services</h2>
+@if (Model.ScheduledCloudServices.Any()) {
+<h2>Scheduled Cloud Services</h2>
 <table class="table">
-	@foreach (var item in Model.ScheduledServices) {
+	@foreach (var item in Model.ScheduledCloudServices) {
 		<tr>
 			<td>@Html.StartStopIconButton(item.IsStarted, item.ServiceName)</td>
 			<td>@item.ServiceName</td>
@@ -30,10 +30,10 @@
 </table>
 }
 
-@if (Model.CloudServices.Any()) {
-<h2>Other Services</h2>
+@if (Model.ScheduledWorkerServices.Any()) {
+<h2>Scheduled Worker Services</h2>
 <table class="table">
-	@foreach (var item in Model.CloudServices) {
+	@foreach (var item in Model.ScheduledWorkerServices) {
 		<tr>
 			<td>@Html.StartStopIconButton(item.IsStarted, item.ServiceName)</td>
 			<td>@item.ServiceName</td>
@@ -42,10 +42,10 @@
 </table>
 }
 
-@if (Model.UnavailableServices.Any()) {
-<h2>Unavailable Services</h2>
+@if (Model.DaemonServices.Any()) {
+<h2>Daemon Services</h2>
 <table class="table">
-	@foreach (var item in Model.UnavailableServices) {
+	@foreach (var item in Model.DaemonServices) {
 		<tr>
 			<td>@Html.StartStopIconButton(item.IsStarted, item.ServiceName)</td>
 			<td>@item.ServiceName</td>

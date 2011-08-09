@@ -41,6 +41,9 @@
     <Reference Include="ICSharpCode.SharpZipLib">
       <HintPath>..\..\packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll</HintPath>
     </Reference>
+    <Reference Include="Ionic.Zip">
+      <HintPath>..\..\packages\DotNetZip.1.9\lib\Ionic.Zip.dll</HintPath>
+    </Reference>
     <Reference Include="Mono.Cecil, Version=0.9.5.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Mono.Cecil.0.9.5.0\lib\net40\Mono.Cecil.dll</HintPath>
     </Reference>
@@ -81,11 +84,13 @@
     <Compile Include="CloudServices.cs" />
     <Compile Include="CloudServiceScheduling.cs" />
     <Compile Include="CloudServiceSchedulingInfo.cs" />
-    <Compile Include="Deployments\ContentBasedNaming.cs" />
-    <Compile Include="Deployments\DeploymentReader.cs" />
-    <Compile Include="Deployments\DeploymentReference.cs" />
-    <Compile Include="Deployments\DeploymentWriter.cs" />
-    <Compile Include="Deployments\IndexManager.cs" />
+    <Compile Include="Build\CellBuilderMonoCecilExtensions.cs" />
+    <Compile Include="Build\ContentBasedNaming.cs" />
+    <Compile Include="Build\CellBuilderReflectionExtensions.cs" />
+    <Compile Include="Build\AutofacConfigBuilder.cs" />
+    <Compile Include="Build\DeploymentReader.cs" />
+    <Compile Include="Build\DeploymentWriter.cs" />
+    <Compile Include="Build\IndexManager.cs" />
     <Compile Include="Logging\CloudLogEntry.cs" />
     <Compile Include="Logging\CloudLogReader.cs" />
     <Compile Include="ManagementModule.cs" />
@@ -98,6 +103,10 @@
     <Compile Include="Settings\ScheduledCloudServiceSettings.cs" />
     <Compile Include="Settings\ScheduledWorkerServiceSettings.cs" />
     <Compile Include="Settings\SettingsManager.cs" />
+    <Compile Include="Build\CloudServicesBuilder.cs" />
+    <Compile Include="Build\DeploymentBuilder.cs" />
+    <Compile Include="Build\CellBuilder.cs" />
+    <Compile Include="Build\XmlExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Lokad.Cloud.Services.Framework\Lokad.Cloud.Services.Framework.csproj">
@@ -112,6 +121,7 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

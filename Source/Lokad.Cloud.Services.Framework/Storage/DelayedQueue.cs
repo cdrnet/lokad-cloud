@@ -6,7 +6,6 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
-using Lokad.Cloud.ServiceFabric;
 using Lokad.Cloud.Storage;
 
 namespace Lokad.Cloud.Services.Framework.Storage
@@ -40,7 +39,7 @@ namespace Lokad.Cloud.Services.Framework.Storage
     {
         public override string ContainerName
         {
-            get { return CloudService.DelayedMessageContainer; }
+            get { return DelayedQueue.DelayedMessageContainer; }
         }
 
         [Rank(0, true), DataMember] public readonly DateTimeOffset TriggerTime;
@@ -63,6 +62,7 @@ namespace Lokad.Cloud.Services.Framework.Storage
     /// must be enqueued with a delay.</remarks>
     public class DelayedQueue
     {
+        internal const string DelayedMessageContainer = "lokad-cloud-messages";
         readonly IBlobStorageProvider _provider;
 
         /// <summary>Initializes a new instance of the <see cref="DelayedQueue"/> class.</summary>

@@ -9,9 +9,9 @@ using System.Text;
 using System.Xml.Linq;
 using Lokad.Cloud.Storage;
 
-namespace Lokad.Cloud.Services.Management.Deployments
+namespace Lokad.Cloud.Services.Management.Build
 {
-    public class DeploymentWriter
+    internal class DeploymentWriter
     {
         private const string ContainerName = "lokad-cloud-services-deployments";
 
@@ -51,42 +51,30 @@ namespace Lokad.Cloud.Services.Management.Deployments
         }
 
         /// <returns>The resulting name of the settings.</returns>
-        public string WriteSettings(XElement xml)
+        public string WriteServices(XElement xml)
         {
-            return PutXml(xml, _naming.NameForSettings);
+            return PutXml(xml, _naming.NameForServices);
         }
 
-        /// <returns>The resulting name of the settings.</returns>
-        public string WriteSettings(string text)
+        ///// <returns>The resulting name of the deployment.</returns>
+        //public DeploymentReference WriteDeployment(string assembliesName, string configName, string settingsName)
+        //{
+        //    var name = PutXml(new XElement("Deployment",
+        //        new XElement("Assemblies", new XAttribute("name", assembliesName)),
+        //        new XElement("Config", new XAttribute("name", configName)),
+        //        new XElement("Settings", new XAttribute("name", settingsName))),
+        //        _naming.NameForDeployment);
+
+        //    var reference = new DeploymentReference(name, assembliesName, configName, settingsName);
+
+        //    _index.PublishDeployment(reference);
+
+        //    return reference;
+        //}
+
+        string PutXml(XElement xmlRoot, Func<byte[], string> nameFor)
         {
-            return PutString(text, _naming.NameForSettings);
-        }
-
-        /// <returns>The resulting name of the settings.</returns>
-        public string WriteSettings(byte[] bytes)
-        {
-            return PutBytes(bytes, _naming.NameForSettings);
-        }
-
-        /// <returns>The resulting name of the deployment.</returns>
-        public DeploymentReference WriteDeployment(string assembliesName, string configName, string settingsName)
-        {
-            var name = PutXml(new XElement("Deployment",
-                new XElement("Assemblies", new XAttribute("name", assembliesName)),
-                new XElement("Config", new XAttribute("name", configName)),
-                new XElement("Settings", new XAttribute("name", settingsName))),
-                _naming.NameForDeployment);
-
-            var reference = new DeploymentReference(name, assembliesName, configName, settingsName);
-
-            _index.PublishDeployment(reference);
-
-            return reference;
-        }
-
-        string PutXml(XElement xml, Func<byte[], string> nameFor)
-        {
-            var document = new XDocument(new XDeclaration("1.0", "utf-8", "yes"), xml);
+            var document = new XDocument(new XDeclaration("1.0", "utf-8", "yes"), xmlRoot);
             using (var stream = new MemoryStream())
             {
                 document.Save(stream);

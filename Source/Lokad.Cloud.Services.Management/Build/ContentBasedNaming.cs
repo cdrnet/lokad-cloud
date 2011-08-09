@@ -6,14 +6,14 @@
 using System;
 using System.Security.Cryptography;
 
-namespace Lokad.Cloud.Services.Management.Deployments
+namespace Lokad.Cloud.Services.Management.Build
 {
     internal class ContentBasedNaming
     {
         private const string Extension = ".lokadcloud";
         private const string AssembliesPrefix = "assemblies-";
         private const string ConfigPrefix = "config-";
-        private const string SettingsPrefix = "settings-";
+        private const string ServicesPrefix = "services-";
         private const string DeploymentPrefix = "deployment-";
 
         private readonly HashAlgorithm _hashAlgorithm;
@@ -34,9 +34,9 @@ namespace Lokad.Cloud.Services.Management.Deployments
             return string.Concat(ConfigPrefix, SafeHashString(configBytes), Extension);
         }
 
-        public string NameForSettings(byte[] settingsBytes)
+        public string NameForServices(byte[] settingsBytes)
         {
-            return string.Concat(SettingsPrefix, SafeHashString(settingsBytes), Extension);
+            return string.Concat(ServicesPrefix, SafeHashString(settingsBytes), Extension);
         }
 
         public string NameForDeployment(byte[] settingsBytes)

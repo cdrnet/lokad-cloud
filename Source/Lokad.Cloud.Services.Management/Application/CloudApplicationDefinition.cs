@@ -8,8 +8,6 @@ using System.Runtime.Serialization;
 
 namespace Lokad.Cloud.Services.Management.Application
 {
-    // TODO (ruegg, 2011-07-04): Drop legacy service definitions
-
     [DataContract(Namespace = "http://schemas.lokad.com/lokad-cloud/application/1.1"), Serializable]
     public class CloudApplicationDefinition
     {
@@ -23,13 +21,7 @@ namespace Lokad.Cloud.Services.Management.Application
         public CloudApplicationAssemblyInfo[] Assemblies { get; set; }
 
         [DataMember]
-        public QueueServiceDefinition[] QueueServices { get; set; }
-
-        [DataMember]
-        public ScheduledServiceDefinition[] ScheduledServices { get; set; }
-
-        [DataMember]
-        public CloudServiceDefinition[] CloudServices { get; set; }
+        public DaemonServiceDefinition[] DaemonServices { get; set; }
 
         [DataMember]
         public QueuedCloudServiceDefinition[] QueuedCloudServices { get; set; }
@@ -39,18 +31,17 @@ namespace Lokad.Cloud.Services.Management.Application
 
         [DataMember]
         public ScheduledWorkerServiceDefinition[] ScheduledWorkerServices { get; set; }
-
-        [DataMember]
-        public DaemonServiceDefinition[] DaemonServices { get; set; }
-    }
-
-    public interface ICloudServiceDefinition
-    {
-        string TypeName { get; set; }
     }
 
     [DataContract(Namespace = "http://schemas.lokad.com/lokad-cloud/application/1.1"), Serializable]
-    public class QueueServiceDefinition : ICloudServiceDefinition
+    public class DaemonServiceDefinition
+    {
+        [DataMember(IsRequired = true)]
+        public string TypeName { get; set; }
+    }
+
+    [DataContract(Namespace = "http://schemas.lokad.com/lokad-cloud/application/1.1"), Serializable]
+    public class QueuedCloudServiceDefinition
     {
         [DataMember(IsRequired = true)]
         public string TypeName { get; set; }
@@ -63,48 +54,14 @@ namespace Lokad.Cloud.Services.Management.Application
     }
 
     [DataContract(Namespace = "http://schemas.lokad.com/lokad-cloud/application/1.1"), Serializable]
-    public class ScheduledServiceDefinition : ICloudServiceDefinition
+    public class ScheduledCloudServiceDefinition
     {
         [DataMember(IsRequired = true)]
         public string TypeName { get; set; }
     }
 
     [DataContract(Namespace = "http://schemas.lokad.com/lokad-cloud/application/1.1"), Serializable]
-    public class CloudServiceDefinition : ICloudServiceDefinition
-    {
-        [DataMember(IsRequired = true)]
-        public string TypeName { get; set; }
-    }
-
-    [DataContract(Namespace = "http://schemas.lokad.com/lokad-cloud/application/1.1"), Serializable]
-    public class QueuedCloudServiceDefinition : ICloudServiceDefinition
-    {
-        [DataMember(IsRequired = true)]
-        public string TypeName { get; set; }
-
-        [DataMember(IsRequired = true)]
-        public string MessageTypeName { get; set; }
-
-        [DataMember(IsRequired = true)]
-        public string QueueName { get; set; }
-    }
-
-    [DataContract(Namespace = "http://schemas.lokad.com/lokad-cloud/application/1.1"), Serializable]
-    public class ScheduledCloudServiceDefinition : ICloudServiceDefinition
-    {
-        [DataMember(IsRequired = true)]
-        public string TypeName { get; set; }
-    }
-
-    [DataContract(Namespace = "http://schemas.lokad.com/lokad-cloud/application/1.1"), Serializable]
-    public class ScheduledWorkerServiceDefinition : ICloudServiceDefinition
-    {
-        [DataMember(IsRequired = true)]
-        public string TypeName { get; set; }
-    }
-
-    [DataContract(Namespace = "http://schemas.lokad.com/lokad-cloud/application/1.1"), Serializable]
-    public class DaemonServiceDefinition : ICloudServiceDefinition
+    public class ScheduledWorkerServiceDefinition
     {
         [DataMember(IsRequired = true)]
         public string TypeName { get; set; }

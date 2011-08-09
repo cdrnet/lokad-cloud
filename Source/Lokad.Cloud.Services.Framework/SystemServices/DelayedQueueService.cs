@@ -5,7 +5,6 @@
 
 using System;
 using System.Threading;
-using Lokad.Cloud.ServiceFabric;
 using Lokad.Cloud.Services.Framework.Logging;
 using Lokad.Cloud.Services.Framework.Storage;
 using Lokad.Cloud.Storage;
@@ -19,7 +18,7 @@ namespace Lokad.Cloud.Services.Framework.SystemServices
     /// Routinely checks for expired delayed messages that needs to
     /// be put in queue for immediate consumption.
     /// </summary>
-    [ScheduledServiceSettings(TriggerInterval = 15)] // 15s
+    [ScheduledCloudServiceDefaultSettings(TriggerIntervalSeconds = 15)]
     public class DelayedQueueService : ScheduledCloudService
     {
         public override void OnSchedule(DateTimeOffset scheduledTime, CancellationToken cancellationToken)

@@ -18,7 +18,8 @@ namespace Lokad.Cloud.Services.Framework.SystemServices
     /// store non-persistent data, typically state information concerning ongoing
     /// processing.
     /// </remarks>
-    [ScheduledServiceSettings(TriggerInterval = 300)] // by default 1 execution every 5min
+    [ScheduledCloudServiceDefaultSettings(TriggerIntervalSeconds = 300,
+        Title = "Lokad.Cloud Storage Garbage Collector Service")]
     public class GarbageCollectorService : ScheduledCloudService
     {
         static TimeSpan MaxExecutionTime { get { return TimeSpan.FromMinutes(10); } }

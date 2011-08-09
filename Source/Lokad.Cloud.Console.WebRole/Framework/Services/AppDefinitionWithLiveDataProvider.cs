@@ -40,33 +40,31 @@ namespace Lokad.Cloud.Console.WebRole.Framework.Services
             {
                 return new ServicesModel
                     {
-                        QueueServices = new QueueServiceModel[0],
-                        ScheduledServices = new CloudServiceInfo[0],
-                        CloudServices = new CloudServiceInfo[0],
-                        UnavailableServices = new CloudServiceInfo[0]
+                        QueuedCloudServices = new QueueServiceModel[0],
+                        ScheduledCloudServices = new CloudServiceInfo[0],
+                        ScheduledWorkerServices = new CloudServiceInfo[0],
+                        DaemonServices = new CloudServiceInfo[0]
                     };
             }
 
             var appDefinition = applicationDefinition.Value;
 
-            var queueServices = services.Join(
-                appDefinition.QueueServices,
+            var queuedCloudServices = services.Join(
+                appDefinition.QueuedCloudServices,
                 s => s.ServiceName,
                 d => d.TypeName,
                 (s, d) => new QueueServiceModel { ServiceName = s.ServiceName, IsStarted = s.IsStarted, Definition = d }).ToArray();
 
-            var scheduledServices = services.Where(s => appDefinition.ScheduledServices.Any(ads => ads.TypeName.StartsWith(s.ServiceName))).ToArray();
-            var otherServices = services.Where(s => appDefinition.CloudServices.Any(ads => ads.TypeName.StartsWith(s.ServiceName))).ToArray();
-            var unavailableServices = services
-                .Where(s => !queueServices.Any(d => d.ServiceName == s.ServiceName))
-                .Except(scheduledServices).Except(otherServices).ToArray();
+            var scheduledCloudServices = services.Where(s => appDefinition.ScheduledCloudServices.Any(ads => ads.TypeName.StartsWith(s.ServiceName))).ToArray();
+            var scheduledWorkerServices = services.Where(s => appDefinition.ScheduledWorkerServices.Any(ads => ads.TypeName.StartsWith(s.ServiceName))).ToArray();
+            var daemonServices = services.Where(s => appDefinition.DaemonServices.Any(ads => ads.TypeName.StartsWith(s.ServiceName))).ToArray();
 
             return new ServicesModel
                 {
-                    QueueServices = queueServices,
-                    ScheduledServices = scheduledServices,
-                    CloudServices = otherServices,
-                    UnavailableServices = unavailableServices
+                    QueuedCloudServices = queuedCloudServices,
+                    ScheduledCloudServices = scheduledCloudServices,
+                    ScheduledWorkerServices = scheduledWorkerServices,
+                    DaemonServices = daemonServices
                 };
         }
 
@@ -91,7 +89,7 @@ namespace Lokad.Cloud.Console.WebRole.Framework.Services
                         QueueName = queueName,
                         MessageCount = queues.GetApproximateCount(queueName),
                         Latency = queues.GetApproximateLatency(queueName).Convert(ts => ts.PrettyFormat(), string.Empty),
-                        Services = applicationDefinition.Convert(cd => cd.QueueServices.Where(d => d.QueueName == queueName).ToArray(), new QueueServiceDefinition[0])
+                        Services = applicationDefinition.Convert(cd => cd.QueuedCloudServices.Where(d => d.QueueName == queueName).ToArray(), new QueuedCloudServiceDefinition[0])
                     }).ToArray(),
 
                     HasQuarantinedMessages = failingMessages.Count > 0,

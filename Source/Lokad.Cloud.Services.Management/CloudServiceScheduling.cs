@@ -32,35 +32,37 @@ namespace Lokad.Cloud.Services.Management
         /// </summary>
         public List<CloudServiceSchedulingInfo> GetSchedules()
         {
+            throw new NotImplementedException();
+
             // TODO: Redesign to make it self-contained (so that we don't need to pass the name as well)
 
-            return _blobs.ListBlobNames(ScheduledServiceStateName.GetPrefix())
-                .Select(name => System.Tuple.Create(name, _blobs.GetBlob(name)))
-                .Where(pair => pair.Item2.HasValue)
-                .Select(pair =>
-                    {
-                        var state = pair.Item2.Value;
-                        var info = new CloudServiceSchedulingInfo
-                            {
-                                ServiceName = pair.Item1.ServiceName,
-                                TriggerInterval = state.TriggerInterval,
-                                LastExecuted = state.LastExecuted,
-                                WorkerScoped = state.SchedulePerWorker,
-                                LeasedBy = Maybe<string>.Empty,
-                                LeasedSince = Maybe<DateTimeOffset>.Empty,
-                                LeasedUntil = Maybe<DateTimeOffset>.Empty
-                            };
+            //return _blobs.ListBlobNames(ScheduledServiceStateName.GetPrefix())
+            //    .Select(name => System.Tuple.Create(name, _blobs.GetBlob(name)))
+            //    .Where(pair => pair.Item2.HasValue)
+            //    .Select(pair =>
+            //        {
+            //            var state = pair.Item2.Value;
+            //            var info = new CloudServiceSchedulingInfo
+            //                {
+            //                    ServiceName = pair.Item1.ServiceName,
+            //                    TriggerInterval = state.TriggerInterval,
+            //                    LastExecuted = state.LastExecuted,
+            //                    WorkerScoped = state.SchedulePerWorker,
+            //                    LeasedBy = Maybe<string>.Empty,
+            //                    LeasedSince = Maybe<DateTimeOffset>.Empty,
+            //                    LeasedUntil = Maybe<DateTimeOffset>.Empty
+            //                };
 
-                        if (state.Lease != null)
-                        {
-                            info.LeasedBy = state.Lease.Owner;
-                            info.LeasedSince = state.Lease.Acquired;
-                            info.LeasedUntil = state.Lease.Timeout;
-                        }
+            //            if (state.Lease != null)
+            //            {
+            //                info.LeasedBy = state.Lease.Owner;
+            //                info.LeasedSince = state.Lease.Acquired;
+            //                info.LeasedUntil = state.Lease.Timeout;
+            //            }
 
-                        return info;
-                    })
-                .ToList();
+            //            return info;
+            //        })
+            //    .ToList();
         }
 
         /// <summary>
@@ -68,28 +70,30 @@ namespace Lokad.Cloud.Services.Management
         /// </summary>
         public CloudServiceSchedulingInfo GetSchedule(string serviceName)
         {
-            var blob = _blobs.GetBlob(new ScheduledServiceStateName(serviceName));
+            throw new NotImplementedException();
 
-            var state = blob.Value;
-            var info = new CloudServiceSchedulingInfo
-            {
-                ServiceName = serviceName,
-                TriggerInterval = state.TriggerInterval,
-                LastExecuted = state.LastExecuted,
-                WorkerScoped = state.SchedulePerWorker,
-                LeasedBy = Maybe<string>.Empty,
-                LeasedSince = Maybe<DateTimeOffset>.Empty,
-                LeasedUntil = Maybe<DateTimeOffset>.Empty
-            };
+            //var blob = _blobs.GetBlob(new ScheduledServiceStateName(serviceName));
 
-            if (state.Lease != null)
-            {
-                info.LeasedBy = state.Lease.Owner;
-                info.LeasedSince = state.Lease.Acquired;
-                info.LeasedUntil = state.Lease.Timeout;
-            }
+            //var state = blob.Value;
+            //var info = new CloudServiceSchedulingInfo
+            //{
+            //    ServiceName = serviceName,
+            //    TriggerInterval = state.TriggerInterval,
+            //    LastExecuted = state.LastExecuted,
+            //    WorkerScoped = state.SchedulePerWorker,
+            //    LeasedBy = Maybe<string>.Empty,
+            //    LeasedSince = Maybe<DateTimeOffset>.Empty,
+            //    LeasedUntil = Maybe<DateTimeOffset>.Empty
+            //};
 
-            return info;
+            //if (state.Lease != null)
+            //{
+            //    info.LeasedBy = state.Lease.Owner;
+            //    info.LeasedSince = state.Lease.Acquired;
+            //    info.LeasedUntil = state.Lease.Timeout;
+            //}
+
+            //return info;
         }
 
         /// <summary>
@@ -97,8 +101,10 @@ namespace Lokad.Cloud.Services.Management
         /// </summary>
         public List<string> GetScheduledServiceNames()
         {
-            return _blobs.ListBlobNames(ScheduledServiceStateName.GetPrefix())
-                .Select(reference => reference.ServiceName).ToList();
+            throw new NotImplementedException();
+
+            //return _blobs.ListBlobNames(ScheduledServiceStateName.GetPrefix())
+            //    .Select(reference => reference.ServiceName).ToList();
         }
 
         /// <summary>
@@ -106,13 +112,15 @@ namespace Lokad.Cloud.Services.Management
         /// </summary>
         public void SetTriggerInterval(string serviceName, TimeSpan triggerInterval)
         {
-            _blobs.UpdateBlobIfExist(
-                new ScheduledServiceStateName(serviceName),
-                state =>
-                    {
-                        state.TriggerInterval = triggerInterval;
-                        return state;
-                    });
+            throw new NotImplementedException();
+
+            //_blobs.UpdateBlobIfExist(
+            //    new ScheduledServiceStateName(serviceName),
+            //    state =>
+            //        {
+            //            state.TriggerInterval = triggerInterval;
+            //            return state;
+            //        });
         }
 
         /// <summary>
@@ -120,7 +128,9 @@ namespace Lokad.Cloud.Services.Management
         /// </summary>
         public void ResetSchedule(string serviceName)
         {
-            _blobs.DeleteBlobIfExist(new ScheduledServiceStateName(serviceName));
+            throw new NotImplementedException();
+
+            //_blobs.DeleteBlobIfExist(new ScheduledServiceStateName(serviceName));
         }
 
         /// <summary>
@@ -128,13 +138,15 @@ namespace Lokad.Cloud.Services.Management
         /// </summary>
         public void ReleaseLease(string serviceName)
         {
-            _blobs.UpdateBlobIfExist(
-                new ScheduledServiceStateName(serviceName),
-                state =>
-                    {
-                        state.Lease = null;
-                        return state;
-                    });
+            throw new NotImplementedException();
+
+            //_blobs.UpdateBlobIfExist(
+            //    new ScheduledServiceStateName(serviceName),
+            //    state =>
+            //        {
+            //            state.Lease = null;
+            //            return state;
+            //        });
         }
     }
 }

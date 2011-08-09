@@ -12,7 +12,7 @@ This application expects a deployment cell settings tag in the following format:
 
     <Settings>
       <Config name="config-hashSHA256hex" />
-      <Services name="settings-hashSHA256hex"
+      <Services name="settings-hashSHA256hex" />
     </Settings>
 
 Alternatively, instead of referencing external blobs, one or both of the elements can be inlined:

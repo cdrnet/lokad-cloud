@@ -7,7 +7,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Lokad.Cloud.ServiceFabric;
 using Lokad.Cloud.Services.Framework;
 using Lokad.Cloud.Storage;
 using Mono.Cecil;
@@ -71,12 +70,6 @@ namespace Lokad.Cloud.Services.Management.Application
             var reader = new CloudApplicationPackageReader();
             var package = reader.ReadPackage(packageData, true);
 
-            // legacy
-            var legacyCloudServiceTypeDefinitions = new List<TypeDefinition>();
-            var legacyQueueServiceTypeDefinitions = new List<TypeDefinition>();
-            var legacyScheduledServiceTypeDefinitions = new List<TypeDefinition>();
-
-            // new
             var queuedCloudServiceTypeDefinitions = new List<TypeDefinition>();
             var scheduledCloudServiceTypeDefinitions = new List<TypeDefinition>();
             var scheduledWorkerServiceTypeDefinitions = new List<TypeDefinition>();
@@ -85,12 +78,6 @@ namespace Lokad.Cloud.Services.Management.Application
             var typeDefinitionMaps = new Dictionary<string, TypeDefinition>();
             var serviceBaseTypes = new Dictionary<string, List<TypeDefinition>>
                 {
-                    // legacy
-                    { typeof(CloudService).FullName, legacyCloudServiceTypeDefinitions },
-                    { typeof(ScheduledService).FullName, legacyScheduledServiceTypeDefinitions },
-                    { typeof(QueueService<>).FullName, legacyQueueServiceTypeDefinitions },
-
-                    // new
                     { typeof(QueuedCloudService<>).FullName, queuedCloudServiceTypeDefinitions },
                     { typeof(ScheduledCloudService).FullName, scheduledCloudServiceTypeDefinitions },
                     { typeof(ScheduledWorkerService).FullName, scheduledWorkerServiceTypeDefinitions },
@@ -103,7 +90,6 @@ namespace Lokad.Cloud.Services.Management.Application
             // (e.g. Autofac 2 is completely incompatible to Autofac 1)
 
             var assebliesBytes = package.Assemblies.Select(package.GetAssembly).ToList();
-            assebliesBytes.Add(File.ReadAllBytes(typeof(CloudService).Assembly.Location));
             assebliesBytes.Add(File.ReadAllBytes(typeof(ICloudService).Assembly.Location));
             // NOTE: Add here any assemblies from Lokad.Cloud that contain predefined cloud services
 
@@ -153,21 +139,7 @@ namespace Lokad.Cloud.Services.Management.Application
                     Timestamp = DateTimeOffset.UtcNow,
                     Assemblies = package.Assemblies.ToArray(),
 
-                    // legacy
-                    ScheduledServices = legacyScheduledServiceTypeDefinitions.Select(td => new ScheduledServiceDefinition { TypeName = td.FullName }).ToArray(),
-                    CloudServices = legacyCloudServiceTypeDefinitions.Select(td => new CloudServiceDefinition { TypeName = td.FullName }).ToArray(),
-                    QueueServices = legacyQueueServiceTypeDefinitions.Select(td =>
-                        {
-                            var messageType = LegacyGetQueueServiceMessageType(td, typeDefinitionMaps);
-                            return new QueueServiceDefinition
-                            {
-                                TypeName = td.FullName,
-                                MessageTypeName = messageType.FullName,
-                                QueueName = GetAttributeProperty(td, typeof(QueueServiceSettingsAttribute).FullName, "QueueName", () => messageType.FullName.ToLowerInvariant().Replace(".", "-"))
-                            };
-                        }).ToArray(),
-
-                    // new
+                    DaemonServices = daemonServiceTypeDefinitions.Select(td => new DaemonServiceDefinition { TypeName = td.FullName }).ToArray(),
                     QueuedCloudServices = queuedCloudServiceTypeDefinitions.Select(td =>
                         {
                             var messageType = GetQueuedCloudServiceMessageType(td, typeDefinitionMaps);
@@ -175,12 +147,11 @@ namespace Lokad.Cloud.Services.Management.Application
                                 {
                                     TypeName = td.FullName,
                                     MessageTypeName = messageType.FullName,
-                                    QueueName = GetAttributeProperty(td, typeof(QueueServiceSettingsAttribute).FullName, "QueueName", () => messageType.FullName.ToLowerInvariant().Replace(".", "-"))
+                                    QueueName = GetAttributeProperty(td, typeof(QueuedCloudServiceDefaultSettingsAttribute).FullName, "QueueName", () => messageType.FullName.ToLowerInvariant().Replace(".", "-"))
                                 };
                         }).ToArray(),
                     ScheduledCloudServices = scheduledCloudServiceTypeDefinitions.Select(td => new ScheduledCloudServiceDefinition { TypeName = td.FullName }).ToArray(),
-                    ScheduledWorkerServices = scheduledWorkerServiceTypeDefinitions.Select(td => new ScheduledWorkerServiceDefinition { TypeName = td.FullName }).ToArray(),
-                    DaemonServices = daemonServiceTypeDefinitions.Select(td => new DaemonServiceDefinition { TypeName = td.FullName }).ToArray()
+                    ScheduledWorkerServices = scheduledWorkerServiceTypeDefinitions.Select(td => new ScheduledWorkerServiceDefinition { TypeName = td.FullName }).ToArray()
                 };
         }
 
@@ -199,24 +170,6 @@ namespace Lokad.Cloud.Services.Management.Application
             }
 
             return (T)property.Argument.Value;
-        }
-
-        private static TypeReference LegacyGetQueueServiceMessageType(TypeDefinition typeDefinition, Dictionary<string, TypeDefinition> typeDefinitionMaps)
-        {
-            var baseRef = typeDefinition.BaseType;
-            var baseRefName = baseRef.Namespace + "." + baseRef.Name;
-            if (baseRefName == typeof(QueueService<>).FullName)
-            {
-                return ((GenericInstanceType)baseRef).GenericArguments[0];
-            }
-
-            var parentMessageType = LegacyGetQueueServiceMessageType(typeDefinitionMaps[baseRefName], typeDefinitionMaps);
-            if (!parentMessageType.IsGenericParameter)
-            {
-                return parentMessageType;
-            }
-
-            return ((GenericInstanceType)baseRef).GenericArguments[0];
         }
 
         private static TypeReference GetQueuedCloudServiceMessageType(TypeDefinition typeDefinition, Dictionary<string, TypeDefinition> typeDefinitionMaps)

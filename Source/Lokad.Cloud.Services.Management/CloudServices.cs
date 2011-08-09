@@ -3,13 +3,10 @@
 // URL: http://www.lokad.com/
 #endregion
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using Lokad.Cloud.ServiceFabric;
 using Lokad.Cloud.Storage;
-
-// TODO: blobs are sequentially enumerated, performance issue
-// if there are more than a few dozen services
 
 namespace Lokad.Cloud.Services.Management
 {
@@ -31,17 +28,19 @@ namespace Lokad.Cloud.Services.Management
         /// </summary>
         public List<CloudServiceInfo> GetServices()
         {
+            throw new NotImplementedException();
+
             // TODO: Redesign to make it self-contained (so that we don't need to pass the name as well)
 
-            return _blobs.ListBlobNames(CloudServiceStateName.GetPrefix())
-                .Select(name => System.Tuple.Create(name, _blobs.GetBlob(name)))
-                .Where(pair => pair.Item2.HasValue)
-                .Select(pair => new CloudServiceInfo
-                    {
-                        ServiceName = pair.Item1.ServiceName,
-                        IsStarted = pair.Item2.Value == CloudServiceState.Started
-                    })
-                .ToList();
+            //return _blobs.ListBlobNames(CloudServiceStateName.GetPrefix())
+            //    .Select(name => System.Tuple.Create(name, _blobs.GetBlob(name)))
+            //    .Where(pair => pair.Item2.HasValue)
+            //    .Select(pair => new CloudServiceInfo
+            //        {
+            //            ServiceName = pair.Item1.ServiceName,
+            //            IsStarted = pair.Item2.Value == CloudServiceState.Started
+            //        })
+            //    .ToList();
         }
 
         /// <summary>
@@ -49,12 +48,14 @@ namespace Lokad.Cloud.Services.Management
         /// </summary>
         public CloudServiceInfo GetService(string serviceName)
         {
-            var blob = _blobs.GetBlob(new CloudServiceStateName(serviceName));
-            return new CloudServiceInfo
-                {
-                    ServiceName = serviceName,
-                    IsStarted = blob.Value == CloudServiceState.Started
-                };
+            throw new NotImplementedException();
+
+            //var blob = _blobs.GetBlob(new CloudServiceStateName(serviceName));
+            //return new CloudServiceInfo
+            //    {
+            //        ServiceName = serviceName,
+            //        IsStarted = blob.Value == CloudServiceState.Started
+            //    };
         }
 
         /// <summary>
@@ -62,8 +63,10 @@ namespace Lokad.Cloud.Services.Management
         /// </summary>
         public List<string> GetServiceNames()
         {
-            return _blobs.ListBlobNames(CloudServiceStateName.GetPrefix())
-                .Select(reference => reference.ServiceName).ToList();
+            throw new NotImplementedException();
+
+            //return _blobs.ListBlobNames(CloudServiceStateName.GetPrefix())
+            //    .Select(reference => reference.ServiceName).ToList();
         }
 
         /// <summary>
@@ -71,7 +74,9 @@ namespace Lokad.Cloud.Services.Management
         /// </summary>
         public void EnableService(string serviceName)
         {
-            _blobs.PutBlob(new CloudServiceStateName(serviceName), CloudServiceState.Started);
+            throw new NotImplementedException();
+
+            //_blobs.PutBlob(new CloudServiceStateName(serviceName), CloudServiceState.Started);
         }
 
         /// <summary>
@@ -79,7 +84,9 @@ namespace Lokad.Cloud.Services.Management
         /// </summary>
         public void DisableService(string serviceName)
         {
-            _blobs.PutBlob(new CloudServiceStateName(serviceName), CloudServiceState.Stopped);
+            throw new NotImplementedException();
+
+            //_blobs.PutBlob(new CloudServiceStateName(serviceName), CloudServiceState.Stopped);
         }
 
         /// <summary>
@@ -87,7 +94,9 @@ namespace Lokad.Cloud.Services.Management
         /// </summary>
         public void ResetServiceState(string serviceName)
         {
-            _blobs.DeleteBlobIfExist(new CloudServiceStateName(serviceName));
+            throw new NotImplementedException();
+
+            //_blobs.DeleteBlobIfExist(new CloudServiceStateName(serviceName));
         }
     }
 }

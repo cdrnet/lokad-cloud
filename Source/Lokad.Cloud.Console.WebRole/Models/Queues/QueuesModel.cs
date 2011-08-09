@@ -19,7 +19,7 @@ namespace Lokad.Cloud.Console.WebRole.Models.Queues
         public string QueueName { get; set; }
         public int MessageCount { get; set; }
         public string Latency { get; set; }
-        public QueueServiceDefinition[] Services { get; set; }
+        public QueuedCloudServiceDefinition[] Services { get; set; }
     }
 
     public class AzureQuarantineQueue

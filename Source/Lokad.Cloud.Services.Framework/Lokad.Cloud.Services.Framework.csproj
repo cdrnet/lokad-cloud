@@ -66,6 +66,7 @@
       <Link>Properties\VersionAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="CloudServiceType.cs" />
+    <Compile Include="ScheduledWorkerServiceDefaultSettingsAttribute.cs" />
     <Compile Include="DaemonService.cs" />
     <Compile Include="ICloudService.cs" />
     <Compile Include="Jobs\Job.cs" />
@@ -88,13 +89,10 @@
     <Compile Include="Logging\LoggingModule.cs" />
     <Compile Include="Storage\NullStorageModule.cs" />
     <Compile Include="Legacy\RoleConfigurationSettings.cs" />
-    <Compile Include="Legacy\ServiceFabric\CloudService.cs" />
-    <Compile Include="Legacy\ServiceFabric\CloudServiceSettingsAttribute.cs" />
-    <Compile Include="Legacy\ServiceFabric\QueueService.cs" />
-    <Compile Include="Legacy\ServiceFabric\QueueServiceSettingsAttribute.cs" />
+    <Compile Include="DaemonServiceDefaultSettingsAttribute.cs" />
+    <Compile Include="QueuedCloudServiceDefaultSettingsAttribute.cs" />
     <Compile Include="Legacy\ServiceFabric\RuntimeFinalizer.cs" />
-    <Compile Include="Legacy\ServiceFabric\ScheduledService.cs" />
-    <Compile Include="Legacy\ServiceFabric\ScheduledServiceSettingsAttribute.cs" />
+    <Compile Include="ScheduledCloudServiceDefaultSettingsAttribute.cs" />
     <Compile Include="Legacy\ServiceFabric\ServiceExecutionFeedback.cs" />
     <Compile Include="Legacy\ServiceFabric\SynchronizationLeaseState.cs" />
     <Compile Include="Storage\StorageModule.cs" />
@@ -124,7 +122,6 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Jobs\_ReadMe.txt" />
-    <Content Include="Legacy\ServiceFabric\ReadMe.txt" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
