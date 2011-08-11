@@ -68,9 +68,9 @@ namespace Lokad.Cloud.Services.Framework.SystemServices
                 .Subscribe(@event =>
                      {
                          var e = @event.Item;
-                         TryLog(string.Format("Storage: Retried on policy {0} because of {1} on {2}{3} {4}",
+                         TryLog(string.Format("Storage: Retried on policy {0}{1} on {2}{3} {4}",
                              e.Policy,
-                             e.Exception != null ? e.Exception.GetType().Name : "an unknown error",
+                             e.Exception != null ? " because of " + e.Exception.GetType().Name : string.Empty,
                              CloudEnvironment.MachineName,
                              @event.DroppedItems > 0 ? string.Format(". There have been {0} similar events in the last 15 minutes:", @event.DroppedItems) : ":",
                              e.Exception != null ? e.ToString() : string.Empty),
