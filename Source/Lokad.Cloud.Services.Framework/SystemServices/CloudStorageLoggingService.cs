@@ -5,8 +5,8 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reactive.Linq;
+using Lokad.Cloud.Diagnostics;
 using Lokad.Cloud.Services.Framework.Logging;
 using Lokad.Cloud.Storage.Instrumentation.Events;
 
@@ -64,17 +64,18 @@ namespace Lokad.Cloud.Services.Framework.SystemServices
 
             yield return observable
                 .OfType<StorageOperationRetriedEvent>()
-                .Buffer(TimeSpan.FromHours(1))
-                .Subscribe(events =>
-                {
-                    foreach (var group in events.GroupBy(e => e.Policy))
-                    {
-                        TryLog(string.Format("Storage: {0} retries per hour for the {1} policy on {2}. {3}",
-                            group.Count(), group.Key, CloudEnvironment.MachineName,
-                            string.Join(", ", group.Where(e => e.Exception != null).Select(e => e.Exception.GetType().Name).Distinct().ToArray())),
-                            level: LogLevel.Debug);
-                    }
-                });
+                .ThrottleTokenBucket(TimeSpan.FromMinutes(15), 2)
+                .Subscribe(@event =>
+                     {
+                         var e = @event.Item;
+                         TryLog(string.Format("Storage: Retried on policy {0} because of {1} on {2}{3} {4}",
+                             e.Policy,
+                             e.Exception != null ? e.Exception.GetType().Name : "an unknown error",
+                             CloudEnvironment.MachineName,
+                             @event.DroppedItems > 0 ? string.Format(". There have been {0} similar events in the last 15 minutes:", @event.DroppedItems) : ":",
+                             e.Exception != null ? e.ToString() : string.Empty),
+                             e.Exception, LogLevel.Debug);
+                     });
         }
 
         protected void TryLog(object message, Exception exception = null, LogLevel level = LogLevel.Info)

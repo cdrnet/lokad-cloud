@@ -127,6 +127,7 @@
     <Compile Include="SystemServices\CloudStorageLoggingService.cs" />
     <Compile Include="SystemServices\DelayedQueueService.cs" />
     <Compile Include="SystemServices\GarbageCollectorService.cs" />
+    <Compile Include="SystemServices\TockenBucketThrottling.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Lokad.Cloud.Storage\Lokad.Cloud.Storage.csproj">
