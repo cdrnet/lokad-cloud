@@ -9,7 +9,6 @@ using Autofac;
 using Lokad.Cloud.Services.Framework.Storage;
 using Lokad.Cloud.Shared.Test;
 using Lokad.Cloud.Storage;
-using Lokad.Cloud.Storage.Shared.Threading;
 using NUnit.Framework;
 
 namespace Lokad.Cloud.Test.Storage
@@ -61,7 +60,8 @@ namespace Lokad.Cloud.Test.Storage
             var random = new Random();
             const int threadsCount = 4;
             var increments = Range.Array(threadsCount).Select(e => Range.Array(5).Select(i => random.Next(20)).ToArray()).ToArray();
-            var localSums = increments.SelectInParallel(
+
+            var localSums = increments.AsParallel().Select(
                     e =>
                 {
                     var c = new BlobCounter(provider, ContainerName, "SomeBlobName");
@@ -70,7 +70,7 @@ namespace Lokad.Cloud.Test.Storage
                         c.Increment(increment);
                     }
                     return e.Sum();
-                }, threadsCount);
+                    }).ToList();
 
             Assert.AreEqual(increments.Sum(i => i.Sum()), localSums.Sum(), "Broken invariant.");
             Assert.AreEqual(localSums.Sum(), counter.GetValue(), "Values should be equal, BlobCounter supposed to be thread-safe");
