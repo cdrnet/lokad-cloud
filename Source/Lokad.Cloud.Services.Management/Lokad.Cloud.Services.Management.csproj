@@ -61,6 +61,13 @@
     <Reference Include="Ionic.Zip">
       <HintPath>..\..\packages\DotNetZip.1.9\lib\Ionic.Zip.dll</HintPath>
     </Reference>
+    <Reference Include="Lokad.Cloud.Storage, Version=1.4.104.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\Lokad.Cloud.Storage.1.4.104.0\lib\Lokad.Cloud.Storage.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.WindowsAzure.StorageClient, Version=1.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\WindowsAzure.StorageClient.Library.1.4\lib\Microsoft.WindowsAzure.StorageClient.dll</HintPath>
+    </Reference>
     <Reference Include="Mono.Cecil, Version=0.9.5.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Mono.Cecil.0.9.5.0\lib\net40\Mono.Cecil.dll</HintPath>
     </Reference>
@@ -129,10 +136,6 @@
     <ProjectReference Include="..\Lokad.Cloud.Services.Framework\Lokad.Cloud.Services.Framework.csproj">
       <Project>{BA1AC04C-5DE2-4E40-8FC9-8EBF31C1B0F3}</Project>
       <Name>Lokad.Cloud.Services.Framework</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Lokad.Cloud.Storage\Lokad.Cloud.Storage.csproj">
-      <Project>{0F9244AB-3B7C-4F98-9D44-E46FBC65522C}</Project>
-      <Name>Lokad.Cloud.Storage</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
