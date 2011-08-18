@@ -59,6 +59,10 @@
     <Reference Include="Autofac.Configuration, Version=2.4.5.724, Culture=neutral, PublicKeyToken=17863af14b0044da, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Autofac.2.4.5.724\lib\NET40\Autofac.Configuration.dll</HintPath>
     </Reference>
+    <Reference Include="Lokad.Cloud.Storage, Version=1.4.103.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\Lokad.Cloud.Storage.1.4.103.0\lib\Lokad.Cloud.Storage.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.WindowsAzure.StorageClient, Version=1.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\..\packages\WindowsAzure.StorageClient.Library.1.4\lib\Microsoft.WindowsAzure.StorageClient.dll</HintPath>
     </Reference>
@@ -86,31 +90,17 @@
     <None Include="App.template.config">
       <SubType>Designer</SubType>
     </None>
-    <Compile Include="CloudStorageTests.cs" />
     <Compile Include="Diagnostics\CloudLoggerTests.cs" />
     <Compile Include="GlobalSetup.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ServiceFabric\AssemblyLoaderTests.cs" />
     <Compile Include="ServiceFabric\RuntimeFinalizerTests.cs" />
     <Compile Include="Services\QueueServiceTests.cs" />
-    <Compile Include="Shared\Monads\MaybeTests.cs" />
     <Compile Include="Shared\Range.cs" />
     <Compile Include="Shared\Threading\WaitForTests.cs" />
-    <Compile Include="Storage\BlobNameTests.cs" />
     <Compile Include="Storage\BlobCounterTests.cs" />
-    <Compile Include="Storage\BlobStorageProviderTests.cs" />
-    <Compile Include="Storage\CloudFormatterTests.cs" />
-    <Compile Include="Storage\CloudTableTests.cs" />
     <Compile Include="Storage\DelayedQueueTests.cs" />
-    <Compile Include="Storage\FatEntityTests.cs" />
-    <Compile Include="Storage\InMemory\MemoryBlobStorageProviderTests.cs" />
-    <Compile Include="Storage\InMemory\MemoryQueueStorageProviderTests.cs" />
-    <Compile Include="Storage\InMemory\MemoryTableStorageProviderTests.cs" />
-    <Compile Include="Storage\MessageWrapperTests.cs" />
-    <Compile Include="Storage\QueueStorageProviderTests.cs" />
     <Compile Include="Storage\StorageCredentialsVerifierTests.cs" />
-    <Compile Include="Storage\TableStorageProviderTests.cs" />
-    <Compile Include="Storage\TemporaryBlobNameTests.cs" />
     <Compile Include="TypeMapperProviderTests.cs" />
     <None Include="packages.config" />
   </ItemGroup>
@@ -122,10 +112,6 @@
     <ProjectReference Include="..\..\Source\Lokad.Cloud.Provisioning\Lokad.Cloud.Provisioning.csproj">
       <Project>{B3CA9DCB-04DB-4442-AC0C-6E1F70854DA1}</Project>
       <Name>Lokad.Cloud.Provisioning</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Source\Lokad.Cloud.Storage\Lokad.Cloud.Storage.csproj">
-      <Project>{0F9244AB-3B7C-4F98-9D44-E46FBC65522C}</Project>
-      <Name>Lokad.Cloud.Storage</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
