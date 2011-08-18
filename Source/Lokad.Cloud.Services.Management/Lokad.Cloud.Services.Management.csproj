@@ -61,6 +61,9 @@
     <Reference Include="Ionic.Zip">
       <HintPath>..\..\packages\DotNetZip.1.9\lib\Ionic.Zip.dll</HintPath>
     </Reference>
+    <Reference Include="Lokad.Cloud.Provisioning">
+      <HintPath>..\..\packages\Lokad.Cloud.Provisioning.1.4.102.0\lib\Lokad.Cloud.Provisioning.dll</HintPath>
+    </Reference>
     <Reference Include="Lokad.Cloud.Storage, Version=1.4.104.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\Lokad.Cloud.Storage.1.4.104.0\lib\Lokad.Cloud.Storage.dll</HintPath>

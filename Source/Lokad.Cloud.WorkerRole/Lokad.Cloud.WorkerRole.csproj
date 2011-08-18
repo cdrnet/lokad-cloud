@@ -66,9 +66,16 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\Lokad.Cloud.AppHost.Framework.0.3.6\lib\Lokad.Cloud.AppHost.Framework.dll</HintPath>
     </Reference>
+    <Reference Include="Lokad.Cloud.Provisioning, Version=1.4.102.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\Lokad.Cloud.Provisioning.1.4.102.0\lib\Lokad.Cloud.Provisioning.dll</HintPath>
+    </Reference>
     <Reference Include="Lokad.Cloud.Storage, Version=1.4.104.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\Lokad.Cloud.Storage.1.4.104.0\lib\Lokad.Cloud.Storage.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Net.Http, Version=0.3.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\HttpClient.0.3.0\lib\40\Microsoft.Net.Http.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.WindowsAzure.ServiceRuntime">
       <SpecificVersion>False</SpecificVersion>
@@ -93,10 +100,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Lokad.Cloud.Provisioning\Lokad.Cloud.Provisioning.csproj">
-      <Project>{B3CA9DCB-04DB-4442-AC0C-6E1F70854DA1}</Project>
-      <Name>Lokad.Cloud.Provisioning</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Lokad.Cloud.Services.AppContext\Lokad.Cloud.Services.AppContext.csproj">
       <Project>{5956C070-E406-4A70-9A8F-C4987A98393B}</Project>
       <Name>Lokad.Cloud.Services.AppContext</Name>
