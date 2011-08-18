@@ -13,7 +13,8 @@
     <StartDevelopmentStorage>True</StartDevelopmentStorage>
     <Name>Lokad.Cloud.DeployConsole</Name>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
-    <CloudExtensionsDir>..\..\Resource\Build\</CloudExtensionsDir>
+    <CloudExtensionsTaskPath>$(MSBuildThisFileDirectory)\..\..\Resource\Build\Microsoft.VisualStudio.WindowsAzure.Tasks.1.4.dll</CloudExtensionsTaskPath>
+    <CloudExtensionsDir>$(MSBuildThisFileDirectory)\..\..\Resource\Build\</CloudExtensionsDir>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -47,5 +48,6 @@
     </ProjectReference>
   </ItemGroup>
   <!-- Import the target files for this project template -->
+  <Import Project="$(CloudExtensionsDir)Microsoft.WindowsAzure.Common.targets" />
   <Import Project="$(CloudExtensionsDir)Microsoft.WindowsAzure.targets" />
 </Project>

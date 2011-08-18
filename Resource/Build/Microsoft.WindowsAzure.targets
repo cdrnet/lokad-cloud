@@ -185,7 +185,7 @@
     <ValidationIssuesAreErrors Condition=" '$(ValidationIssuesAreErrors)' == '' ">False</ValidationIssuesAreErrors>
 
     <!-- Full path of the the Microsoft.Common.targets extension file. -->
-    <CommonTargetsExtensionFile>$(MSBuildExtensionsPath)\4.0\Microsoft.Common.targets\ImportAfter\Microsoft.WindowsAzure.Common.targets</CommonTargetsExtensionFile>
+    <CommonTargetsExtensionFile>$(MSBuildThisFileDirectory)\Microsoft.WindowsAzure.Common.targets</CommonTargetsExtensionFile>
 
   </PropertyGroup>
 
