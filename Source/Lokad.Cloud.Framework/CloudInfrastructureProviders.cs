@@ -23,20 +23,6 @@ namespace Lokad.Cloud
 
         public ILog Log { get; set; }
 
-        /// <summary>IoC constructor.</summary>
-        public CloudInfrastructureProviders(
-            IBlobStorageProvider blobStorage,
-            IQueueStorageProvider queueStorage,
-            ITableStorageProvider tableStorage,
-            ILog log,
-            IProvisioningProvider provisioning,
-            IRuntimeFinalizer runtimeFinalizer = null)
-            : base(blobStorage, queueStorage, tableStorage, runtimeFinalizer)
-        {
-            Provisioning = provisioning;
-            Log = log;
-        }
-
         /// <summary>IoC constructor 2.</summary>
         public CloudInfrastructureProviders(
             CloudStorageProviders storageProviders,

@@ -28,7 +28,7 @@ namespace Lokad.Cloud.Diagnostics
             builder.RegisterType<BlobDiagnosticsRepository>().As<ICloudDiagnosticsRepository>().PreserveExistingDefaults();
             builder.RegisterType<ServiceMonitor>().As<IServiceMonitor>();
             builder.RegisterType<DiagnosticsAcquisition>()
-                .PropertiesAutowired(true)
+                .PropertiesAutowired(PropertyWiringFlags.PreserveSetValues)
                 .InstancePerDependency();
 
             // Runtime Observer Subject
