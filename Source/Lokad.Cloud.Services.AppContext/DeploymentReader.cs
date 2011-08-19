@@ -4,7 +4,6 @@
 #endregion
 
 using System;
-using System.IO;
 using System.Xml.Linq;
 using Lokad.Cloud.AppHost.Framework;
 using Lokad.Cloud.Storage;
@@ -32,39 +31,12 @@ namespace Lokad.Cloud.Services.AppContext
 
         public XElement GetHeadIfModified(string knownETag, out string newETag)
         {
-            return Storage.RawBlobStorage.GetBlobIfModified<byte[]>(ContainerName, HeadName, knownETag, out newETag)
-                .Convert(bytes =>
-                    {
-                        using (var stream = new MemoryStream(bytes))
-                        {
-                            return XDocument.Load(stream).Root;
-                        }
-                    }, (XElement)null);
+            return Storage.RawBlobStorage.GetBlobIfModified<XElement>(ContainerName, HeadName, knownETag, out newETag).GetValue((XElement)null);
         }
 
         public T GetItem<T>(string itemName) where T : class
         {
-            var bytes = Storage.RawBlobStorage.GetBlob<byte[]>(ContainerName, itemName);
-            if (!bytes.HasValue)
-            {
-                return default(T);
-            }
-
-            var type = typeof(T);
-            if (type.IsAssignableFrom(typeof(byte[])))
-            {
-                return bytes.Value as T;
-            }
-
-            if (type.IsAssignableFrom(typeof(XElement)))
-            {
-                using (var stream = new MemoryStream(bytes.Value))
-                {
-                    return XDocument.Load(stream).Root as T;
-                }
-            }
-
-            throw new NotSupportedException();
+            return Storage.RawBlobStorage.GetBlob<T>(ContainerName, itemName).GetValue(() => default(T));
         }
     }
 }
