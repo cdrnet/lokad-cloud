@@ -61,8 +61,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\Autofac.2.5.2.830\lib\NET40\Autofac.Configuration.dll</HintPath>
     </Reference>
-    <Reference Include="Lokad.Cloud.Provisioning, Version=1.4.101.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Lokad.Cloud.Provisioning.1.4.101.0\lib\Lokad.Cloud.Provisioning.dll</HintPath>
+    <Reference Include="Lokad.Cloud.Provisioning, Version=1.4.103.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\Lokad.Cloud.Provisioning.1.4.103.0\lib\Lokad.Cloud.Provisioning.dll</HintPath>
     </Reference>
     <Reference Include="Lokad.Cloud.Storage, Version=1.4.104.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
