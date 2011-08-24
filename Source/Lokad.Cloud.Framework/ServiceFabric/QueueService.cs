@@ -5,6 +5,7 @@
 
 using System;
 using System.Linq;
+using System.Threading;
 
 namespace Lokad.Cloud.ServiceFabric
 {
@@ -69,10 +70,25 @@ namespace Lokad.Cloud.ServiceFabric
             if (messages.Any())
             {
                 var msg = messages.First();
-                Start(msg);
 
-                // Messages might have already been deleted by the 'Start' method.
-                // It's OK, 'Delete' is idempotent.
+                try
+                {
+                    Start(msg);
+                }
+                catch (ThreadAbortException)
+                {
+                    // no effect if the message has already been deleted, abandoned or resumed
+                    ResumeLater(msg);
+                    throw;
+                }
+                catch (Exception)
+                {
+                    // no effect if the message has already been deleted, abandoned or resumed
+                    Abandon(msg);
+                    throw;
+                }
+
+                // no effect if the message has already been deleted, abandoned or resumed
                 Delete(msg);
 
                 return ServiceExecutionFeedback.WorkAvailable;
@@ -101,6 +117,16 @@ namespace Lokad.Cloud.ServiceFabric
         public void Abandon(T message)
         {
             QueueStorage.Abandon(message);
+        }
+
+        /// <summary>
+        /// Resume a message retrieved through <see cref="Start"/>
+        /// later and put it visibly back on the queue,
+        /// without decreasing the poison detection dequeue count.
+        /// </summary>
+        public void ResumeLater(T message)
+        {
+            QueueStorage.ResumeLater(message);
         }
     }
 }
