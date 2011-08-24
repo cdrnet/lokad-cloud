@@ -81,25 +81,6 @@ namespace Lokad.Cloud
             get { return IsAvailable ? RoleEnvironment.DeploymentId : Maybe<string>.Empty; }
         }
 
-        public static Maybe<int> AzureWorkerInstanceCount
-        {
-            get
-            {
-                if (!IsAvailable)
-                {
-                    return Maybe<int>.Empty;
-                }
-
-                Role workerRole;
-                if(!RoleEnvironment.Roles.TryGetValue("Lokad.Cloud.WorkerRole", out workerRole))
-                {
-                    return Maybe<int>.Empty;
-                }
-
-                return workerRole.Instances.Count;
-            }
-        }
-
         /// <summary>
         /// Retrieves the root path of a named local resource.
         /// </summary>
@@ -166,16 +147,6 @@ namespace Lokad.Cloud
                 // setting was removed from the csdef, skip
                 // (logging is usually not available at that stage)
             }
-        }
-
-        public static bool HasSecureEndpoint()
-        {
-            if (!IsAvailable)
-            {
-                return false;
-            }
-
-            return RoleEnvironment.CurrentRoleInstance.InstanceEndpoints.ContainsKey("HttpsIn");
         }
     }
 }
