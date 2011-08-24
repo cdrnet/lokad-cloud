@@ -26,7 +26,6 @@ namespace Lokad.Cloud.ServiceFabric.Runtime
         readonly ICloudRuntimeObserver _observer;
 
         readonly IServiceMonitor _monitoring;
-        readonly DiagnosticsAcquisition _diagnostics;
 
         readonly ICloudConfigurationSettings _settings;
 
@@ -50,7 +49,6 @@ namespace Lokad.Cloud.ServiceFabric.Runtime
 
             _settings = settings;
             _monitoring = new ServiceMonitor(diagnosticsRepository);
-            _diagnostics = new DiagnosticsAcquisition(diagnosticsRepository);
         }
 
         /// <summary>Called once by the service fabric. Call is not supposed to return
@@ -124,8 +122,6 @@ namespace Lokad.Cloud.ServiceFabric.Runtime
                 {
                     _applicationFinalizer.FinalizeRuntime();
                 }
-
-                TryDumpDiagnostics();
 
                 if (applicationContainer != null)
                 {
@@ -245,29 +241,6 @@ namespace Lokad.Cloud.ServiceFabric.Runtime
             services = serviceTypes.Select(type => (CloudService)applicationContainer.Resolve(type)).ToList();
 
             return applicationContainer;
-        }
-
-        /// <summary>
-        /// Try to dump diagnostics, but suppress any exceptions if it fails
-        /// </summary>
-        void TryDumpDiagnostics()
-        {
-            try
-            {
-                _diagnostics.CollectStatistics();
-            }
-            catch (ThreadAbortException)
-            {
-                Thread.ResetAbort();
-                _log.WarnFormat("Runtime: skipped acquiring statistics on worker {0}", CloudEnvironment.PartitionKey);
-            }
-            catch(Exception e)
-            {
-                _log.WarnFormat(e, "Runtime: failed to acquire statistics on worker {0}: {1}", CloudEnvironment.PartitionKey, e.Message);
-                // might fail when shutting down on exception
-                // logging is likely to fail as well in this case
-                // Suppress exception, can't do anything (will be recycled anyway)
-            }
         }
     }
 }
