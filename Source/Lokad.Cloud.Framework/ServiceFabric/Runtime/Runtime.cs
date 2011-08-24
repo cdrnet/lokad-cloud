@@ -62,25 +62,26 @@ namespace Lokad.Cloud.ServiceFabric.Runtime
             // hook on the current thread to force shut down
             _executeThread = Thread.CurrentThread;
 
+            IContainer applicationContainer = null;
             try
             {
                 List<CloudService> services;
-                using (var applicationContainer = LoadAndBuildApplication(out services))
+
+                // note: we need to keep the container alive until the finally block
+                // because the finalizer (of the container) is called there.
+                applicationContainer = LoadAndBuildApplication(out services);
+
+                _applicationFinalizer = applicationContainer.ResolveOptional<IRuntimeFinalizer>();
+                _scheduler = new Scheduler(services, RunService, _observer);
+
+                foreach (var action in _scheduler.Schedule())
                 {
-                    // Give the application a chance to override external diagnostics sources
-                    applicationContainer.InjectProperties(_diagnostics);
-                    _applicationFinalizer = applicationContainer.ResolveOptional<IRuntimeFinalizer>();
-                    _scheduler = new Scheduler(services, RunService, _observer);
-
-                    foreach (var action in _scheduler.Schedule())
+                    if (_isStopRequested)
                     {
-                        if (_isStopRequested)
-                        {
-                            break;
-                        }
-
-                        action();
+                        break;
                     }
+
+                    action();
                 }
             }
             catch (ThreadInterruptedException)
@@ -125,6 +126,11 @@ namespace Lokad.Cloud.ServiceFabric.Runtime
                 }
 
                 TryDumpDiagnostics();
+
+                if (applicationContainer != null)
+                {
+                    applicationContainer.Dispose();
+                }
 
                 _log.DebugFormat("Runtime: stopped on worker {0}.", CloudEnvironment.PartitionKey);
             }
