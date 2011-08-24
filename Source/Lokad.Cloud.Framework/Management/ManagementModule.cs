@@ -25,7 +25,7 @@ namespace Lokad.Cloud.Management
             builder.Register(c => new CloudProvisioning(
                     c.Resolve<ICloudConfigurationSettings>(), 
                     c.Resolve<Storage.Shared.Logging.ILog>()))
-                .As<CloudProvisioning, IProvisioningProvider>()
+                .As<IProvisioningProvider>()
                 .SingleInstance();
 
             // Provisioning Observer Subject

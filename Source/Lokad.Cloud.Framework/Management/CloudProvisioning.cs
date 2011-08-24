@@ -59,34 +59,6 @@ namespace Lokad.Cloud.Management
             // ok
             _provisioning = new AzureProvisioning(settings.SelfManagementSubscriptionId, certificate.Value, provisioningObserver);
             _currentDeployment = new AzureCurrentDeployment(currentDeploymentPrivateId.Value, settings.SelfManagementSubscriptionId, certificate.Value, provisioningObserver);
-
-            _currentDeployment.Discover(CancellationToken.None).ContinueWith(t =>
-                {
-                    var baseException = t.Exception.GetBaseException();
-
-                    if (ProvisioningErrorHandling.IsTransientError(baseException))
-                    {
-                        _log.DebugFormat(baseException, "Provisioning: Initial discovery failed with a transient error.");
-                        return;
-                    }
-
-                    HttpStatusCode httpStatus;
-                    if (ProvisioningErrorHandling.TryGetHttpStatusCode(baseException, out httpStatus))
-                    {
-                        switch(httpStatus)
-                        {
-                            case HttpStatusCode.Forbidden:
-                                _log.WarnFormat(baseException, "Provisioning: Initial discovery failed with HTTP 403 Forbidden. We tried using subscription '{0}' and certificate '{1}' ({2}) {3} a private key.",
-                                    settings.SelfManagementSubscriptionId, certificate.Value.SubjectName, certificate.Value.Thumbprint, certificate.Value.HasPrivateKey ? "with" : "without");
-                                return;
-                            default:
-                                _log.WarnFormat(baseException, "Provisioning: Initial discovery failed with a permanent HTTP {0} {1} error.", (int)httpStatus, httpStatus);
-                                return;
-                        }
-                    }
-
-                    _log.WarnFormat(baseException, "Provisioning: Initial discovery failed with a permanent error.");
-                }, TaskContinuationOptions.OnlyOnFaulted);
         }
 
         public bool IsAvailable
