@@ -137,8 +137,6 @@
     <Compile Include="Diagnostics\CloudLogger.cs" />
     <Compile Include="Diagnostics\CloudStorageLogger.cs" />
     <Compile Include="Diagnostics\CloudProvisioningLogger.cs" />
-    <Compile Include="Diagnostics\Persistence\PartitionStatisticsName.cs" />
-    <Compile Include="Diagnostics\Persistence\ServiceStatisticsName.cs" />
     <Compile Include="Diagnostics\TockenBucketThrottling.cs" />
     <Compile Include="Instrumentation\CloudRuntimeInstrumentationSubject.cs" />
     <Compile Include="Instrumentation\Events\CloudRuntimeBusyEvent.cs" />
@@ -170,30 +168,17 @@
     <Compile Include="ServiceFabric\Runtime\AssemblyLoader.cs" />
     <Compile Include="ServiceFabric\Runtime\NoRestartFloodPolicy.cs" />
     <Compile Include="CloudInfrastructureProviders.cs" />
-    <Compile Include="Diagnostics\DiagnosticsAcquisition.cs" />
     <Compile Include="Diagnostics\DiagnosticsModule.cs" />
-    <Compile Include="Diagnostics\PartitionMonitor.cs" />
-    <Compile Include="Diagnostics\PartitionStatistics.cs" />
-    <Compile Include="Diagnostics\ICloudDiagnosticsRepository.cs" />
-    <Compile Include="Diagnostics\Persistence\BlobDiagnosticsRepository.cs" />
-    <Compile Include="Diagnostics\ServiceMonitor.cs" />
-    <Compile Include="Diagnostics\IServiceMonitor.cs" />
-    <Compile Include="Diagnostics\ServiceStatistics.cs" />
-    <Compile Include="Diagnostics\TimeSegments.cs" />
     <Compile Include="Management\CloudAssemblies.cs" />
     <Compile Include="Management\CloudConfiguration.cs" />
-    <Compile Include="Management\CloudStatistics.cs" />
     <Compile Include="Management\ManagementModule.cs" />
     <Compile Include="Management\CloudServiceInfo.cs" />
     <Compile Include="Management\CloudServices.cs" />
     <Compile Include="Management\CloudServiceSchedulingInfo.cs" />
     <Compile Include="Management\CloudServiceScheduling.cs" />
-    <Compile Include="Mock\MemoryMonitor.cs" />
     <Compile Include="Mock\MockStorageModule.cs" />
     <Compile Include="ServiceFabric\Runtime\Scheduler.cs" />
     <Compile Include="Services\AssemblyConfigurationUpdateService.cs" />
-    <Compile Include="Services\MonitoringDataRetentionService.cs" />
-    <Compile Include="Services\MonitoringService.cs" />
     <Compile Include="Shared\Logging\ILog.cs" />
     <Compile Include="Shared\Logging\ILogExtensions.cs" />
     <Compile Include="Shared\Logging\ILogProvider.cs" />
@@ -221,6 +206,7 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

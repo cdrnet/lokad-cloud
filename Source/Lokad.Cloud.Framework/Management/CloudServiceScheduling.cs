@@ -113,8 +113,6 @@ namespace Lokad.Cloud.Management
                     {
                         typeof(GarbageCollectorService),
                         typeof(DelayedQueueService),
-                        typeof(MonitoringService),
-                        typeof(MonitoringDataRetentionService),
                         typeof(AssemblyConfigurationUpdateService)
                     }
                     .Select(type => type.FullName)

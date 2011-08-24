@@ -10,7 +10,6 @@ using System.Linq;
 using System.Threading;
 using Autofac;
 using Autofac.Configuration;
-using Lokad.Cloud.Diagnostics;
 using Lokad.Cloud.Instrumentation;
 using Lokad.Cloud.Runtime;
 using Lokad.Cloud.Storage.Shared.Logging;
@@ -25,8 +24,6 @@ namespace Lokad.Cloud.ServiceFabric.Runtime
         readonly ILog _log;
         readonly ICloudRuntimeObserver _observer;
 
-        readonly IServiceMonitor _monitoring;
-
         readonly ICloudConfigurationSettings _settings;
 
         /// <summary>Main thread used to schedule services in <see cref="Execute()"/>.</summary>
@@ -40,7 +37,7 @@ namespace Lokad.Cloud.ServiceFabric.Runtime
         public IContainer RuntimeContainer { get; set; }
 
         /// <summary>IoC constructor.</summary>
-        public Runtime(RuntimeProviders runtimeProviders, ICloudConfigurationSettings settings, ICloudDiagnosticsRepository diagnosticsRepository, ICloudRuntimeObserver observer = null)
+        public Runtime(RuntimeProviders runtimeProviders, ICloudConfigurationSettings settings, ICloudRuntimeObserver observer = null)
         {
             _runtimeProviders = runtimeProviders;
             _runtimeFinalizer = runtimeProviders.RuntimeFinalizer;
@@ -48,7 +45,6 @@ namespace Lokad.Cloud.ServiceFabric.Runtime
             _observer = observer;
 
             _settings = settings;
-            _monitoring = new ServiceMonitor(diagnosticsRepository);
         }
 
         /// <summary>Called once by the service fabric. Call is not supposed to return
@@ -70,7 +66,7 @@ namespace Lokad.Cloud.ServiceFabric.Runtime
                 applicationContainer = LoadAndBuildApplication(out services);
 
                 _applicationFinalizer = applicationContainer.ResolveOptional<IRuntimeFinalizer>();
-                _scheduler = new Scheduler(services, RunService, _observer);
+                _scheduler = new Scheduler(services, service => service.Start(), _observer);
 
                 foreach (var action in _scheduler.Schedule())
                 {
@@ -130,21 +126,6 @@ namespace Lokad.Cloud.ServiceFabric.Runtime
 
                 _log.DebugFormat("Runtime: stopped on worker {0}.", CloudEnvironment.PartitionKey);
             }
-        }
-
-        /// <summary>
-        /// Run a scheduled service
-        /// </summary>
-        ServiceExecutionFeedback RunService(CloudService service)
-        {
-            ServiceExecutionFeedback feedback;
-
-            using (_monitoring.Monitor(service))
-            {
-                feedback = service.Start();
-            }
-
-            return feedback;
         }
 
         /// <summary>The name of the service that is being executed, if any, <c>null</c> otherwise.</summary>

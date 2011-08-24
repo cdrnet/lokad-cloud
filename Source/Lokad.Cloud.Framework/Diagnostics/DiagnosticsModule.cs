@@ -7,7 +7,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Autofac;
-using Lokad.Cloud.Diagnostics.Persistence;
 using Lokad.Cloud.Instrumentation;
 using Lokad.Cloud.Instrumentation.Events;
 using Lokad.Cloud.Storage;
@@ -23,13 +22,6 @@ namespace Lokad.Cloud.Diagnostics
         {
             builder.Register(CloudLogger).As<ILog>();
             builder.Register(CloudLogProvider).As<ILogProvider>();
-
-            // Cloud Monitoring
-            builder.RegisterType<BlobDiagnosticsRepository>().As<ICloudDiagnosticsRepository>().PreserveExistingDefaults();
-            builder.RegisterType<ServiceMonitor>().As<IServiceMonitor>();
-            builder.RegisterType<DiagnosticsAcquisition>()
-                .PropertiesAutowired(PropertyWiringFlags.PreserveSetValues)
-                .InstancePerDependency();
 
             // Runtime Observer Subject
             builder.Register(RuntimeObserver)
