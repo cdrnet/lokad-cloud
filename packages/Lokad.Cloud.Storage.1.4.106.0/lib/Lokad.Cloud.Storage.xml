@@ -349,6 +349,9 @@
             </remarks>
             <returns>The value returned by the lambda. If empty, then the blob has been deleted.</returns>
         </member>
+        <member name="M:Lokad.Cloud.Storage.IBlobStorageProvider.IsBlobLocked(System.String,System.String)">
+            <summary>Query whether a blob is locked by a blob lease.</summary>
+        </member>
         <member name="M:Lokad.Cloud.Storage.IBlobStorageProvider.TryAcquireLease(System.String,System.String)">
             <summary>Requests a new lease on the blob and returns its new lease ID</summary>
         </member>
@@ -464,6 +467,9 @@
             <summary>
             Throws a DataCorruptionException if the content hash is available but doesn't match.
             </summary>
+        </member>
+        <member name="M:Lokad.Cloud.Storage.Azure.BlobStorageProvider.IsBlobLocked(System.String,System.String)">
+            <remarks></remarks>
         </member>
         <member name="M:Lokad.Cloud.Storage.Azure.BlobStorageProvider.TryAcquireLease(System.String,System.String)">
             <remarks></remarks>
@@ -624,8 +630,24 @@
             <param name="messages">Messages to be put.</param>
             <remarks>If the queue does not exist, it gets created.</remarks>
         </member>
+        <member name="M:Lokad.Cloud.Storage.IQueueStorageProvider.PutRangeParallel``1(System.String,System.Collections.Generic.IEnumerable{``0})">
+            <summary>
+            Puts messages on a queue. Uses Tasks to increase thouroughput dramatically.
+            </summary>
+            <typeparam name="T">Type of the messages.</typeparam>
+            <param name="queueName">Identifier of the queue where messages are put.</param>
+            <param name="messages">Messages to be put.</param>
+            <remarks>If the queue does not exist, it gets created.</remarks>
+        </member>
         <member name="M:Lokad.Cloud.Storage.IQueueStorageProvider.Clear(System.String)">
             <summary>Clear all the messages from the specified queue.</summary>
+        </member>
+        <member name="M:Lokad.Cloud.Storage.IQueueStorageProvider.KeepAlive``1(``0)">
+            <summary>Keep the message alive for another period.</summary>
+            <returns>The new visibility timeout</returns>
+        </member>
+        <member name="M:Lokad.Cloud.Storage.IQueueStorageProvider.ReviveMessages">
+            <summary>Revive messages that are no longer kept alive.</summary>
         </member>
         <member name="M:Lokad.Cloud.Storage.IQueueStorageProvider.Delete``1(``0)">
             <summary>Deletes a message being processed from the queue.</summary>
@@ -766,6 +788,9 @@
         <member name="M:Lokad.Cloud.Storage.Azure.QueueStorageProvider.PutRange``1(System.String,System.Collections.Generic.IEnumerable{``0})">
             <remarks></remarks>
         </member>
+        <member name="M:Lokad.Cloud.Storage.Azure.QueueStorageProvider.PutRangeParallel``1(System.String,System.Collections.Generic.IEnumerable{``0})">
+            <remarks></remarks>
+        </member>
         <member name="M:Lokad.Cloud.Storage.Azure.QueueStorageProvider.DeleteOverflowingMessages(System.String)">
             <remarks></remarks>
         </member>
@@ -858,6 +883,11 @@
             so we can track it safely even when abandoning it later
             </summary>
         </member>
+        <member name="P:Lokad.Cloud.Storage.Azure.InProcessMessage.CommitStarted">
+            <summary>
+            True if Delete, Abandon or ResumeNext has been requested
+            </summary>
+        </member>
         <member name="T:Lokad.Cloud.Storage.BlobName`1">
             <summary>
             Base class for strongly typed hierarchical references to blobs of a
@@ -917,6 +947,9 @@
         </member>
         <member name="F:Lokad.Cloud.Storage.Azure.PersistedMessageBlobName.StoreName">
             <summary>Indicates the name of the swap out store where the message is persisted.</summary>
+        </member>
+        <member name="M:Lokad.Cloud.Storage.Azure.Retry.DoUntilTrue(Microsoft.WindowsAzure.StorageClient.RetryPolicy,System.Func{System.Boolean})">
+            <remarks>Policy must support exceptions being null.</remarks>
         </member>
         <member name="T:Lokad.Cloud.Storage.Azure.TableStorageProvider">
             <summary>Implementation based on the Table Storage of Windows Azure.</summary>
@@ -1664,6 +1697,9 @@
         <member name="M:Lokad.Cloud.Storage.InMemory.MemoryBlobStorageProvider.UpsertBlobOrDelete``1(System.String,System.String,System.Func{Lokad.Cloud.Storage.Maybe{``0}},System.Func{``0,Lokad.Cloud.Storage.Maybe{``0}})">
             <remarks></remarks>
         </member>
+        <member name="M:Lokad.Cloud.Storage.InMemory.MemoryBlobStorageProvider.IsBlobLocked(System.String,System.String)">
+            <remarks></remarks>
+        </member>
         <member name="M:Lokad.Cloud.Storage.InMemory.MemoryBlobStorageProvider.TryAcquireLease(System.String,System.String)">
             <remarks></remarks>
         </member>
@@ -1940,6 +1976,12 @@
             <summary>Put a message on a queue (derived from the message type T).</summary>
         </member>
         <member name="M:Lokad.Cloud.Storage.QueueStorageExtensions.PutRange``1(Lokad.Cloud.Storage.IQueueStorageProvider,System.Collections.Generic.IEnumerable{``0})">
+            <summary>Put messages on a queue (derived from the message type T).</summary>
+            <typeparam name="T">Type of the messages.</typeparam>
+            <param name="messages">Messages to be put.</param>
+            <remarks>If the queue does not exist, it gets created.</remarks>
+        </member>
+        <member name="M:Lokad.Cloud.Storage.QueueStorageExtensions.PutRangeParallel``1(Lokad.Cloud.Storage.IQueueStorageProvider,System.Collections.Generic.IEnumerable{``0})">
             <summary>Put messages on a queue (derived from the message type T).</summary>
             <typeparam name="T">Type of the messages.</typeparam>
             <param name="messages">Messages to be put.</param>
