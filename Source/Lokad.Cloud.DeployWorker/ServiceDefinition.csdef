@@ -5,6 +5,7 @@
     <LocalResources>
       <LocalStorage name="LokadCloudStorage" sizeInMB="2" cleanOnRoleRecycle="true" />
       <LocalStorage name="LocalCacheStorage" sizeInMB="1024" cleanOnRoleRecycle="true" />
+      <LocalStorage name="Cells" cleanOnRoleRecycle="true" sizeInMB="50" />
     </LocalResources>
     <ConfigurationSettings>
       <Setting name="DataConnectionString" />
