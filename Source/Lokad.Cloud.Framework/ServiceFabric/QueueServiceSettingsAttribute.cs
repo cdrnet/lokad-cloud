@@ -28,5 +28,11 @@ namespace Lokad.Cloud.ServiceFabric
         /// If the property is left at zero, then the default value of 5 is applied.
         /// </remarks>
         public int MaxProcessingTrials { get; set; }
+
+        /// <summary>
+        /// If set, the queue service will use resilient dequeueing with a shortened visibility timeout.
+        /// It will switch to a controlled message lifetime after processing a message for the provided timespan (in seconds).
+        /// </summary>
+        public int ResilientDequeueAfterSeconds { get; set; }
     }
 }

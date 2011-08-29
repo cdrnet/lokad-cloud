@@ -6,6 +6,7 @@
 using System;
 using System.Linq;
 using System.Threading;
+using Lokad.Cloud.Storage;
 
 namespace Lokad.Cloud.ServiceFabric
 {
@@ -20,10 +21,13 @@ namespace Lokad.Cloud.ServiceFabric
     /// <para>A empty constructor is needed for instantiation through reflection.</para>
     /// </remarks>
     public abstract class QueueService<T> : CloudService
+        where T : class
     {
         readonly string _queueName;
         readonly string _serviceName;
         readonly TimeSpan _visibilityTimeout;
+        readonly TimeSpan _resilientAfter;
+        readonly bool _resilientDequeue;
         readonly int _maxProcessingTrials;
 
         /// <summary>Name of the queue associated to the service.</summary>
@@ -50,11 +54,22 @@ namespace Lokad.Cloud.ServiceFabric
                 {
                     _maxProcessingTrials = settings.MaxProcessingTrials;
                 }
+
+                if (settings.ResilientDequeueAfterSeconds > 0)
+                {
+                    _resilientDequeue = true;
+                    _resilientAfter = TimeSpan.FromSeconds(settings.ResilientDequeueAfterSeconds);
+                }
+                else
+                {
+                    _resilientAfter = TimeSpan.Zero;
+                }
             }
             else
             {
                 _queueName = TypeMapper.GetStorageName(typeof (T));
                 _serviceName = GetType().FullName;
+                _resilientAfter = TimeSpan.Zero;
             }
 
             // 1.25 * execution timeout, but limited to 2h max
@@ -64,37 +79,51 @@ namespace Lokad.Cloud.ServiceFabric
         /// <summary>Do not try to override this method, use <see cref="Start"/> instead.</summary>
         protected sealed override ServiceExecutionFeedback StartImpl()
         {
-            // 1 message at most
-            var messages = QueueStorage.Get<T>(_queueName, 1, _visibilityTimeout, _maxProcessingTrials);
-
-            if (messages.Any())
+            if (_resilientDequeue)
             {
-                var msg = messages.First();
-
-                try
+                using(var message = QueueStorage.GetResilient<T>(_queueName, _resilientAfter, _maxProcessingTrials))
                 {
-                    Start(msg);
-                }
-                catch (ThreadAbortException)
-                {
-                    // no effect if the message has already been deleted, abandoned or resumed
-                    ResumeLater(msg);
-                    throw;
-                }
-                catch (Exception)
-                {
-                    // no effect if the message has already been deleted, abandoned or resumed
-                    Abandon(msg);
-                    throw;
-                }
+                    if (message == null)
+                    {
+                        return ServiceExecutionFeedback.Skipped;
+                    }
 
-                // no effect if the message has already been deleted, abandoned or resumed
-                Delete(msg);
-
-                return ServiceExecutionFeedback.WorkAvailable;
+                    ProcessMessage(message.Message);
+                    return ServiceExecutionFeedback.WorkAvailable;
+                }
             }
 
-            return ServiceExecutionFeedback.Skipped;
+            var messages = QueueStorage.Get<T>(_queueName, 1, _visibilityTimeout, _maxProcessingTrials).ToList();
+            if (messages.Count == 0)
+            {
+                return ServiceExecutionFeedback.Skipped;
+            }
+
+            ProcessMessage(messages[0]);
+            return ServiceExecutionFeedback.WorkAvailable;
+        }
+
+        private void ProcessMessage(T message)
+        {
+            try
+            {
+                Start(message);
+            }
+            catch (ThreadAbortException)
+            {
+                // no effect if the message has already been deleted, abandoned or resumed
+                ResumeLater(message);
+                throw;
+            }
+            catch (Exception)
+            {
+                // no effect if the message has already been deleted, abandoned or resumed
+                Abandon(message);
+                throw;
+            }
+
+            // no effect if the message has already been deleted, abandoned or resumed
+            Delete(message);
         }
 
         /// <summary>Method called first by the <c>Lokad.Cloud</c> framework when a message is
