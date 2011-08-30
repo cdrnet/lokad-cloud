@@ -33,11 +33,13 @@ namespace Lokad.Cloud.Diagnostics
                 return;
             }
 
-            _subscriptions.Add(_observable.OfType<BlobDeserializationFailedEvent>().Subscribe(e => TryLog(e, e.Exception)));
+            _subscriptions.Add(_observable.OfType<BlobDeserializationFailedEvent>().Subscribe(e => TryLog(e, e.Exception, LogLevel.Error)));
             _subscriptions.Add(_observable.OfType<MessageDeserializationFailedQuarantinedEvent>().Subscribe(e => TryLog(e, e.Exceptions)));
             _subscriptions.Add(_observable.OfType<MessageProcessingFailedQuarantinedEvent>().Subscribe(e => TryLog(e)));
+            _subscriptions.Add(_observable.OfType<MessagesRevivedEvent>().Subscribe(e => TryLog(e)));
 
             _subscriptions.Add(_observable.OfType<StorageOperationRetriedEvent>()
+                .Where(@event => @event.Policy != "OptimisticConcurrency")
                 .ThrottleTokenBucket(TimeSpan.FromMinutes(15), 2)
                 .Subscribe(@event =>
                     {
