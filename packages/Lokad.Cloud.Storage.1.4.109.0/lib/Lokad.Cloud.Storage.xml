@@ -1556,6 +1556,12 @@
             <summary>Abstracts the finalizer (used for fast resource release
             in case of runtime shutdown).</summary>
         </member>
+        <member name="T:Lokad.Cloud.Storage.Instrumentation.Events.MessagesRevivedEvent">
+            <summary>
+            Raised whenever one or more messages have been revived
+            (e.g. from kee-alive messages that were no longer kept alive).
+            </summary>
+        </member>
         <member name="T:Lokad.Cloud.Storage.RawFormatter">
             <summary>
             Raw byte pass-through formatter, supporting byte-array, string (UTF-8) and XElement (Root of UTF-8 XDocument) only.
