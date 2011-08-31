@@ -112,7 +112,7 @@ namespace Lokad.Cloud.Management
                 new[]
                     {
                         typeof(GarbageCollectorService),
-                        typeof(DelayedQueueService),
+                        typeof(ReviveMessagesService),
                         typeof(AssemblyConfigurationUpdateService)
                     }
                     .Select(type => type.FullName)
