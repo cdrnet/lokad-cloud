@@ -4,17 +4,14 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>1.4.0</ProductVersion>
-    <ProjectGuid>{d15da935-5655-4056-a57e-0b0815073efa}</ProjectGuid>
+    <ProductVersion>1.6</ProductVersion>
+    <ProjectGuid>{180d35c8-6c98-48bb-ba79-e82e1c15ae7c}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Lokad.Cloud.DeployWorker</RootNamespace>
     <AssemblyName>Lokad.Cloud.DeployWorker</AssemblyName>
     <StartDevelopmentStorage>True</StartDevelopmentStorage>
     <Name>Lokad.Cloud.DeployWorker</Name>
-    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
-    <CloudExtensionsTaskPath>$(MSBuildThisFileDirectory)\..\..\Resource\Build\Microsoft.VisualStudio.WindowsAzure.Tasks.1.4.dll</CloudExtensionsTaskPath>
-    <CloudExtensionsDir>$(MSBuildThisFileDirectory)\..\..\Resource\Build\</CloudExtensionsDir>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -36,7 +33,8 @@
   <!-- Items for the project -->
   <ItemGroup>
     <ServiceDefinition Include="ServiceDefinition.csdef" />
-    <ServiceConfiguration Include="ServiceConfiguration.cscfg" />
+    <ServiceConfiguration Include="ServiceConfiguration.Local.cscfg" />
+    <ServiceConfiguration Include="ServiceConfiguration.Cloud.cscfg" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Lokad.Cloud.WorkerRole\Lokad.Cloud.WorkerRole.csproj">
@@ -45,9 +43,13 @@
       <Private>True</Private>
       <RoleType>Worker</RoleType>
       <RoleName>Lokad.Cloud.WorkerRole</RoleName>
+      <UpdateDiagnosticsConnectionStringOnPublish>True</UpdateDiagnosticsConnectionStringOnPublish>
     </ProjectReference>
   </ItemGroup>
   <!-- Import the target files for this project template -->
-  <Import Project="$(CloudExtensionsDir)Microsoft.WindowsAzure.Common.targets" />
+  <PropertyGroup>
+    <VisualStudioVersion Condition=" '$(VisualStudioVersion)' == '' ">10.0</VisualStudioVersion>
+    <CloudExtensionsDir Condition=" '$(CloudExtensionsDir)' == '' ">$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Windows Azure Tools\1.6\</CloudExtensionsDir>
+  </PropertyGroup>
   <Import Project="$(CloudExtensionsDir)Microsoft.WindowsAzure.targets" />
 </Project>
