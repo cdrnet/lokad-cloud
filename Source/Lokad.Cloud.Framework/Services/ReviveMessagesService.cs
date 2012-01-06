@@ -23,12 +23,12 @@ namespace Lokad.Cloud.Services
     {
         protected override void StartOnSchedule()
         {
-            QueueStorage.ReviveMessages();
+            Queues.ReviveMessages();
 
             // TODO (ruegg, 2011-08-31): legacy - to be ported into ReviveMessages later:
 
             // lazy enumeration over the delayed messages
-            foreach (var parsedName in BlobStorage.ListBlobNames(new DelayedMessageName()))
+            foreach (var parsedName in Blobs.ListBlobNames(new DelayedMessageName()))
             {
                 if (DateTimeOffset.UtcNow <= parsedName.TriggerTime)
                 {
@@ -38,15 +38,15 @@ namespace Lokad.Cloud.Services
                     break;
                 }
 
-                var dm = BlobStorage.GetBlob(parsedName);
+                var dm = Blobs.GetBlob(parsedName);
                 if (!dm.HasValue)
                 {
                     Log.WarnFormat("Deserialization failed for delayed message {0}, message was dropped.", parsedName.Identifier);
                     continue;
                 }
 
-                QueueStorage.Put(dm.Value.QueueName, dm.Value.InnerMessage);
-                BlobStorage.DeleteBlobIfExist(parsedName);
+                Queues.Put(dm.Value.QueueName, dm.Value.InnerMessage);
+                Blobs.DeleteBlobIfExist(parsedName);
             }
         }
     }

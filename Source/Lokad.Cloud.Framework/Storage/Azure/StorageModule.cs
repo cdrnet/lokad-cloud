@@ -9,7 +9,6 @@ using System.Linq;
 using System.Net;
 using Autofac;
 using Lokad.Cloud.Diagnostics;
-using Lokad.Cloud.Management;
 using Lokad.Cloud.Runtime;
 using Lokad.Cloud.Storage.Instrumentation;
 using Lokad.Cloud.Storage.Instrumentation.Events;
@@ -33,7 +32,6 @@ namespace Lokad.Cloud.Storage.Azure
 
             builder.Register(RuntimeProviders);
             builder.Register(CloudStorageProviders);
-            builder.Register(CloudInfrastructureProviders);
 
             // Storage Observer Subject
             builder.Register(StorageObserver)
@@ -64,14 +62,6 @@ namespace Lokad.Cloud.Storage.Azure
                 .WithObserver(c.Resolve<ICloudStorageObserver>())
                 .WithRuntimeFinalizer(c.ResolveOptional<IRuntimeFinalizer>())
                 .BuildRuntimeProviders(c.ResolveOptional<ILog>());
-        }
-
-        static CloudInfrastructureProviders CloudInfrastructureProviders(IComponentContext c)
-        {
-            return new CloudInfrastructureProviders(
-                c.Resolve<CloudStorageProviders>(),
-                c.ResolveOptional<IProvisioningProvider>(),
-                c.ResolveOptional<ILog>());
         }
 
         static CloudStorageProviders CloudStorageProviders(IComponentContext c)

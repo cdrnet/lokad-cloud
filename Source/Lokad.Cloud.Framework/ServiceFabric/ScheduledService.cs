@@ -127,7 +127,7 @@ namespace Lokad.Cloud.ServiceFabric
             //    scheduled services (because they have a lease).
             if (!_scheduledPerWorker)
             {
-                Providers.RuntimeFinalizer.Register(this);
+                Storage.RuntimeFinalizer.Register(this);
             }
         }
 

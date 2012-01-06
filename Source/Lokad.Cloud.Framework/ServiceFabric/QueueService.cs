@@ -81,7 +81,7 @@ namespace Lokad.Cloud.ServiceFabric
         {
             if (_resilientDequeue)
             {
-                using(var message = QueueStorage.GetResilient<T>(_queueName, _resilientAfter, _maxProcessingTrials))
+                using(var message = Queues.GetResilient<T>(_queueName, _resilientAfter, _maxProcessingTrials))
                 {
                     if (message == null)
                     {
@@ -93,7 +93,7 @@ namespace Lokad.Cloud.ServiceFabric
                 }
             }
 
-            var messages = QueueStorage.Get<T>(_queueName, 1, _visibilityTimeout, _maxProcessingTrials).ToList();
+            var messages = Queues.Get<T>(_queueName, 1, _visibilityTimeout, _maxProcessingTrials).ToList();
             if (messages.Count == 0)
             {
                 return ServiceExecutionFeedback.Skipped;
@@ -136,7 +136,7 @@ namespace Lokad.Cloud.ServiceFabric
         /// </summary>
         public void Delete(T message)
         {
-            QueueStorage.Delete(message);
+            Queues.Delete(message);
         }
 
         /// <summary>
@@ -145,7 +145,7 @@ namespace Lokad.Cloud.ServiceFabric
         /// </summary>
         public void Abandon(T message)
         {
-            QueueStorage.Abandon(message);
+            Queues.Abandon(message);
         }
 
         /// <summary>
@@ -155,7 +155,7 @@ namespace Lokad.Cloud.ServiceFabric
         /// </summary>
         public void ResumeLater(T message)
         {
-            QueueStorage.ResumeLater(message);
+            Queues.ResumeLater(message);
         }
     }
 }
