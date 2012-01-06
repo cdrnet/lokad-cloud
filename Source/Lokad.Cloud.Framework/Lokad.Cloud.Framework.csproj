@@ -150,8 +150,8 @@
     <Compile Include="Instrumentation\ICloudRuntimeObserver.cs" />
     <Compile Include="Jobs\Job.cs" />
     <Compile Include="Jobs\JobManager.cs" />
-    <Compile Include="Management\CloudProvisioning.cs" />
     <Compile Include="Management\IProvisioningProvider.cs" />
+    <Compile Include="Mock\MemoryEnvironment.cs" />
     <Compile Include="Mock\MemoryProvisioning.cs" />
     <Compile Include="RoleConfigurationSettings.cs" />
     <Compile Include="Runtime\CloudStorageExtensions.cs" />
@@ -176,7 +176,6 @@
     <Compile Include="Diagnostics\DiagnosticsModule.cs" />
     <Compile Include="Management\CloudAssemblies.cs" />
     <Compile Include="Management\CloudConfiguration.cs" />
-    <Compile Include="Management\ManagementModule.cs" />
     <Compile Include="Management\CloudServiceInfo.cs" />
     <Compile Include="Management\CloudServices.cs" />
     <Compile Include="Management\CloudServiceSchedulingInfo.cs" />

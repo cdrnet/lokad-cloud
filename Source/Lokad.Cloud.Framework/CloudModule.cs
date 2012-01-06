@@ -4,7 +4,14 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using Autofac;
+using Lokad.Cloud.Diagnostics;
+using Lokad.Cloud.Management;
+using Lokad.Cloud.Provisioning.Instrumentation;
+using Lokad.Cloud.Provisioning.Instrumentation.Events;
+using Lokad.Cloud.Storage.Azure;
 
 namespace Lokad.Cloud
 {
@@ -24,15 +31,31 @@ namespace Lokad.Cloud
     {
         protected override void Load(ContainerBuilder builder)
         {
-            builder.RegisterModule(new Storage.Azure.StorageModule());
-            builder.RegisterModule(new Diagnostics.DiagnosticsModule());
-            builder.RegisterModule(new Management.ManagementModule());
+            builder.RegisterModule(new StorageModule());
+            builder.RegisterModule(new DiagnosticsModule());
 
             builder.RegisterType<Jobs.JobManager>();
             builder.RegisterType<ServiceFabric.RuntimeFinalizer>().As<IRuntimeFinalizer>().InstancePerLifetimeScope();
 
             // NOTE: Guid is not very nice, but this will be replaced anyway once fully ported to AppHost
-            builder.Register(c => new CloudEnvironment(c.Resolve<Management.IProvisioningProvider>(), Guid.NewGuid().ToString("N"))).As<ICloudEnvironment>().SingleInstance();
+            builder.Register(c =>
+                new CloudEnvironment(
+                    Guid.NewGuid().ToString("N"),
+                    c.Resolve<ICloudConfigurationSettings>(),
+                    c.Resolve<ILog>(),
+                    c.ResolveOptional<ICloudProvisioningObserver>()))
+                .As<ICloudEnvironment, IProvisioningProvider>().SingleInstance();
+
+            // Provisioning Observer Subject
+            builder.Register(ProvisioningObserver)
+                .As<ICloudProvisioningObserver, IObservable<ICloudProvisioningEvent>>()
+                .SingleInstance();
+        }
+
+        static CloudProvisioningInstrumentationSubject ProvisioningObserver(IComponentContext c)
+        {
+            // will include any registered storage event observers, if there are any, as fixed subscriptions
+            return new CloudProvisioningInstrumentationSubject(c.Resolve<IEnumerable<IObserver<ICloudProvisioningEvent>>>().ToArray());
         }
     }
 }
