@@ -23,8 +23,9 @@ namespace Lokad.Cloud.Test.Services
             var storage = CloudStorage.ForInMemoryStorage().BuildStorageProviders();
             var runtimeStorage = CloudStorage.ForInMemoryStorage().BuildRuntimeProviders();
             var legacyProviders = new CloudInfrastructureProviders(storage, new MemoryProvisioning(), NullLog.Instance);
+            var environment = new CloudEnvironment(legacyProviders.Provisioning, "Test");
             
-            var service = new SquareQueueService { Providers = legacyProviders, RuntimeProviders = runtimeStorage };
+            var service = new SquareQueueService { Providers = legacyProviders, RuntimeProviders = runtimeStorage, CloudEnvironment = environment};
 
             const string containerName = "mockcontainer";
 

@@ -16,6 +16,7 @@ namespace Lokad.Cloud.Diagnostics
     {
         private readonly IObservable<ICloudStorageEvent> _observable;
         private readonly ILog _log;
+
         private readonly List<IDisposable> _subscriptions;
 
         public CloudStorageLogger(IObservable<ICloudStorageEvent> observable, ILog log)
@@ -46,7 +47,7 @@ namespace Lokad.Cloud.Diagnostics
                         TryLog(string.Format("Storage: Retried on policy {0}{1} on {2}.{3}",
                             e.Policy,
                             e.Exception != null ? " because of " + e.Exception.GetType().Name : string.Empty,
-                            CloudEnvironment.PartitionKey,
+                            Environment.MachineName,
                             @event.DroppedItems > 0 ? string.Format(" There have been {0} similar events in the last 15 minutes.", @event.DroppedItems) : string.Empty),
                             e.Exception, LogLevel.Debug);
                     }));

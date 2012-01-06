@@ -5,6 +5,7 @@
 
 using System;
 using Lokad.Cloud.Storage;
+using Microsoft.WindowsAzure.ServiceRuntime;
 
 namespace Lokad.Cloud
 {
@@ -17,7 +18,14 @@ namespace Lokad.Cloud
 
         public static Maybe<ICloudConfigurationSettings> LoadFromRoleEnvironment()
         {
-            if (!CloudEnvironment.IsAvailable)
+            try
+            {
+                if (!RoleEnvironment.IsAvailable)
+                {
+                    return Maybe<ICloudConfigurationSettings>.Empty;
+                }
+            }
+            catch (TypeInitializationException)
             {
                 return Maybe<ICloudConfigurationSettings>.Empty;
             }
@@ -31,7 +39,23 @@ namespace Lokad.Cloud
 
         static void ApplySettingFromRole(string setting, Action<string> setter)
         {
-            CloudEnvironment.GetConfigurationSetting(setting).Apply(setter);
+            try
+            {
+                var value = RoleEnvironment.GetConfigurationSettingValue(setting);
+                if (!String.IsNullOrEmpty(value))
+                {
+                    value = value.Trim();
+                }
+                if (!String.IsNullOrEmpty(value))
+                {
+                    setter(value);
+                }
+            }
+            catch (RoleEnvironmentException)
+            {
+                // setting was removed from the csdef, skip
+                // (logging is usually not available at that stage)
+            }
         }
     }
 

@@ -7,39 +7,126 @@ using System;
 using System.IO;
 using System.Net;
 using System.Security.Cryptography.X509Certificates;
-using Lokad.Cloud.Storage;
+using System.Threading;
+using Lokad.Cloud.Management;
 using Microsoft.WindowsAzure.ServiceRuntime;
 
 namespace Lokad.Cloud
 {
     /// <summary>
-    /// Cloud Environment Helper
+    /// Cloud Environment
     /// </summary>
     /// <remarks>
-    /// Providing functionality of Azure <see cref="RoleEnvironment"/>,
-    /// but more neutral and resilient to missing runtime.
+    /// See also AppHost IApplicationEnvironment
     /// </remarks>
-    public static class CloudEnvironment
+    public sealed class CloudEnvironment : ICloudEnvironment
     {
         static bool _runtimeAvailable;
-        static string _partitionKey;
+        private readonly IProvisioningProvider _provisioning;
+        private readonly Lazy<string> _hostName = new Lazy<string>(Dns.GetHostName);
+        private readonly string _uniqueInstanceName;
 
-        static CloudEnvironment()
+        public CloudEnvironment(IProvisioningProvider provisioning, string uniqueInstanceName)
         {
+            _provisioning = provisioning;
+            _uniqueInstanceName = uniqueInstanceName;
+        }
+
+        string ICloudEnvironment.WorkerName
+        {
+            get { return _hostName.Value; }
+        }
+
+        string ICloudEnvironment.UniqueWorkerInstanceName
+        {
+            get { return _uniqueInstanceName; }
+        }
+
+        int ICloudEnvironment.CurrentWorkerInstanceCount
+        {
+            get
+            {
+                return _provisioning.GetWorkerInstanceCount(CancellationToken.None).Result;
+            }
+        }
+
+        void ICloudEnvironment.ProvisionWorkerInstances(int numberOfInstances)
+        {
+            _provisioning.SetWorkerInstanceCount(numberOfInstances, CancellationToken.None);
+        }
+
+        void ICloudEnvironment.ProvisionWorkerInstancesAtLeast(int minNumberOfInstances)
+        {
+            _provisioning.GetWorkerInstanceCount(CancellationToken.None).ContinueWith(task =>
+                {
+                    if (task.Result < minNumberOfInstances)
+                    {
+                        _provisioning.SetWorkerInstanceCount(minNumberOfInstances, CancellationToken.None);
+                    }
+                });
+        }
+
+        string ICloudEnvironment.GetSettingValue(string settingName)
+        {
+            if (!IsAvailable)
+            {
+                return null;
+            }
+
             try
             {
-                _runtimeAvailable = RoleEnvironment.IsAvailable;
+                var value = RoleEnvironment.GetConfigurationSettingValue(settingName);
+                if (!String.IsNullOrEmpty(value))
+                {
+                    value = value.Trim();
+                }
+
+                return String.IsNullOrEmpty(value) ? null : value;
             }
-            catch (TypeInitializationException)
+            catch (RoleEnvironmentException)
             {
-                _runtimeAvailable = false;
+                return null;
+                // setting was removed from the csdef, skip
+                // (logging is usually not available at that stage)
             }
+        }
+
+        X509Certificate2 ICloudEnvironment.GetCertificate(string thumbprint)
+        {
+            var store = new X509Store(StoreName.My, StoreLocation.CurrentUser);
+            try
+            {
+                store.Open(OpenFlags.ReadOnly);
+                var certs = store.Certificates.Find(X509FindType.FindByThumbprint, thumbprint, false);
+                if(certs.Count != 1)
+                {
+                    return null;
+                }
+
+                return certs[0];
+            }
+            finally
+            {
+                store.Close();
+            }
+        }
+
+        string ICloudEnvironment.GetLocalResourcePath(string resourceName)
+        {
+            if (IsAvailable)
+            {
+                return RoleEnvironment.GetLocalResource(resourceName).RootPath;
+            }
+
+            var dir = Path.Combine(Path.GetTempPath(), resourceName);
+            Directory.CreateDirectory(dir);
+            return dir;
         }
 
         /// <summary>
         /// Indicates whether the instance is running in the Cloud environment.
         /// </summary>
-        public static bool IsAvailable
+        static bool IsAvailable
         {
             get
             {
@@ -57,95 +144,6 @@ namespace Lokad.Cloud
                 }
 
                 return _runtimeAvailable;
-            }
-        }
-
-        /// <summary>
-        /// Cloud Worker Key
-        /// </summary>
-        public static string PartitionKey
-        {
-            get { return _partitionKey ?? (_partitionKey = Dns.GetHostName()); }
-        }
-
-        /// <summary>
-        /// ID of the Cloud Worker Instances
-        /// </summary>
-        public static Maybe<string> AzureCurrentInstanceId
-        {
-            get { return IsAvailable ? RoleEnvironment.CurrentRoleInstance.Id : Maybe<string>.Empty; }
-        }
-
-        public static Maybe<string> AzureDeploymentId
-        {
-            get { return IsAvailable ? RoleEnvironment.DeploymentId : Maybe<string>.Empty; }
-        }
-
-        /// <summary>
-        /// Retrieves the root path of a named local resource.
-        /// </summary>
-        public static string GetLocalStoragePath(string resourceName)
-        {
-            if (IsAvailable)
-            {
-                return RoleEnvironment.GetLocalResource(resourceName).RootPath;
-            }
-
-            var dir = Path.Combine(Path.GetTempPath(), resourceName);
-            Directory.CreateDirectory(dir);
-            return dir;
-        }
-
-        public static Maybe<X509Certificate2> GetCertificate(string thumbprint)
-        {
-            var store = new X509Store(StoreName.My, StoreLocation.CurrentUser);
-            try
-            {
-                store.Open(OpenFlags.ReadOnly);
-                var certs = store.Certificates.Find(X509FindType.FindByThumbprint, thumbprint, false);
-                if(certs.Count != 1)
-                {
-                    return Maybe<X509Certificate2>.Empty;
-                }
-
-                return certs[0];
-            }
-            finally
-            {
-                store.Close();
-            }
-        }
-
-        ///<summary>
-        /// Retreives the configuration setting from the <see cref="RoleEnvironment"/>.
-        ///</summary>
-        ///<param name="configurationSettingName">Name of the configuration setting</param>
-        ///<returns>configuration value, or an empty result, if the environment is not present, or the value is null or empty</returns>
-        public static Maybe<string> GetConfigurationSetting(string configurationSettingName)
-        {
-            if (!IsAvailable)
-            {
-                return Maybe<string>.Empty;
-            }
-
-            try
-            {
-                var value = RoleEnvironment.GetConfigurationSettingValue(configurationSettingName);
-                if (!String.IsNullOrEmpty(value))
-                {
-                    value = value.Trim();
-                }
-                if (String.IsNullOrEmpty(value))
-                {
-                    value = null;
-                }
-                return value;
-            }
-            catch (RoleEnvironmentException)
-            {
-                return Maybe<string>.Empty;
-                // setting was removed from the csdef, skip
-                // (logging is usually not available at that stage)
             }
         }
     }

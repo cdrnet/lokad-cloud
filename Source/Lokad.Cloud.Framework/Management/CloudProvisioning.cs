@@ -11,54 +11,64 @@ using System.Threading.Tasks;
 using Lokad.Cloud.Diagnostics;
 using Lokad.Cloud.Provisioning;
 using Lokad.Cloud.Provisioning.Instrumentation;
-using Lokad.Cloud.Storage;
+using Microsoft.WindowsAzure.ServiceRuntime;
 
 namespace Lokad.Cloud.Management
 {
     /// <summary>Azure Management API Provider, Provisioning Provider.</summary>
     public class CloudProvisioning : IProvisioningProvider
     {
+        private readonly ICloudEnvironment _environment;
         private readonly ILog _log;
 
         private readonly AzureCurrentDeployment _currentDeployment;
         private readonly AzureProvisioning _provisioning;
 
         /// <summary>IoC constructor.</summary>
-        public CloudProvisioning(ICloudConfigurationSettings settings, ILog log, ICloudProvisioningObserver provisioningObserver = null)
+        public CloudProvisioning(ICloudEnvironment environment, ICloudConfigurationSettings settings, ILog log, ICloudProvisioningObserver provisioningObserver = null)
         {
+            _environment = environment;
             _log = log;
 
             // try get settings and certificate
-            if (!CloudEnvironment.IsAvailable)
+            try
             {
-                _log.WarnFormat("Provisioning: RoleEnvironment not available on worker {0}.", CloudEnvironment.PartitionKey);
+                if (!RoleEnvironment.IsAvailable)
+                {
+                    _log.WarnFormat("Provisioning: RoleEnvironment not available on worker {0}.", environment.WorkerName);
+                return;
+            }
+            }
+            catch (TypeInitializationException)
+            {
+                _log.WarnFormat("Provisioning: RoleEnvironment not available on worker {0}.", environment.WorkerName);
                 return;
             }
 
-            var currentDeploymentPrivateId = CloudEnvironment.AzureDeploymentId;
-            Maybe<X509Certificate2> certificate = Maybe<X509Certificate2>.Empty;
+            var currentDeploymentPrivateId = RoleEnvironment.DeploymentId;
+            X509Certificate2 certificate = null;
             if (!String.IsNullOrWhiteSpace(settings.SelfManagementCertificateThumbprint))
             {
-                certificate = CloudEnvironment.GetCertificate(settings.SelfManagementCertificateThumbprint);
+                certificate = _environment.GetCertificate(settings.SelfManagementCertificateThumbprint);
             }
 
             // early evaluate management status for intrinsic fault states, to skip further processing
-            if (!currentDeploymentPrivateId.HasValue || !certificate.HasValue || string.IsNullOrWhiteSpace(settings.SelfManagementSubscriptionId))
+            if (currentDeploymentPrivateId == null || certificate == null || string.IsNullOrWhiteSpace(settings.SelfManagementSubscriptionId))
             {
                 _log.DebugFormat("Provisioning: Not available because either the certificate or the subscription was not provided correctly.");
                 return;
             }
 
             // detect dev fabric
-            if (currentDeploymentPrivateId.Value.StartsWith("deployment("))
+            if (currentDeploymentPrivateId.StartsWith("deployment("))
             {
-                _log.DebugFormat("Provisioning: Not available in dev fabric instance '{0}'.", CloudEnvironment.AzureCurrentInstanceId.GetValue("N/A"));
+                _log.Debug("Provisioning: Not available in dev fabric instance.");
                 return;
             }
 
             // ok
-            _provisioning = new AzureProvisioning(settings.SelfManagementSubscriptionId, certificate.Value, provisioningObserver);
-            _currentDeployment = new AzureCurrentDeployment(currentDeploymentPrivateId.Value, settings.SelfManagementSubscriptionId, certificate.Value, provisioningObserver);
+            _provisioning = new AzureProvisioning(settings.SelfManagementSubscriptionId, certificate, provisioningObserver);
+            _currentDeployment = new AzureCurrentDeployment(currentDeploymentPrivateId, settings.SelfManagementSubscriptionId, certificate, provisioningObserver);
         }
 
         public bool IsAvailable

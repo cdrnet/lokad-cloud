@@ -100,6 +100,8 @@ namespace Lokad.Cloud.ServiceFabric
 
         public RuntimeProviders RuntimeProviders { get; set; }
 
+        public ICloudEnvironment CloudEnvironment { get; set; }
+
         // Short-hands are only provided for the most frequently used providers.
         // (ex: IRuntimeFinalizer is typically NOT a frequently used provider)
 

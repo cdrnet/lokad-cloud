@@ -106,11 +106,12 @@ namespace Lokad.Cloud.ServiceFabric.Runtime
             using (var runtimeContainer = runtimeBuilder.Build())
             {
                 var log = runtimeContainer.Resolve<ILog>();
+                var environment = runtimeContainer.Resolve<ICloudEnvironment>();
 
                 AppDomain.CurrentDomain.UnhandledException += (sender, e) => log.ErrorFormat(
                     e.ExceptionObject as Exception,
                     "Runtime Host: An unhandled {0} exception occurred on worker {1} in a background thread. The Runtime Host will be restarted: {2}.",
-                    e.ExceptionObject.GetType().Name, CloudEnvironment.PartitionKey, e.IsTerminating);
+                    e.ExceptionObject.GetType().Name, environment.WorkerName, e.IsTerminating);
 
                 _runtime = null;
                 try
@@ -122,7 +123,7 @@ namespace Lokad.Cloud.ServiceFabric.Runtime
                     _runtime.Execute();
 
                     log.DebugFormat("Runtime Host: Runtime has stopped cleanly on worker {0}.",
-                        CloudEnvironment.PartitionKey);
+                        environment.WorkerName);
                 }
                 catch (TypeLoadException typeLoadException)
                 {
@@ -143,20 +144,20 @@ namespace Lokad.Cloud.ServiceFabric.Runtime
                 catch (TriggerRestartException)
                 {
                     log.DebugFormat("Runtime Host: Triggered to stop execution on worker {0}. The Role Instance will be recycled and the Runtime Host restarted.",
-                        CloudEnvironment.PartitionKey);
+                        environment.WorkerName);
 
                     return true;
                 }
                 catch (ThreadAbortException)
                 {
                     Thread.ResetAbort();
-                    log.DebugFormat("Runtime Host: execution was aborted on worker {0}. The Runtime is stopping.", CloudEnvironment.PartitionKey);
+                    log.DebugFormat("Runtime Host: execution was aborted on worker {0}. The Runtime is stopping.", environment.WorkerName);
                 }
                 catch (Exception ex)
                 {
                     // Generic exception
                     log.ErrorFormat(ex, "Runtime Host: An unhandled {0} exception occurred on worker {1}. The Runtime Host will be restarted.",
-                        ex.GetType().Name, CloudEnvironment.PartitionKey);
+                        ex.GetType().Name, environment.WorkerName);
                 }
                 finally
                 {

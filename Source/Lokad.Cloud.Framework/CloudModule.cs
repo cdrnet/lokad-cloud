@@ -3,6 +3,7 @@
 // URL: http://www.lokad.com/
 #endregion
 
+using System;
 using Autofac;
 
 namespace Lokad.Cloud
@@ -29,6 +30,9 @@ namespace Lokad.Cloud
 
             builder.RegisterType<Jobs.JobManager>();
             builder.RegisterType<ServiceFabric.RuntimeFinalizer>().As<IRuntimeFinalizer>().InstancePerLifetimeScope();
+
+            // NOTE: Guid is not very nice, but this will be replaced anyway once fully ported to AppHost
+            builder.Register(c => new CloudEnvironment(c.Resolve<Management.IProvisioningProvider>(), Guid.NewGuid().ToString("N"))).As<ICloudEnvironment>().SingleInstance();
         }
     }
 }
