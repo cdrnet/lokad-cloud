@@ -34,7 +34,7 @@ namespace Lokad.Cloud.Diagnostics
 
         static CloudLogger CloudLogger(IComponentContext c)
         {
-            return new CloudLogger(BlobStorageForDiagnostics(c), string.Empty);
+            return new CloudLogger(BlobStorageForDiagnostics(c));
         }
 
         static IBlobStorageProvider BlobStorageForDiagnostics(IComponentContext c)

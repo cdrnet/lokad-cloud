@@ -26,7 +26,6 @@ namespace Lokad.Cloud.Diagnostics
         public string Level { get; set; }
         public string Message { get; set; }
         public string Error { get; set; }
-        public string Source { get; set; }
     }
 
     /// <summary>
@@ -61,17 +60,21 @@ namespace Lokad.Cloud.Diagnostics
         private const int DeleteBatchSize = 50;
 
         private readonly IBlobStorageProvider _blobStorage;
-        private readonly string _source;
 
         /// <summary>Minimal log level (inclusive), below this level,
         /// notifications are ignored.</summary>
         public LogLevel LogLevelThreshold { get; set; }
 
+        [Obsolete("Do not use, will be removed in near future.")]
         public CloudLogger(IBlobStorageProvider blobStorage, string source)
         {
             _blobStorage = blobStorage;
-            _source = source;
+            LogLevelThreshold = LogLevel.Min;
+        }
 
+        public CloudLogger(IBlobStorageProvider blobStorage)
+        {
+            _blobStorage = blobStorage;
             LogLevelThreshold = LogLevel.Min;
         }
 
@@ -94,17 +97,8 @@ namespace Lokad.Cloud.Diagnostics
 
             var now = DateTime.UtcNow;
 
-            var logEntry = new LogEntry
-                {
-                    DateTimeUtc = now,
-                    Level = level.ToString(),
-                    Message = message.ToString(),
-                    Error = ex != null ? ex.ToString() : string.Empty,
-                    Source = _source ?? string.Empty
-                };
-
-            var blobContent = FormatLogEntry(logEntry);
-            var blobName = string.Format("{0}/{1}/", FormatDateTimeNamePrefix(logEntry.DateTimeUtc), logEntry.Level);
+            var blobContent = FormatLogEntry(now, level, message.ToString(), ex != null ? ex.ToString() : string.Empty);
+            var blobName = string.Format("{0}/{1}/", FormatDateTimeNamePrefix(now), level);
             var blobContainer = LevelToContainer(level);
 
             var attempt = 0;
@@ -247,8 +241,9 @@ namespace Lokad.Cloud.Diagnostics
             return ContainerNamePrefix + "-" + level.ToString().ToLower();
         }
 
-        private static string FormatLogEntry(LogEntry logEntry)
+        private static string FormatLogEntry(DateTime dateTimeUtc, LogLevel level, string message, string error)
         {
+            // TODO: drop empty source tag
             return string.Format(
                 @"
 <log>
@@ -256,14 +251,13 @@ namespace Lokad.Cloud.Diagnostics
   <timestamp>{1}</timestamp>
   <message>{2}</message>
   <error>{3}</error>
-  <source>{4}</source>
+  <source></source>
 </log>
 ",
-                logEntry.Level,
-                logEntry.DateTimeUtc.ToString("o", CultureInfo.InvariantCulture),
-                SecurityElement.Escape(logEntry.Message),
-                SecurityElement.Escape(logEntry.Error),
-                SecurityElement.Escape(logEntry.Source));
+                level,
+                dateTimeUtc.ToString("o", CultureInfo.InvariantCulture),
+                SecurityElement.Escape(message),
+                SecurityElement.Escape(error));
         }
 
         private static LogEntry ParseLogEntry(string blobContent)
@@ -279,7 +273,6 @@ namespace Lokad.Cloud.Diagnostics
                         DateTimeUtc = DateTime.ParseExact(nav.SelectSingleNode("/log/timestamp").InnerXml, "o", CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal).ToUniversalTime(),
                         Message = nav.SelectSingleNode("/log/message").InnerXml,
                         Error = nav.SelectSingleNode("/log/error").InnerXml,
-                        Source = nav.SelectSingleNode("/log/source").InnerXml,
                     };
             }
         }
