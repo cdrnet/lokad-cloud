@@ -6,10 +6,8 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.IO;
 using System.Linq;
-using System.Security;
-using System.Xml.XPath;
+using System.Xml.Linq;
 using Lokad.Cloud.Storage;
 
 namespace Lokad.Cloud.Diagnostics
@@ -124,7 +122,7 @@ namespace Lokad.Cloud.Diagnostics
             // Skip
             for (var i = skip; i > 0 && enumerators.Count > 0; i--)
             {
-                var max = enumerators.Aggregate((left, right) => string.Compare(left.Current.Item2, right.Current.Item2) < 0 ? left : right);
+                var max = enumerators.Aggregate((left, right) => String.CompareOrdinal(left.Current.Item2, right.Current.Item2) < 0 ? left : right);
                 if (!max.MoveNext())
                 {
                     enumerators.Remove(max);
@@ -134,7 +132,7 @@ namespace Lokad.Cloud.Diagnostics
             // actual iterator
             while (enumerators.Count > 0)
             {
-                var max = enumerators.Aggregate((left, right) => string.Compare(left.Current.Item2, right.Current.Item2) < 0 ? left : right);
+                var max = enumerators.Aggregate((left, right) => String.CompareOrdinal(left.Current.Item2, right.Current.Item2) < 0 ? left : right);
                 var blob = _blobStorage.GetBlob<string>(max.Current.Item1, max.Current.Item2);
                 if (blob.HasValue)
                 {
@@ -209,7 +207,7 @@ namespace Lokad.Cloud.Diagnostics
                 }
 
             } while (deleteQueue.Count > 0);
-        }
+        } 
 
         private static string LevelToContainer(LogLevel level)
         {
@@ -219,37 +217,24 @@ namespace Lokad.Cloud.Diagnostics
         private static string FormatLogEntry(DateTime dateTimeUtc, LogLevel level, string message, string error)
         {
             // TODO: drop empty source tag
-            return string.Format(
-                @"
-<log>
-  <level>{0}</level>
-  <timestamp>{1}</timestamp>
-  <message>{2}</message>
-  <error>{3}</error>
-  <source></source>
-</log>
-",
-                level,
-                dateTimeUtc.ToString("o", CultureInfo.InvariantCulture),
-                SecurityElement.Escape(message),
-                SecurityElement.Escape(error));
+            return new XElement("log",
+                new XElement("level", level),
+                new XElement("timestamp", dateTimeUtc.ToString("o", CultureInfo.InvariantCulture)),
+                new XElement("message", message),
+                new XElement("error", error),
+                new XElement("source")).ToString();
         }
 
         private static LogEntry ParseLogEntry(string blobContent)
         {
-            using (var stream = new StringReader(blobContent))
-            {
-                var xpath = new XPathDocument(stream);
-                var nav = xpath.CreateNavigator();
-
-                return new LogEntry
-                    {
-                        Level = nav.SelectSingleNode("/log/level").InnerXml,
-                        DateTimeUtc = DateTime.ParseExact(nav.SelectSingleNode("/log/timestamp").InnerXml, "o", CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal).ToUniversalTime(),
-                        Message = nav.SelectSingleNode("/log/message").InnerXml,
-                        Error = nav.SelectSingleNode("/log/error").InnerXml,
-                    };
-            }
+            var xml = XElement.Parse(blobContent);
+            return new LogEntry
+                {
+                    Level = xml.Element("level").ValueOrDefault(),
+                    DateTimeUtc = xml.Element("timestamp").ProjectOrDefault(x => DateTime.ParseExact(x.Value, "o", CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal).ToUniversalTime()),
+                    Message = xml.Element("message").ValueOrDefault(),
+                    Error = xml.Element("error").ValueOrDefault()
+                };
         }
 
         /// <summary>Time prefix with inversion in order to enumerate

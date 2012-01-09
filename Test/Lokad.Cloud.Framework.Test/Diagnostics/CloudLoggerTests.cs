@@ -49,11 +49,11 @@ namespace Lokad.Cloud.Test.Diagnostics
             _logger.Info(new TriggerRestartException("CloudLoggerTests.Log"), "Not a restart, just a test.");
             _logger.Info(new TriggerRestartException("CloudLoggerTests.Log"), "Not a restart, just a test II.");
 
-            Assert.AreEqual(0, _logger.GetLogsOfLevel(LogLevel.Fatal).Where(l => l.DateTimeUtc > now).Count());
-            Assert.AreEqual(1, _logger.GetLogsOfLevel(LogLevel.Error).Where(l => l.DateTimeUtc > now).Count());
-            Assert.AreEqual(0, _logger.GetLogsOfLevel(LogLevel.Warn).Where(l => l.DateTimeUtc > now).Count());
-            Assert.AreEqual(2, _logger.GetLogsOfLevel(LogLevel.Info).Where(l => l.DateTimeUtc > now).Count());
-            Assert.AreEqual(0, _logger.GetLogsOfLevel(LogLevel.Debug).Where(l => l.DateTimeUtc > now).Count());
+            Assert.AreEqual(0, _logger.GetLogsOfLevel(LogLevel.Fatal).Count(l => l.DateTimeUtc > now));
+            Assert.AreEqual(1, _logger.GetLogsOfLevel(LogLevel.Error).Count(l => l.DateTimeUtc > now));
+            Assert.AreEqual(0, _logger.GetLogsOfLevel(LogLevel.Warn).Count(l => l.DateTimeUtc > now));
+            Assert.AreEqual(2, _logger.GetLogsOfLevel(LogLevel.Info).Count(l => l.DateTimeUtc > now));
+            Assert.AreEqual(0, _logger.GetLogsOfLevel(LogLevel.Debug).Count(l => l.DateTimeUtc > now));
         }
 
         [Test]
@@ -70,11 +70,11 @@ namespace Lokad.Cloud.Test.Diagnostics
             _logger.Info(new TriggerRestartException("CloudLoggerTests.Log"), "Not a restart, just a test.");
             _logger.Info(new TriggerRestartException("CloudLoggerTests.Log"), "Not a restart, just a test II.");
 
-            Assert.AreEqual(0, _logger.GetLogsOfLevelOrHigher(LogLevel.Fatal).Where(l => l.DateTimeUtc > now).Count());
-            Assert.AreEqual(1, _logger.GetLogsOfLevelOrHigher(LogLevel.Error).Where(l => l.DateTimeUtc > now).Count());
-            Assert.AreEqual(1, _logger.GetLogsOfLevelOrHigher(LogLevel.Warn).Where(l => l.DateTimeUtc > now).Count());
-            Assert.AreEqual(3, _logger.GetLogsOfLevelOrHigher(LogLevel.Info).Where(l => l.DateTimeUtc > now).Count());
-            Assert.AreEqual(3, _logger.GetLogsOfLevelOrHigher(LogLevel.Debug).Where(l => l.DateTimeUtc > now).Count());
+            Assert.AreEqual(0, _logger.GetLogsOfLevelOrHigher(LogLevel.Fatal).Count(l => l.DateTimeUtc > now));
+            Assert.AreEqual(1, _logger.GetLogsOfLevelOrHigher(LogLevel.Error).Count(l => l.DateTimeUtc > now));
+            Assert.AreEqual(1, _logger.GetLogsOfLevelOrHigher(LogLevel.Warn).Count(l => l.DateTimeUtc > now));
+            Assert.AreEqual(3, _logger.GetLogsOfLevelOrHigher(LogLevel.Info).Count(l => l.DateTimeUtc > now));
+            Assert.AreEqual(3, _logger.GetLogsOfLevelOrHigher(LogLevel.Debug).Count(l => l.DateTimeUtc > now));
         }
 
         [Test]
