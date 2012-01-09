@@ -181,7 +181,6 @@
     <Compile Include="Services\AssemblyConfigurationUpdateService.cs" />
     <Compile Include="Shared\Logging\ILog.cs" />
     <Compile Include="Shared\Logging\ILogExtensions.cs" />
-    <Compile Include="Shared\Logging\ILogProvider.cs" />
     <Compile Include="Shared\Logging\LogLevel.cs" />
     <Compile Include="Shared\Logging\NullLog.cs" />
     <Compile Include="Shared\Threading\WaitFor.cs" />

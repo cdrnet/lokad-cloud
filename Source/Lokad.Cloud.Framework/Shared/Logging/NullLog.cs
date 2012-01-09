@@ -16,11 +16,6 @@ namespace Lokad.Cloud.Storage.Shared.Logging
         /// </summary>
         public static readonly ILog Instance = new NullLog();
 
-        /// <summary>
-        /// Singleton instance of the <see cref="NullLogProvider"/>.
-        /// </summary>
-        public static readonly ILogProvider Provider = new NullLogProvider();
-
         NullLog()
         {
         }
@@ -36,16 +31,6 @@ namespace Lokad.Cloud.Storage.Shared.Logging
         bool ILog.IsEnabled(LogLevel level)
         {
             return false;
-        }
-    }
-
-    /// <summary>Returns the <see cref="ILog"/> that does not do anything.</summary>
-    public sealed class NullLogProvider : ILogProvider
-    {
-        /// <remarks></remarks>
-        public ILog Get(string key)
-        {
-            return NullLog.Instance;
         }
     }
 }

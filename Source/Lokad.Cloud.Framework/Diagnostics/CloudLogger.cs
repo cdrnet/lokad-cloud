@@ -320,24 +320,4 @@ namespace Lokad.Cloud.Diagnostics
             return new DateTime(year, month, day, hour, minute, second, millisecond, DateTimeKind.Utc);
         }
     }
-
-    ///<summary>Log provider for the cloud logger.</summary>
-    public class CloudLogProvider : ILogProvider
-    {
-        // TODO (ruegg, 2011-05-26): Looks like legacy code, verify and remove
-
-        readonly IBlobStorageProvider _provider;
-
-        /// <summary>IoC constructor.</summary>
-        public CloudLogProvider(IBlobStorageProvider provider)
-        {
-            _provider = provider;
-        }
-
-        /// <remarks></remarks>
-        public Storage.Shared.Logging.ILog Get(string key)
-        {
-            return new CloudLogger(_provider, key);
-        }
-    }
 }
