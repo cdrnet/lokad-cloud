@@ -33,7 +33,7 @@ namespace Lokad.Cloud.Console.WebRole.Controllers
             InitializeDeploymentTenant(hostedServiceName);
 
             var entries = new CloudLogger(Providers.BlobStorage)
-                .GetLogsOfLevelOrHigher(Storage.Shared.Logging.LogLevel.Info)
+                .GetLogsOfLevelOrHigher(LogLevel.Info)
                 .Take(InitialEntriesCount);
 
             return View(LogEntriesToModel(entries.ToArray(), InitialEntriesCount));
@@ -116,20 +116,20 @@ namespace Lokad.Cloud.Console.WebRole.Controllers
             return logsModel;
         }
 
-        static Storage.Shared.Logging.LogLevel ParseLogLevel(string str)
+        static LogLevel ParseLogLevel(string str)
         {
             switch (str.ToLowerInvariant())
             {
                 case "debug":
-                    return Storage.Shared.Logging.LogLevel.Debug;
+                    return LogLevel.Debug;
                 case "info":
-                    return Storage.Shared.Logging.LogLevel.Info;
+                    return LogLevel.Info;
                 case "warn":
-                    return Storage.Shared.Logging.LogLevel.Warn;
+                    return LogLevel.Warn;
                 case "error":
-                    return Storage.Shared.Logging.LogLevel.Error;
+                    return LogLevel.Error;
                 case "fatal":
-                    return Storage.Shared.Logging.LogLevel.Fatal;
+                    return LogLevel.Fatal;
             }
 
             throw new ArgumentOutOfRangeException();

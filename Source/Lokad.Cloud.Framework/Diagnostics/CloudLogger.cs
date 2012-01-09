@@ -11,9 +11,6 @@ using System.Linq;
 using System.Security;
 using System.Xml.XPath;
 using Lokad.Cloud.Storage;
-using Lokad.Cloud.Storage.Shared.Logging;
-
-// TODO: clean-up the 'Storage.Shared.Logging.' type prefix once Lokad.Shared is removed.
 
 namespace Lokad.Cloud.Diagnostics
 {
@@ -61,26 +58,9 @@ namespace Lokad.Cloud.Diagnostics
 
         private readonly IBlobStorageProvider _blobStorage;
 
-        /// <summary>Minimal log level (inclusive), below this level,
-        /// notifications are ignored.</summary>
-        public LogLevel LogLevelThreshold { get; set; }
-
-        [Obsolete("Do not use, will be removed in near future.")]
-        public CloudLogger(IBlobStorageProvider blobStorage, string source)
-        {
-            _blobStorage = blobStorage;
-            LogLevelThreshold = LogLevel.Min;
-        }
-
         public CloudLogger(IBlobStorageProvider blobStorage)
         {
             _blobStorage = blobStorage;
-            LogLevelThreshold = LogLevel.Min;
-        }
-
-        public bool IsEnabled(LogLevel level)
-        {
-            return level >= LogLevelThreshold;
         }
 
         public void Log(LogLevel level, object message)
@@ -90,11 +70,6 @@ namespace Lokad.Cloud.Diagnostics
 
         public void Log(LogLevel level, Exception ex, object message)
         {
-            if (!IsEnabled(level))
-            {
-                return;
-            }
-
             var now = DateTime.UtcNow;
 
             var blobContent = FormatLogEntry(now, level, message.ToString(), ex != null ? ex.ToString() : string.Empty);

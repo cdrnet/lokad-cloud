@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Lokad.Cloud.Diagnostics;
 using Lokad.Cloud.Jobs;
 using Lokad.Cloud.Runtime;
 using Lokad.Cloud.Shared.Threading;
@@ -112,7 +113,7 @@ namespace Lokad.Cloud.ServiceFabric
         public ITableStorageProvider TableStorage { get { return Providers.TableStorage; } }
 
         /// <summary>Short-hand for <c>Providers.Log</c>.</summary>
-        public Storage.Shared.Logging.ILog Log { get { return Providers.Log; } }
+        public ILog Log { get { return Providers.Log; } }
 
         public JobManager Jobs { get; set; }
 

@@ -5,7 +5,7 @@
 
 using System;
 
-namespace Lokad.Cloud.Storage.Shared.Logging
+namespace Lokad.Cloud.Diagnostics
 {
     /// <summary> <see cref="ILog"/> that does not do anything.</summary>
     [Serializable]
@@ -26,11 +26,6 @@ namespace Lokad.Cloud.Storage.Shared.Logging
 
         void ILog.Log(LogLevel level, Exception ex, object message)
         {
-        }
-
-        bool ILog.IsEnabled(LogLevel level)
-        {
-            return false;
         }
     }
 }

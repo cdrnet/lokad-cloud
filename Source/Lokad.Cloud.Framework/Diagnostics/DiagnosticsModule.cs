@@ -10,7 +10,6 @@ using Autofac;
 using Lokad.Cloud.Instrumentation;
 using Lokad.Cloud.Instrumentation.Events;
 using Lokad.Cloud.Storage;
-using Lokad.Cloud.Storage.Shared.Logging;
 using Microsoft.WindowsAzure;
 
 namespace Lokad.Cloud.Diagnostics

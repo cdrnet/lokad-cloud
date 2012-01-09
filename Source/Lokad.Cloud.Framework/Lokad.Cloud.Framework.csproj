@@ -179,10 +179,10 @@
     <Compile Include="Mock\MockStorageModule.cs" />
     <Compile Include="ServiceFabric\Runtime\Scheduler.cs" />
     <Compile Include="Services\AssemblyConfigurationUpdateService.cs" />
-    <Compile Include="Shared\Logging\ILog.cs" />
-    <Compile Include="Shared\Logging\ILogExtensions.cs" />
-    <Compile Include="Shared\Logging\LogLevel.cs" />
-    <Compile Include="Shared\Logging\NullLog.cs" />
+    <Compile Include="Diagnostics\ILog.cs" />
+    <Compile Include="Diagnostics\ILogExtensions.cs" />
+    <Compile Include="Diagnostics\LogLevel.cs" />
+    <Compile Include="Diagnostics\NullLog.cs" />
     <Compile Include="Shared\Threading\WaitFor.cs" />
     <Compile Include="Storage\Azure\StorageModule.cs" />
     <Compile Include="Storage\BlobCounter.cs" />

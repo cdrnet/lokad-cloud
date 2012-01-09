@@ -8,10 +8,10 @@ using System.Net;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using System.Threading.Tasks;
+using Lokad.Cloud.Diagnostics;
 using Lokad.Cloud.Provisioning;
 using Lokad.Cloud.Provisioning.Instrumentation;
 using Lokad.Cloud.Storage;
-using Lokad.Cloud.Storage.Shared.Logging;
 
 namespace Lokad.Cloud.Management
 {

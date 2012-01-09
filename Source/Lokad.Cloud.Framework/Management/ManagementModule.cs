@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Autofac;
+using Lokad.Cloud.Diagnostics;
 using Lokad.Cloud.Provisioning.Instrumentation;
 using Lokad.Cloud.Provisioning.Instrumentation.Events;
 
@@ -24,7 +25,7 @@ namespace Lokad.Cloud.Management
             // available anyway and there's no need to make Provisioning resolveable.
             builder.Register(c => new CloudProvisioning(
                     c.Resolve<ICloudConfigurationSettings>(), 
-                    c.Resolve<Storage.Shared.Logging.ILog>()))
+                    c.Resolve<ILog>()))
                 .As<IProvisioningProvider>()
                 .SingleInstance();
 

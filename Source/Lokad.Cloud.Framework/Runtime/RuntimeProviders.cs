@@ -3,6 +3,7 @@
 // URL: http://www.lokad.com/
 #endregion
 
+using Lokad.Cloud.Diagnostics;
 using Lokad.Cloud.Storage;
 
 namespace Lokad.Cloud.Runtime
@@ -30,7 +31,7 @@ namespace Lokad.Cloud.Runtime
         /// in case of runtime shutdown).</summary>
         public IRuntimeFinalizer RuntimeFinalizer { get; private set; }
 
-        public Storage.Shared.Logging.ILog Log { get; private set; }
+        public ILog Log { get; private set; }
 
         /// <summary>IoC constructor.</summary>
         public RuntimeProviders(
@@ -38,7 +39,7 @@ namespace Lokad.Cloud.Runtime
             IQueueStorageProvider queueStorage,
             ITableStorageProvider tableStorage,
             IRuntimeFinalizer runtimeFinalizer,
-            Storage.Shared.Logging.ILog log)
+            ILog log)
         {
             BlobStorage = blobStorage;
             QueueStorage = queueStorage;

@@ -8,11 +8,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using Autofac;
+using Lokad.Cloud.Diagnostics;
 using Lokad.Cloud.Management;
 using Lokad.Cloud.Runtime;
 using Lokad.Cloud.Storage.Instrumentation;
 using Lokad.Cloud.Storage.Instrumentation.Events;
-using Lokad.Cloud.Storage.Shared.Logging;
 using Microsoft.WindowsAzure;
 
 namespace Lokad.Cloud.Storage.Azure

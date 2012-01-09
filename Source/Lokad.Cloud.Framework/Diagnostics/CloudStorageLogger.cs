@@ -7,7 +7,6 @@ using System;
 using System.Collections.Generic;
 using System.Reactive.Linq;
 using Lokad.Cloud.Storage.Instrumentation.Events;
-using Lokad.Cloud.Storage.Shared.Logging;
 
 namespace Lokad.Cloud.Diagnostics
 {

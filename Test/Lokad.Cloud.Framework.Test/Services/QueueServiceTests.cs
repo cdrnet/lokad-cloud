@@ -5,11 +5,11 @@
 
 using System;
 using System.Linq;
+using Lokad.Cloud.Diagnostics;
 using Lokad.Cloud.Mock;
 using Lokad.Cloud.Runtime;
 using Lokad.Cloud.ServiceFabric;
 using Lokad.Cloud.Storage;
-using Lokad.Cloud.Storage.Shared.Logging;
 using NUnit.Framework;
 
 namespace Lokad.Cloud.Test.Services

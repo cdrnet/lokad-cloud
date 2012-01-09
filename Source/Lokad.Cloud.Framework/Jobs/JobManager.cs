@@ -1,5 +1,5 @@
 ﻿using System;
-using Lokad.Cloud.Storage.Shared.Logging;
+using Lokad.Cloud.Diagnostics;
 
 namespace Lokad.Cloud.Jobs
 {

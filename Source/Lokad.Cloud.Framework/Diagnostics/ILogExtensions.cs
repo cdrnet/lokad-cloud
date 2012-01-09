@@ -6,7 +6,7 @@
 using System;
 using System.Globalization;
 
-namespace Lokad.Cloud.Storage.Shared.Logging
+namespace Lokad.Cloud.Diagnostics
 {
     /// <summary>
     /// Helper extensions for any class that implements <see cref="ILog"/>
@@ -14,19 +14,6 @@ namespace Lokad.Cloud.Storage.Shared.Logging
     public static class ILogExtensions
     {
         static readonly CultureInfo _culture = CultureInfo.InvariantCulture;
-
-        /// <summary>
-        /// Determines whether the specified log is recording debug messages.
-        /// </summary>
-        /// <param name="log">The log.</param>
-        /// <returns>
-        /// 	<c>true</c> if the specified log is recording debug messages; otherwise, <c>false</c>.
-        /// </returns>
-        public static bool IsDebugEnabled(this ILog log)
-        {
-            return log.IsEnabled(LogLevel.Debug);
-        }
-
 
         /// <summary>
         /// Writes message with <see cref="LogLevel.Debug"/> level
@@ -77,19 +64,6 @@ namespace Lokad.Cloud.Storage.Shared.Logging
         }
 
         /// <summary>
-        /// Determines whether the specified log is recording info messages.
-        /// </summary>
-        /// <param name="log">The log.</param>
-        /// <returns>
-        /// 	<c>true</c> if the specified log is recording info messages; otherwise, <c>false</c>.
-        /// </returns>
-        public static bool IsInfoEnabled(this ILog log)
-        {
-            return log.IsEnabled(LogLevel.Info);
-        }
-
-
-        /// <summary>
         /// Writes message with <see cref="LogLevel.Info"/> level
         /// </summary>
         /// <param name="log">Log instance being extended</param>
@@ -135,19 +109,6 @@ namespace Lokad.Cloud.Storage.Shared.Logging
         public static void InfoFormat(this ILog log, Exception ex, string format, params object[] args)
         {
             log.Log(LogLevel.Info, ex, string.Format(_culture, format, args));
-        }
-
-
-        /// <summary>
-        /// Determines whether the specified log is recording warning messages.
-        /// </summary>
-        /// <param name="log">The log.</param>
-        /// <returns>
-        /// 	<c>true</c> if the specified log is recording warning messages; otherwise, <c>false</c>.
-        /// </returns>
-        public static bool IsWarnEnabled(this ILog log)
-        {
-            return log.IsEnabled(LogLevel.Warn);
         }
 
         /// <summary>
@@ -198,20 +159,6 @@ namespace Lokad.Cloud.Storage.Shared.Logging
             log.Log(LogLevel.Warn, ex, string.Format(_culture, format, args));
         }
 
-
-        /// <summary>
-        /// Determines whether the specified log is recording error messages.
-        /// </summary>
-        /// <param name="log">The log.</param>
-        /// <returns>
-        /// 	<c>true</c> if the specified log is recording error messages; otherwise, <c>false</c>.
-        /// </returns>
-        public static bool IsErrorEnabled(this ILog log)
-        {
-            return log.IsEnabled(LogLevel.Error);
-        }
-
-
         /// <summary>
         /// Writes message with <see cref="LogLevel.Error"/> level
         /// </summary>
@@ -259,19 +206,6 @@ namespace Lokad.Cloud.Storage.Shared.Logging
         {
             log.Log(LogLevel.Error, ex, string.Format(_culture, format, args));
         }
-
-        /// <summary>
-        /// Determines whether the specified log is recording Fatal messages.
-        /// </summary>
-        /// <param name="log">The log.</param>
-        /// <returns>
-        /// 	<c>true</c> if the specified log is recording datal messages; otherwise, <c>false</c>.
-        /// </returns>
-        public static bool IsFatalEnabled(this ILog log)
-        {
-            return log.IsEnabled(LogLevel.Fatal);
-        }
-
 
         /// <summary>
         /// Writes message with <see cref="LogLevel.Fatal"/> level

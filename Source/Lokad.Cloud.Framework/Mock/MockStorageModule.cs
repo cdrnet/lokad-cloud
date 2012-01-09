@@ -4,6 +4,7 @@
 #endregion
 
 using Autofac;
+using Lokad.Cloud.Diagnostics;
 using Lokad.Cloud.Management;
 using Lokad.Cloud.Storage;
 using Lokad.Cloud.Storage.InMemory;
@@ -21,7 +22,7 @@ namespace Lokad.Cloud.Mock
             builder.Register(c => new MemoryQueueStorageProvider()).As<IQueueStorageProvider>();
             builder.Register(c => new MemoryTableStorageProvider()).As<ITableStorageProvider>();
 
-            builder.Register(c => new MemoryLogger()).As<Storage.Shared.Logging.ILog>();
+            builder.Register(c => new MemoryLogger()).As<ILog>();
             builder.Register(c => new MemoryProvisioning()).As<IProvisioningProvider>();
         }
     }

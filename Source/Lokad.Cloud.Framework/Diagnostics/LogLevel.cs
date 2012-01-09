@@ -3,7 +3,7 @@
 // This code is released under the terms of the new BSD licence
 #endregion
 
-namespace Lokad.Cloud.Storage.Shared.Logging
+namespace Lokad.Cloud.Diagnostics
 {
     /// <remarks></remarks>
     public enum LogLevel
