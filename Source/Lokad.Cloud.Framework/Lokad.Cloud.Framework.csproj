@@ -191,7 +191,6 @@
     <Compile Include="Storage\DelayedQueue.cs" />
     <Compile Include="Storage\StorageCredentialsVerifier.cs" />
     <Compile Include="TypeMapperProvider.cs" />
-    <Compile Include="Mock\MemoryLogger.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\ReviveMessagesService.cs" />
     <Compile Include="Services\GarbageCollectorService.cs" />

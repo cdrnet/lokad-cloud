@@ -21,6 +21,7 @@ namespace Lokad.Cloud.Diagnostics
         public string Level { get; set; }
         public string Message { get; set; }
         public string Error { get; set; }
+        public XElement[] Meta { get; set; }
     }
 
     /// <summary>
@@ -61,16 +62,16 @@ namespace Lokad.Cloud.Diagnostics
             _blobStorage = blobStorage;
         }
 
-        public void Log(LogLevel level, object message)
+        public void Log(LogLevel level, object message, params XElement[] meta)
         {
-            Log(level, null, message);
+            Log(level, null, message, meta);
         }
 
-        public void Log(LogLevel level, Exception ex, object message)
+        public void Log(LogLevel level, Exception exception, object message, params XElement[] meta)
         {
             var now = DateTime.UtcNow;
 
-            var blobContent = FormatLogEntry(now, level, message.ToString(), ex != null ? ex.ToString() : string.Empty);
+            var blobContent = FormatLogEntry(now, level, message.ToString(), exception, meta);
             var blobName = string.Format("{0}/{1}/", FormatDateTimeNamePrefix(now), level);
             var blobContainer = LevelToContainer(level);
 
@@ -214,15 +215,24 @@ namespace Lokad.Cloud.Diagnostics
             return ContainerNamePrefix + "-" + level.ToString().ToLower();
         }
 
-        private static string FormatLogEntry(DateTime dateTimeUtc, LogLevel level, string message, string error)
+        private static string FormatLogEntry(DateTime dateTimeUtc, LogLevel level, string message, Exception exception, XElement[] meta)
         {
-            // TODO: drop empty source tag
-            return new XElement("log",
+            var entry = new XElement("log",
                 new XElement("level", level),
                 new XElement("timestamp", dateTimeUtc.ToString("o", CultureInfo.InvariantCulture)),
-                new XElement("message", message),
-                new XElement("error", error),
-                new XElement("source")).ToString();
+                new XElement("message", message));
+
+            if (exception != null)
+            {
+                entry.Add(new XElement("error", exception.ToString()));
+            }
+
+            if (meta != null && meta.Length > 0)
+            {
+                entry.Add(new XElement("meta", meta));
+            }
+
+            return entry.ToString();
         }
 
         private static LogEntry ParseLogEntry(string blobContent)
@@ -232,8 +242,9 @@ namespace Lokad.Cloud.Diagnostics
                 {
                     Level = xml.Element("level").ValueOrDefault(),
                     DateTimeUtc = xml.Element("timestamp").ProjectOrDefault(x => DateTime.ParseExact(x.Value, "o", CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal).ToUniversalTime()),
-                    Message = xml.Element("message").ValueOrDefault(),
-                    Error = xml.Element("error").ValueOrDefault()
+                    Message = xml.Element("message").ValueOrEmpty(),
+                    Error = xml.Element("error").ValueOrEmpty(),
+                    Meta = xml.Element("meta").ProjectOrDefault(x => x.Elements().ToArray(), () => new XElement[0])
                 };
         }
 

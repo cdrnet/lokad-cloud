@@ -15,6 +15,11 @@ namespace Lokad.Cloud.Diagnostics
             return element == null ? default(T) : projection(element);
         }
 
+        internal static string ValueOrEmpty(this XElement element)
+        {
+            return element == null ? string.Empty : element.Value;
+        }
+
         internal static string ValueOrDefault(this XElement element)
         {
             return element == null ? null : element.Value;

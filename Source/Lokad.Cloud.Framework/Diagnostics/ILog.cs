@@ -4,6 +4,7 @@
 #endregion
 
 using System;
+using System.Xml.Linq;
 
 namespace Lokad.Cloud.Diagnostics
 {
@@ -12,18 +13,17 @@ namespace Lokad.Cloud.Diagnostics
     /// </summary>
     public interface ILog
     {
-        /// <summary> Writes the message to the logger </summary>
+        /// <summary>Writes the message to the logger</summary>
         /// <param name="level">The importance level</param>
         /// <param name="message">The actual message</param>
-        void Log(LogLevel level, object message);
+        /// <param name="meta">Optional semantic meta data</param>
+        void Log(LogLevel level, object message, params XElement[] meta);
 
-        /// <summary>
-        /// Writes the exception and associated information 
-        /// to the logger
-        /// </summary>
+        /// <summary>Writes the exception and associated information to the logger</summary>
         /// <param name="level">The importance level</param>
-        /// <param name="ex">The actual exception</param>
+        /// <param name="exception">The actual exception</param>
         /// <param name="message">Information related to the exception</param>
-        void Log(LogLevel level, Exception ex, object message);
+        /// <param name="meta">Optional semantic meta data</param>
+        void Log(LogLevel level, Exception exception, object message, params XElement[] meta);
     }
 }

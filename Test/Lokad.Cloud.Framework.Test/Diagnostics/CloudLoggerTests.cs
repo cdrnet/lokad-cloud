@@ -6,6 +6,7 @@
 using System;
 using System.Linq;
 using System.Threading;
+using System.Xml.Linq;
 using Autofac;
 using Lokad.Cloud.Diagnostics;
 using Lokad.Cloud.ServiceFabric.Runtime;
@@ -33,6 +34,10 @@ namespace Lokad.Cloud.Test.Diagnostics
                 "My message with CloudLoggerTests.Log.");
 
             _logger.Info(new TriggerRestartException("CloudLoggerTests.Log"), "Not a restart, just a test.");
+
+            _logger.Warn().WithException(new Exception())
+                .WithMeta("JobId", "123").WithMeta(new XElement("abc", "def"))
+                .WriteFormat("Just a {0} Test", "simple");
         }
 
         [Test]

@@ -4,6 +4,7 @@
 #endregion
 
 using System;
+using System.Xml.Linq;
 
 namespace Lokad.Cloud.Diagnostics
 {
@@ -20,11 +21,11 @@ namespace Lokad.Cloud.Diagnostics
         {
         }
 
-        void ILog.Log(LogLevel level, object message)
+        void ILog.Log(LogLevel level, object message, params XElement[] meta)
         {
         }
 
-        void ILog.Log(LogLevel level, Exception ex, object message)
+        void ILog.Log(LogLevel level, Exception ex, object message, params XElement[] meta)
         {
         }
     }

@@ -22,7 +22,7 @@ namespace Lokad.Cloud.Mock
             builder.Register(c => new MemoryQueueStorageProvider()).As<IQueueStorageProvider>();
             builder.Register(c => new MemoryTableStorageProvider()).As<ITableStorageProvider>();
 
-            builder.Register(c => new MemoryLogger()).As<ILog>();
+            builder.RegisterInstance(NullLog.Instance).As<ILog>();
             builder.Register(c => new MemoryProvisioning()).As<IProvisioningProvider>();
         }
     }
