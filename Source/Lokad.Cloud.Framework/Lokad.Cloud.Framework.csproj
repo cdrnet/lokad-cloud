@@ -135,9 +135,11 @@
     <Compile Include="CloudConfigurationModule.cs" />
     <Compile Include="CloudEnvironment.cs" />
     <Compile Include="CloudModule.cs" />
-    <Compile Include="Diagnostics\CloudLogger.cs" />
+    <Compile Include="Diagnostics\CloudLogWriter.cs" />
+    <Compile Include="Diagnostics\CloudLogReader.cs" />
     <Compile Include="Diagnostics\CloudStorageLogger.cs" />
     <Compile Include="Diagnostics\CloudProvisioningLogger.cs" />
+    <Compile Include="Diagnostics\CloudLogEntry.cs" />
     <Compile Include="Diagnostics\TockenBucketThrottling.cs" />
     <Compile Include="Diagnostics\XmlExtension.cs" />
     <Compile Include="Instrumentation\CloudRuntimeInstrumentationSubject.cs" />

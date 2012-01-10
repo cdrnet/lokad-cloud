@@ -32,7 +32,7 @@ namespace Lokad.Cloud.Console.WebRole.Controllers
         {
             InitializeDeploymentTenant(hostedServiceName);
 
-            var entries = new CloudLogger(Providers.BlobStorage)
+            var entries = new CloudLogReader(Providers.BlobStorage)
                 .GetLogsOfLevelOrHigher(LogLevel.Info)
                 .Take(InitialEntriesCount);
 
@@ -46,7 +46,7 @@ namespace Lokad.Cloud.Console.WebRole.Controllers
 
             InitializeDeploymentTenant(hostedServiceName);
 
-            var entries = new CloudLogger(Providers.BlobStorage)
+            var entries = new CloudLogReader(Providers.BlobStorage)
                 .GetLogsOfLevelOrHigher(ParseLogLevel(threshold), skip);
 
             if (!string.IsNullOrWhiteSpace(olderThanToken))
@@ -69,7 +69,7 @@ namespace Lokad.Cloud.Console.WebRole.Controllers
         {
             InitializeDeploymentTenant(hostedServiceName);
 
-            var entry = new CloudLogger(Providers.BlobStorage)
+            var entry = new CloudLogReader(Providers.BlobStorage)
                 .GetLogsOfLevelOrHigher(ParseLogLevel(threshold))
                 .FirstOrDefault();
 
@@ -81,7 +81,7 @@ namespace Lokad.Cloud.Console.WebRole.Controllers
             return Json(new { HasMore = false }, JsonRequestBehavior.AllowGet);
         }
 
-        private static LogsModel LogEntriesToModel(IList<LogEntry> entryList, int requestedCount)
+        private static LogsModel LogEntriesToModel(IList<CloudLogEntry> entryList, int requestedCount)
         {
             if (entryList.Count == 0)
             {
@@ -135,12 +135,12 @@ namespace Lokad.Cloud.Console.WebRole.Controllers
             throw new ArgumentOutOfRangeException();
         }
 
-        static string EntryToToken(LogEntry entry)
+        static string EntryToToken(CloudLogEntry entry)
         {
             return entry.DateTimeUtc.ToString("yyyyMMddHHmmssffff");
         }
 
-        static int EntryToGroupKey(LogEntry entry)
+        static int EntryToGroupKey(CloudLogEntry entry)
         {
             var date = entry.DateTimeUtc.Date;
             return (date.Year * 100 + date.Month) * 100 + date.Day;

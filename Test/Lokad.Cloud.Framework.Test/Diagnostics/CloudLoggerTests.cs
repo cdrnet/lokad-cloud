@@ -1,4 +1,4 @@
-﻿#region Copyright (c) Lokad 2009-2011
+﻿#region Copyright (c) Lokad 2009-2012
 // This code is released under the terms of the new BSD licence.
 // URL: http://www.lokad.com/
 #endregion
@@ -10,6 +10,7 @@ using System.Xml.Linq;
 using Autofac;
 using Lokad.Cloud.Diagnostics;
 using Lokad.Cloud.ServiceFabric.Runtime;
+using Lokad.Cloud.Storage;
 using NUnit.Framework;
 
 namespace Lokad.Cloud.Test.Diagnostics
@@ -17,25 +18,26 @@ namespace Lokad.Cloud.Test.Diagnostics
     [TestFixture]
     public class CloudLoggerTests
     {
-        readonly CloudLogger _logger = (CloudLogger)GlobalSetup.Container.Resolve<ILog>();
+        readonly CloudLogWriter _logWriter = (CloudLogWriter)GlobalSetup.Container.Resolve<ILog>();
+        readonly CloudLogReader _logReader = new CloudLogReader(GlobalSetup.Container.Resolve<CloudStorageProviders>().BlobStorage);
 
         [SetUp]
         public void Setup()
         {
             // cleanup
-            _logger.DeleteOldLogs(DateTime.UtcNow.AddDays(1));
+            _logReader.DeleteOldLogs(DateTime.UtcNow.AddDays(1));
         }
 
         [Test]
         public void CanWriteToLog()
         {
-            _logger.Error(
+            _logWriter.Error(
                 new InvalidOperationException("CloudLoggerTests.Log"),
                 "My message with CloudLoggerTests.Log.");
 
-            _logger.Info(new TriggerRestartException("CloudLoggerTests.Log"), "Not a restart, just a test.");
+            _logWriter.Info(new TriggerRestartException("CloudLoggerTests.Log"), "Not a restart, just a test.");
 
-            _logger.Warn().WithException(new Exception())
+            _logWriter.Warn().WithException(new Exception())
                 .WithMeta("JobId", "123").WithMeta(new XElement("abc", "def"))
                 .WriteFormat("Just a {0} Test", "simple");
         }
@@ -47,18 +49,18 @@ namespace Lokad.Cloud.Test.Diagnostics
             var now = DateTime.UtcNow;
             Thread.Sleep(250);
 
-            _logger.Error(
+            _logWriter.Error(
                 new InvalidOperationException("CloudLoggerTests.Log"),
                 "My message with CloudLoggerTests.Log.");
 
-            _logger.Info(new TriggerRestartException("CloudLoggerTests.Log"), "Not a restart, just a test.");
-            _logger.Info(new TriggerRestartException("CloudLoggerTests.Log"), "Not a restart, just a test II.");
+            _logWriter.Info(new TriggerRestartException("CloudLoggerTests.Log"), "Not a restart, just a test.");
+            _logWriter.Info(new TriggerRestartException("CloudLoggerTests.Log"), "Not a restart, just a test II.");
 
-            Assert.AreEqual(0, _logger.GetLogsOfLevel(LogLevel.Fatal).Count(l => l.DateTimeUtc > now));
-            Assert.AreEqual(1, _logger.GetLogsOfLevel(LogLevel.Error).Count(l => l.DateTimeUtc > now));
-            Assert.AreEqual(0, _logger.GetLogsOfLevel(LogLevel.Warn).Count(l => l.DateTimeUtc > now));
-            Assert.AreEqual(2, _logger.GetLogsOfLevel(LogLevel.Info).Count(l => l.DateTimeUtc > now));
-            Assert.AreEqual(0, _logger.GetLogsOfLevel(LogLevel.Debug).Count(l => l.DateTimeUtc > now));
+            Assert.AreEqual(0, _logReader.GetLogsOfLevel(LogLevel.Fatal).Count(l => l.DateTimeUtc > now));
+            Assert.AreEqual(1, _logReader.GetLogsOfLevel(LogLevel.Error).Count(l => l.DateTimeUtc > now));
+            Assert.AreEqual(0, _logReader.GetLogsOfLevel(LogLevel.Warn).Count(l => l.DateTimeUtc > now));
+            Assert.AreEqual(2, _logReader.GetLogsOfLevel(LogLevel.Info).Count(l => l.DateTimeUtc > now));
+            Assert.AreEqual(0, _logReader.GetLogsOfLevel(LogLevel.Debug).Count(l => l.DateTimeUtc > now));
         }
 
         [Test]
@@ -68,18 +70,18 @@ namespace Lokad.Cloud.Test.Diagnostics
             var now = DateTime.UtcNow;
             Thread.Sleep(250);
 
-            _logger.Error(
+            _logWriter.Error(
                 new InvalidOperationException("CloudLoggerTests.Log"),
                 "My message with CloudLoggerTests.Log.");
 
-            _logger.Info(new TriggerRestartException("CloudLoggerTests.Log"), "Not a restart, just a test.");
-            _logger.Info(new TriggerRestartException("CloudLoggerTests.Log"), "Not a restart, just a test II.");
+            _logWriter.Info(new TriggerRestartException("CloudLoggerTests.Log"), "Not a restart, just a test.");
+            _logWriter.Info(new TriggerRestartException("CloudLoggerTests.Log"), "Not a restart, just a test II.");
 
-            Assert.AreEqual(0, _logger.GetLogsOfLevelOrHigher(LogLevel.Fatal).Count(l => l.DateTimeUtc > now));
-            Assert.AreEqual(1, _logger.GetLogsOfLevelOrHigher(LogLevel.Error).Count(l => l.DateTimeUtc > now));
-            Assert.AreEqual(1, _logger.GetLogsOfLevelOrHigher(LogLevel.Warn).Count(l => l.DateTimeUtc > now));
-            Assert.AreEqual(3, _logger.GetLogsOfLevelOrHigher(LogLevel.Info).Count(l => l.DateTimeUtc > now));
-            Assert.AreEqual(3, _logger.GetLogsOfLevelOrHigher(LogLevel.Debug).Count(l => l.DateTimeUtc > now));
+            Assert.AreEqual(0, _logReader.GetLogsOfLevelOrHigher(LogLevel.Fatal).Count(l => l.DateTimeUtc > now));
+            Assert.AreEqual(1, _logReader.GetLogsOfLevelOrHigher(LogLevel.Error).Count(l => l.DateTimeUtc > now));
+            Assert.AreEqual(1, _logReader.GetLogsOfLevelOrHigher(LogLevel.Warn).Count(l => l.DateTimeUtc > now));
+            Assert.AreEqual(3, _logReader.GetLogsOfLevelOrHigher(LogLevel.Info).Count(l => l.DateTimeUtc > now));
+            Assert.AreEqual(3, _logReader.GetLogsOfLevelOrHigher(LogLevel.Debug).Count(l => l.DateTimeUtc > now));
         }
 
         [Test]
@@ -92,19 +94,19 @@ namespace Lokad.Cloud.Test.Diagnostics
             // Add 30 log messages
             for (int i = 0; i < 10; i++)
             {
-                _logger.Error(
+                _logWriter.Error(
                     new InvalidOperationException("CloudLoggerTests.Log"),
                     "My message with CloudLoggerTests.Log.");
-                _logger.Warn("A test warning");
-                _logger.Info(new TriggerRestartException("CloudLoggerTests.Log"), "Not a restart, just a test.");
+                _logWriter.Warn("A test warning");
+                _logWriter.Info(new TriggerRestartException("CloudLoggerTests.Log"), "Not a restart, just a test.");
             }
 
-            Assert.AreEqual(10, _logger.GetLogs().Take(10).Count());
-            Assert.AreEqual(10, _logger.GetLogs(10).Take(10).Count());
-            Assert.AreEqual(10, _logger.GetLogs(20).Take(10).Count());
-            Assert.IsTrue(_logger.GetLogs(22).Where(l => l.DateTimeUtc > now).Take(22).Count() >= 8);
-            Assert.IsTrue(_logger.GetLogs(25).Where(l => l.DateTimeUtc > now).Take(25).Count() >= 5);
-            Assert.AreEqual(0, _logger.GetLogs(100000).Where(l => l.DateTimeUtc > now).Take(20).Count());
+            Assert.AreEqual(10, _logReader.GetLogs().Take(10).Count());
+            Assert.AreEqual(10, _logReader.GetLogs(10).Take(10).Count());
+            Assert.AreEqual(10, _logReader.GetLogs(20).Take(10).Count());
+            Assert.IsTrue(_logReader.GetLogs(22).Where(l => l.DateTimeUtc > now).Take(22).Count() >= 8);
+            Assert.IsTrue(_logReader.GetLogs(25).Where(l => l.DateTimeUtc > now).Take(25).Count() >= 5);
+            Assert.AreEqual(0, _logReader.GetLogs(100000).Where(l => l.DateTimeUtc > now).Take(20).Count());
         }
 
         [Test]
@@ -114,15 +116,15 @@ namespace Lokad.Cloud.Test.Diagnostics
             Thread.Sleep(100);
             var before = DateTime.UtcNow;
             Thread.Sleep(100);
-            _logger.Error(new TriggerRestartException("CloudLoggerTests.Log"), "Not a restart, just a test.");
+            _logWriter.Error(new TriggerRestartException("CloudLoggerTests.Log"), "Not a restart, just a test.");
             Thread.Sleep(100);
-            _logger.Info(new TriggerRestartException("CloudLoggerTests.Log"), "Not a restart, just a test II.");
+            _logWriter.Info(new TriggerRestartException("CloudLoggerTests.Log"), "Not a restart, just a test II.");
             Thread.Sleep(100);
-            _logger.Warn(new TriggerRestartException("CloudLoggerTests.Log"), "Not a restart, just a test III.");
+            _logWriter.Warn(new TriggerRestartException("CloudLoggerTests.Log"), "Not a restart, just a test III.");
             Thread.Sleep(100);
             var after = DateTime.UtcNow;
 
-            var entries = _logger.GetLogsOfLevelOrHigher(LogLevel.Info).Take(3).ToList();
+            var entries = _logReader.GetLogsOfLevelOrHigher(LogLevel.Info).Take(3).ToList();
 
             var beforeRef = (before - reference).TotalMilliseconds;
             var afterRef = (after - reference).TotalMilliseconds;
@@ -140,21 +142,21 @@ namespace Lokad.Cloud.Test.Diagnostics
         [Test]
         public void DeleteOldLogs()
         {
-            int initialCount = _logger.GetLogs().Count();
+            int initialCount = _logReader.GetLogs().Count();
 
             var begin = DateTime.Now;
             Thread.Sleep(1000); // Wait to make sure that logs are created after 'begin'
 
             for (int i = 0; i < 10; i++)
             {
-                _logger.Info("Just a test message");
+                _logWriter.Info("Just a test message");
             }
 
-            Assert.AreEqual(initialCount + 10, _logger.GetLogs().Count());
+            Assert.AreEqual(initialCount + 10, _logReader.GetLogs().Count());
 
-            _logger.DeleteOldLogs(begin.ToUniversalTime());
+            _logReader.DeleteOldLogs(begin.ToUniversalTime());
 
-            Assert.AreEqual(10, _logger.GetLogs().Count());
+            Assert.AreEqual(10, _logReader.GetLogs().Count());
         }
 
         [Test]
@@ -165,8 +167,8 @@ namespace Lokad.Cloud.Test.Diagnostics
             var rounded = new DateTime(
                 now.Year, now.Month, now.Day, now.Hour, now.Minute, now.Second, now.Millisecond, DateTimeKind.Utc);
 
-            var prefix = CloudLogger.FormatDateTimeNamePrefix(rounded);
-            var roundedBis = CloudLogger.ParseDateTimeFromName(prefix);
+            var prefix = CloudLogWriter.FormatDateTimeNamePrefix(rounded);
+            var roundedBis = CloudLogReader.ParseDateTimeFromName(prefix);
 
             Assert.AreEqual(rounded, roundedBis, "#A00");
         }

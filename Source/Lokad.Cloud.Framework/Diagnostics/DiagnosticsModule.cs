@@ -19,7 +19,7 @@ namespace Lokad.Cloud.Diagnostics
     {
         protected override void Load(ContainerBuilder builder)
         {
-            builder.Register(CloudLogger).As<ILog>();
+            builder.Register(CloudLogWriter).As<ILog>();
 
             // Runtime Observer Subject
             builder.Register(RuntimeObserver)
@@ -31,9 +31,9 @@ namespace Lokad.Cloud.Diagnostics
             builder.RegisterType<CloudProvisioningLogger>().As<IStartable>().SingleInstance();
         }
 
-        static CloudLogger CloudLogger(IComponentContext c)
+        static CloudLogWriter CloudLogWriter(IComponentContext c)
         {
-            return new CloudLogger(BlobStorageForDiagnostics(c));
+            return new CloudLogWriter(BlobStorageForDiagnostics(c));
         }
 
         static IBlobStorageProvider BlobStorageForDiagnostics(IComponentContext c)
