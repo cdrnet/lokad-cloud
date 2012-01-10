@@ -33,7 +33,7 @@ namespace Lokad.Cloud
         private readonly AzureCurrentDeployment _currentDeployment;
         private readonly AzureProvisioning _provisioning;
 
-        public CloudEnvironment(string uniqueInstanceName, ICloudConfigurationSettings settings, ILog log, ICloudProvisioningObserver provisioningObserver = null)
+        public CloudEnvironment(string uniqueInstanceName, CloudConfigurationSettings settings, ILog log, ICloudProvisioningObserver provisioningObserver = null)
         {
             _uniqueInstanceName = uniqueInstanceName;
             _log = log;

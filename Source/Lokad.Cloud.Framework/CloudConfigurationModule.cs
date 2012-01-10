@@ -4,20 +4,20 @@
 #endregion
 
 using Autofac;
-using Autofac.Builder;
 
 namespace Lokad.Cloud
 {
     /// <summary>
     /// IoC configuration module for Azure storage and management credentials.
-    /// Recommended to be loaded either manually or in the appconfig.
+    /// Intended mostly for loading via appconfig, else it's simpler to register a
+    /// <see cref="CloudConfigurationSettings"/> instance directly.
     /// </summary>
     /// <remarks>
     /// When only using the storage (O/C mapping) toolkit standalone it is easier
-    /// to let the <see cref="Standalone"/> factory create the storage providers on demand.
+    /// to let the <see cref="Storage.CloudStorage"/> factory create the storage providers on demand.
     /// </remarks>
     /// <seealso cref="CloudModule"/>
-    /// <seealso cref="Standalone"/>
+    /// <seealso cref="Storage.CloudStorage"/>
     public sealed class CloudConfigurationModule : Module
     {
         /// <summary>Azure storage connection string.</summary>
@@ -29,24 +29,18 @@ namespace Lokad.Cloud
         /// <summary>Azure management certificate thumbprint (optional).</summary>
         public string SelfManagementCertificateThumbprint { get; set; }
 
-        public CloudConfigurationModule()
-        {
-        }
-
-        public CloudConfigurationModule(ICloudConfigurationSettings externalSettings)
-        {
-            ApplySettings(externalSettings);
-        }
-
         protected override void Load(ContainerBuilder builder)
         {
-            if (string.IsNullOrEmpty(DataConnectionString))
-            {
-                var config = RoleConfigurationSettings.LoadFromRoleEnvironment();
-                if (config.HasValue)
+            var settings = new CloudConfigurationSettings
                 {
-                    ApplySettings(config.Value);
-                }
+                    DataConnectionString = DataConnectionString,
+                    SelfManagementSubscriptionId = SelfManagementSubscriptionId,
+                    SelfManagementCertificateThumbprint = SelfManagementCertificateThumbprint
+                };
+
+            if (string.IsNullOrEmpty(settings.DataConnectionString))
+            {
+                settings = CloudConfigurationSettings.LoadFromRoleEnvironment();
             }
 
             // Only register storage components if the storage credentials are OK
@@ -55,24 +49,10 @@ namespace Lokad.Cloud
             // to display a warning to the user (the worker is recycled indefinitely
             // as Run() throws almost immediately)
 
-            if (string.IsNullOrEmpty(DataConnectionString))
+            if (settings != null && !string.IsNullOrEmpty(settings.DataConnectionString))
             {
-                return;
+                builder.RegisterInstance(settings);
             }
-
-            builder.RegisterInstance(new RoleConfigurationSettings
-                {
-                    DataConnectionString = DataConnectionString,
-                    SelfManagementSubscriptionId = SelfManagementSubscriptionId,
-                    SelfManagementCertificateThumbprint = SelfManagementCertificateThumbprint
-                }).As<ICloudConfigurationSettings>();
-        }
-
-        void ApplySettings(ICloudConfigurationSettings settings)
-        {
-            DataConnectionString = settings.DataConnectionString;
-            SelfManagementSubscriptionId = settings.SelfManagementSubscriptionId;
-            SelfManagementCertificateThumbprint = settings.SelfManagementCertificateThumbprint;
         }
     }
 }

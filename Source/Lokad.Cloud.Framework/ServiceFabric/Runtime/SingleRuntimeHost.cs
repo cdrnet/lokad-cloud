@@ -10,7 +10,6 @@ using System.Security;
 using System.Threading;
 using Autofac;
 using Lokad.Cloud.Diagnostics;
-using Lokad.Cloud.Storage;
 
 namespace Lokad.Cloud.ServiceFabric.Runtime
 {
@@ -29,7 +28,7 @@ namespace Lokad.Cloud.ServiceFabric.Runtime
         /// <returns>True if the worker stopped as planned (e.g. due to updated assemblies)</returns>
         public bool Run()
         {
-            var settings = RoleConfigurationSettings.LoadFromRoleEnvironment();
+            var settings = CloudConfigurationSettings.LoadFromRoleEnvironment();
 
             // The trick is to load this same assembly in another domain, then
             // instantiate this same class and invoke Run
@@ -90,7 +89,7 @@ namespace Lokad.Cloud.ServiceFabric.Runtime
         /// Run the hosted runtime, blocking the calling thread.
         /// </summary>
         /// <returns>True if the worker stopped as planned (e.g. due to updated assemblies)</returns>
-        public bool Run(Maybe<ICloudConfigurationSettings> externalRoleConfiguration)
+        public bool Run(CloudConfigurationSettings settings)
         {
             _stoppedWaitHandle.Reset();
 
@@ -98,7 +97,7 @@ namespace Lokad.Cloud.ServiceFabric.Runtime
 
             var runtimeBuilder = new ContainerBuilder();
             runtimeBuilder.RegisterModule(new CloudModule());
-            runtimeBuilder.RegisterModule(externalRoleConfiguration.Convert(s =>  new CloudConfigurationModule(s), () => new CloudConfigurationModule()));
+            runtimeBuilder.RegisterInstance(settings);
             runtimeBuilder.RegisterType<Runtime>().InstancePerDependency();
 
             // Run

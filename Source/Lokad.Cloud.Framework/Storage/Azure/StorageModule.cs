@@ -41,7 +41,7 @@ namespace Lokad.Cloud.Storage.Azure
 
         private static CloudStorageAccount StorageAccountFromSettings(IComponentContext c)
         {
-            var settings = c.Resolve<ICloudConfigurationSettings>();
+            var settings = c.Resolve<CloudConfigurationSettings>();
             CloudStorageAccount account;
             if (CloudStorageAccount.TryParse(settings.DataConnectionString, out account))
             {
