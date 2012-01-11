@@ -1,4 +1,4 @@
-﻿#region Copyright (c) Lokad 2009-2010
+﻿#region Copyright (c) Lokad 2009-2012
 // This code is released under the terms of the new BSD licence.
 // URL: http://www.lokad.com/
 #endregion
@@ -6,7 +6,7 @@
 using System;
 using System.Threading;
 
-namespace Lokad.Cloud.ServiceFabric.Runtime
+namespace Lokad.Cloud
 {
     /// <summary>
     /// Helper class to deal with pathological situations where a worker crashes at

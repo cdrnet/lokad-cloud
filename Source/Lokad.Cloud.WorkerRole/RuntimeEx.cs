@@ -17,7 +17,7 @@ using Lokad.Cloud.Runtime;
 namespace Lokad.Cloud.ServiceFabric.Runtime
 {
     /// <summary>Organize the executions of the services.</summary>
-    internal class Runtime
+    internal class RuntimeEx
     {
         readonly RuntimeProviders _runtimeProviders;
         readonly IRuntimeFinalizer _runtimeFinalizer;
@@ -38,7 +38,7 @@ namespace Lokad.Cloud.ServiceFabric.Runtime
         public IContainer RuntimeContainer { get; set; }
 
         /// <summary>IoC constructor.</summary>
-        public Runtime(RuntimeProviders runtimeProviders, ICloudEnvironment environment, CloudConfigurationSettings settings, ICloudRuntimeObserver observer = null)
+        public RuntimeEx(RuntimeProviders runtimeProviders, ICloudEnvironment environment, CloudConfigurationSettings settings, ICloudRuntimeObserver observer = null)
         {
             _runtimeProviders = runtimeProviders;
             _runtimeFinalizer = runtimeProviders.RuntimeFinalizer;

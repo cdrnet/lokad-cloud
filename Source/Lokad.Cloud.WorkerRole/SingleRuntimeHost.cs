@@ -1,4 +1,4 @@
-﻿#region Copyright (c) Lokad 2009-2011
+﻿#region Copyright (c) Lokad 2009-2012
 // This code is released under the terms of the new BSD licence.
 // URL: http://www.lokad.com/
 #endregion
@@ -10,8 +10,9 @@ using System.Security;
 using System.Threading;
 using Autofac;
 using Lokad.Cloud.Diagnostics;
+using Lokad.Cloud.ServiceFabric.Runtime;
 
-namespace Lokad.Cloud.ServiceFabric.Runtime
+namespace Lokad.Cloud
 {
     /// <summary>
     /// AppDomain-isolated host for a single runtime instance.
@@ -78,7 +79,7 @@ namespace Lokad.Cloud.ServiceFabric.Runtime
     internal class SingleRuntimeHost : MarshalByRefObject, IDisposable
     {
         /// <summary>Current hosted runtime instance.</summary>
-        volatile Runtime _runtime;
+        volatile RuntimeEx _runtime;
 
         /// <summary>
         /// Manual-reset wait handle, signaled once the host stopped running.
@@ -98,7 +99,7 @@ namespace Lokad.Cloud.ServiceFabric.Runtime
             var runtimeBuilder = new ContainerBuilder();
             runtimeBuilder.RegisterModule(new CloudModule());
             runtimeBuilder.RegisterInstance(settings);
-            runtimeBuilder.RegisterType<Runtime>().InstancePerDependency();
+            runtimeBuilder.RegisterType<RuntimeEx>().InstancePerDependency();
 
             // Run
 
@@ -115,7 +116,7 @@ namespace Lokad.Cloud.ServiceFabric.Runtime
                 _runtime = null;
                 try
                 {
-                    _runtime = runtimeContainer.Resolve<Runtime>();
+                    _runtime = runtimeContainer.Resolve<RuntimeEx>();
                     _runtime.RuntimeContainer = runtimeContainer;
 
                     // runtime endlessly keeps pinging queues for pending work

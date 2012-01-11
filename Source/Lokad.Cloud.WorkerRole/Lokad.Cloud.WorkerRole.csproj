@@ -97,14 +97,12 @@
       <Link>Properties\VersionAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="HostContext.cs" />
+    <Compile Include="NoRestartFloodPolicy.cs" />
+    <Compile Include="RuntimeEx.cs" />
+    <Compile Include="ServiceFabricHost.cs" />
+    <Compile Include="SingleRuntimeHost.cs" />
     <Compile Include="WorkerRole.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Lokad.Cloud.Framework\Lokad.Cloud.Framework.csproj">
-      <Project>{BA84F8E7-F8B9-4912-BF93-9F4D0DDC5C29}</Project>
-      <Name>Lokad.Cloud.Framework</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -126,6 +124,12 @@
       <ProductName>Windows Installer 3.1</ProductName>
       <Install>true</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Lokad.Cloud.Framework\Lokad.Cloud.Framework.csproj">
+      <Project>{BA84F8E7-F8B9-4912-BF93-9F4D0DDC5C29}</Project>
+      <Name>Lokad.Cloud.Framework</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
