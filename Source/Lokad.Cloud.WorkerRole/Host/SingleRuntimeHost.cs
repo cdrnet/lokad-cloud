@@ -23,6 +23,11 @@ namespace Lokad.Cloud.Host
         /// only for the caller instance (non-isolated).</summary>
         volatile SingleRuntimeHost _isolatedInstance;
 
+        public IsolatedSingleRuntimeHost(HostContext hostContext)
+        {
+            
+        }
+
         /// <summary>
         /// Run the hosted runtime, blocking the calling thread.
         /// </summary>

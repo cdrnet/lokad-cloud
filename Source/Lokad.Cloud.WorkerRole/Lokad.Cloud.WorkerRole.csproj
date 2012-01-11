@@ -103,7 +103,6 @@
     <Compile Include="HostContext.cs" />
     <Compile Include="Host\NoRestartFloodPolicy.cs" />
     <Compile Include="Host\Runtime.cs" />
-    <Compile Include="Host\ServiceFabricHost.cs" />
     <Compile Include="Host\SingleRuntimeHost.cs" />
     <Compile Include="Diagnostics\TockenBucketThrottling.cs" />
     <Compile Include="WorkerRole.cs" />
