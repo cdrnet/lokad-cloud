@@ -8,13 +8,11 @@ using System.IO;
 using System.Reflection;
 using System.Security;
 using System.Threading;
-using Autofac;
 using Lokad.Cloud.AppHost.Framework.Definition;
 using Lokad.Cloud.Diagnostics;
 using Lokad.Cloud.Runtime;
 using Lokad.Cloud.ServiceFabric.Runtime;
 using Lokad.Cloud.Storage;
-using Microsoft.WindowsAzure;
 
 namespace Lokad.Cloud.Host
 {
@@ -114,82 +112,72 @@ namespace Lokad.Cloud.Host
         {
             _stoppedWaitHandle.Reset();
 
-            // Runtime IoC Setup
+            var log = new CloudLogWriter(CloudStorage.ForAzureConnectionString(settings.DataConnectionString).BuildBlobStorage());
 
-            var runtimeBuilder = new ContainerBuilder();
-            runtimeBuilder.RegisterModule(new CloudModule());
-            runtimeBuilder.RegisterInstance(settings);
+            var runtimeFinalizer = new ServiceFabric.RuntimeFinalizer();
+            var runtimeProviders = CloudStorage
+                    .ForAzureConnectionString(settings.DataConnectionString)
+                    .WithObserver(Observers.CreateStorageObserver(log))
+                    .WithRuntimeFinalizer(runtimeFinalizer)
+                    .BuildRuntimeProviders(log);
 
-            // Run
+            AppDomain.CurrentDomain.UnhandledException += (sender, e) => log.ErrorFormat(
+                e.ExceptionObject as Exception,
+                "Runtime Host: An unhandled {0} exception occurred on worker {1} in a background thread. The Runtime Host will be restarted: {2}.",
+                e.ExceptionObject.GetType().Name, environment.Host.WorkerName, e.IsTerminating);
 
-            using (var runtimeContainer = runtimeBuilder.Build())
+            _runtime = null;
+            try
             {
-                var log = runtimeContainer.Resolve<ILog>();
+                _runtime = new Runtime(runtimeProviders, environment, settings, Observers.CreateRuntimeObserver(log));
 
-                AppDomain.CurrentDomain.UnhandledException += (sender, e) => log.ErrorFormat(
-                    e.ExceptionObject as Exception,
-                    "Runtime Host: An unhandled {0} exception occurred on worker {1} in a background thread. The Runtime Host will be restarted: {2}.",
-                    e.ExceptionObject.GetType().Name, environment.Host.WorkerName, e.IsTerminating);
+                // runtime endlessly keeps pinging queues for pending work
+                _runtime.Execute();
 
-                _runtime = null;
-                try
-                {
-                    var runtimeProviders = CloudStorage
-                        .ForAzureAccount(runtimeContainer.Resolve<CloudStorageAccount>())
-                        .WithObserver(Observers.CreateStorageObserver(log))
-                        .WithRuntimeFinalizer(runtimeContainer.ResolveOptional<IRuntimeFinalizer>())
-                        .BuildRuntimeProviders(log);
-
-                    _runtime = new Runtime(runtimeProviders, environment, settings, Observers.CreateRuntimeObserver(log));
-
-                    // runtime endlessly keeps pinging queues for pending work
-                    _runtime.Execute();
-
-                    log.DebugFormat("Runtime Host: Runtime has stopped cleanly on worker {0}.",
-                        environment.Host.WorkerName);
-                }
-                catch (TypeLoadException typeLoadException)
-                {
-                    log.ErrorFormat(typeLoadException, "Runtime Host: Type {0} could not be loaded. The Runtime Host will be restarted.",
-                        typeLoadException.TypeName);
-                }
-                catch (FileLoadException fileLoadException)
-                {
-                    // Tentatively: referenced assembly is missing
-                    log.Fatal(fileLoadException, "Runtime Host: Could not load assembly probably due to a missing reference assembly. The Runtime Host will be restarted.");
-                }
-                catch (SecurityException securityException)
-                {
-                    // Tentatively: assembly cannot be loaded due to security config
-                    log.FatalFormat(securityException, "Runtime Host: Could not load assembly {0} probably due to security configuration. The Runtime Host will be restarted.",
-                        securityException.FailedAssemblyInfo);
-                }
-                catch (TriggerRestartException)
-                {
-                    log.DebugFormat("Runtime Host: Triggered to stop execution on worker {0}. The Role Instance will be recycled and the Runtime Host restarted.",
-                        environment.Host.WorkerName);
-
-                    return true;
-                }
-                catch (ThreadAbortException)
-                {
-                    Thread.ResetAbort();
-                    log.DebugFormat("Runtime Host: execution was aborted on worker {0}. The Runtime is stopping.", environment.Host.WorkerName);
-                }
-                catch (Exception ex)
-                {
-                    // Generic exception
-                    log.ErrorFormat(ex, "Runtime Host: An unhandled {0} exception occurred on worker {1}. The Runtime Host will be restarted.",
-                        ex.GetType().Name, environment.Host.WorkerName);
-                }
-                finally
-                {
-                    _stoppedWaitHandle.Set();
-                    _runtime = null;
-                }
-
-                return false;
+                log.DebugFormat("Runtime Host: Runtime has stopped cleanly on worker {0}.",
+                    environment.Host.WorkerName);
             }
+            catch (TypeLoadException typeLoadException)
+            {
+                log.ErrorFormat(typeLoadException, "Runtime Host: Type {0} could not be loaded. The Runtime Host will be restarted.",
+                    typeLoadException.TypeName);
+            }
+            catch (FileLoadException fileLoadException)
+            {
+                // Tentatively: referenced assembly is missing
+                log.Fatal(fileLoadException, "Runtime Host: Could not load assembly probably due to a missing reference assembly. The Runtime Host will be restarted.");
+            }
+            catch (SecurityException securityException)
+            {
+                // Tentatively: assembly cannot be loaded due to security config
+                log.FatalFormat(securityException, "Runtime Host: Could not load assembly {0} probably due to security configuration. The Runtime Host will be restarted.",
+                    securityException.FailedAssemblyInfo);
+            }
+            catch (TriggerRestartException)
+            {
+                log.DebugFormat("Runtime Host: Triggered to stop execution on worker {0}. The Role Instance will be recycled and the Runtime Host restarted.",
+                    environment.Host.WorkerName);
+
+                return true;
+            }
+            catch (ThreadAbortException)
+            {
+                Thread.ResetAbort();
+                log.DebugFormat("Runtime Host: execution was aborted on worker {0}. The Runtime is stopping.", environment.Host.WorkerName);
+            }
+            catch (Exception ex)
+            {
+                // Generic exception
+                log.ErrorFormat(ex, "Runtime Host: An unhandled {0} exception occurred on worker {1}. The Runtime Host will be restarted.",
+                    ex.GetType().Name, environment.Host.WorkerName);
+            }
+            finally
+            {
+                _stoppedWaitHandle.Set();
+                _runtime = null;
+            }
+
+            return false;
         }
 
         /// <summary>
