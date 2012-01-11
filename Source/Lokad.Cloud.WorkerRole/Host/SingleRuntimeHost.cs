@@ -9,8 +9,12 @@ using System.Reflection;
 using System.Security;
 using System.Threading;
 using Autofac;
+using Lokad.Cloud.AppHost.Framework.Definition;
 using Lokad.Cloud.Diagnostics;
+using Lokad.Cloud.Runtime;
 using Lokad.Cloud.ServiceFabric.Runtime;
+using Lokad.Cloud.Storage;
+using Microsoft.WindowsAzure;
 
 namespace Lokad.Cloud.Host
 {
@@ -19,13 +23,15 @@ namespace Lokad.Cloud.Host
     /// </summary>
     internal class IsolatedSingleRuntimeHost
     {
+        private readonly HostContext _hostContext;
+
         /// <summary>Refer to the callee instance (isolated). This property is not null
         /// only for the caller instance (non-isolated).</summary>
         volatile SingleRuntimeHost _isolatedInstance;
 
         public IsolatedSingleRuntimeHost(HostContext hostContext)
         {
-            
+            _hostContext = hostContext;
         }
 
         /// <summary>
@@ -48,9 +54,18 @@ namespace Lokad.Cloud.Host
                     Assembly.GetExecutingAssembly().FullName,
                     typeof(SingleRuntimeHost).FullName);
 
+                var solution = new SolutionHead("Solution");
+                var assemblies = new AssembliesHead("Assemblies");
+                var environment = new ApplicationEnvironment(
+                    _hostContext,
+                    _hostContext.GetNewCellLifeIdentity("Lokad.Cloud", "Cell", solution),
+                    solution,
+                    assemblies,
+                    cmd => { });
+
                 // This never throws, unless something went wrong with IoC setup and that's fine
                 // because it is not possible to execute the worker
-                restartForAssemblyUpdate = _isolatedInstance.Run(settings);
+                restartForAssemblyUpdate = _isolatedInstance.Run(settings, environment);
             }
             finally
             {
@@ -95,7 +110,7 @@ namespace Lokad.Cloud.Host
         /// Run the hosted runtime, blocking the calling thread.
         /// </summary>
         /// <returns>True if the worker stopped as planned (e.g. due to updated assemblies)</returns>
-        public bool Run(CloudConfigurationSettings settings)
+        public bool Run(CloudConfigurationSettings settings, ApplicationEnvironment environment)
         {
             _stoppedWaitHandle.Reset();
 
@@ -104,31 +119,34 @@ namespace Lokad.Cloud.Host
             var runtimeBuilder = new ContainerBuilder();
             runtimeBuilder.RegisterModule(new CloudModule());
             runtimeBuilder.RegisterInstance(settings);
-            runtimeBuilder.RegisterType<Runtime>().InstancePerDependency();
 
             // Run
 
             using (var runtimeContainer = runtimeBuilder.Build())
             {
                 var log = runtimeContainer.Resolve<ILog>();
-                var environment = runtimeContainer.Resolve<ICloudEnvironment>();
 
                 AppDomain.CurrentDomain.UnhandledException += (sender, e) => log.ErrorFormat(
                     e.ExceptionObject as Exception,
                     "Runtime Host: An unhandled {0} exception occurred on worker {1} in a background thread. The Runtime Host will be restarted: {2}.",
-                    e.ExceptionObject.GetType().Name, environment.WorkerName, e.IsTerminating);
+                    e.ExceptionObject.GetType().Name, environment.Host.WorkerName, e.IsTerminating);
 
                 _runtime = null;
                 try
                 {
-                    _runtime = runtimeContainer.Resolve<Runtime>();
-                    _runtime.RuntimeContainer = runtimeContainer;
+                    var runtimeProviders = CloudStorage
+                        .ForAzureAccount(runtimeContainer.Resolve<CloudStorageAccount>())
+                        .WithObserver(Observers.CreateStorageObserver(log))
+                        .WithRuntimeFinalizer(runtimeContainer.ResolveOptional<IRuntimeFinalizer>())
+                        .BuildRuntimeProviders(log);
+
+                    _runtime = new Runtime(runtimeProviders, environment, settings, Observers.CreateRuntimeObserver(log));
 
                     // runtime endlessly keeps pinging queues for pending work
                     _runtime.Execute();
 
                     log.DebugFormat("Runtime Host: Runtime has stopped cleanly on worker {0}.",
-                        environment.WorkerName);
+                        environment.Host.WorkerName);
                 }
                 catch (TypeLoadException typeLoadException)
                 {
@@ -149,20 +167,20 @@ namespace Lokad.Cloud.Host
                 catch (TriggerRestartException)
                 {
                     log.DebugFormat("Runtime Host: Triggered to stop execution on worker {0}. The Role Instance will be recycled and the Runtime Host restarted.",
-                        environment.WorkerName);
+                        environment.Host.WorkerName);
 
                     return true;
                 }
                 catch (ThreadAbortException)
                 {
                     Thread.ResetAbort();
-                    log.DebugFormat("Runtime Host: execution was aborted on worker {0}. The Runtime is stopping.", environment.WorkerName);
+                    log.DebugFormat("Runtime Host: execution was aborted on worker {0}. The Runtime is stopping.", environment.Host.WorkerName);
                 }
                 catch (Exception ex)
                 {
                     // Generic exception
                     log.ErrorFormat(ex, "Runtime Host: An unhandled {0} exception occurred on worker {1}. The Runtime Host will be restarted.",
-                        ex.GetType().Name, environment.WorkerName);
+                        ex.GetType().Name, environment.Host.WorkerName);
                 }
                 finally
                 {

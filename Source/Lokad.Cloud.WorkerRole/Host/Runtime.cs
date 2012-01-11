@@ -10,6 +10,7 @@ using System.Linq;
 using System.Threading;
 using Autofac;
 using Autofac.Configuration;
+using Lokad.Cloud.AppHost.Framework;
 using Lokad.Cloud.Diagnostics;
 using Lokad.Cloud.Instrumentation;
 using Lokad.Cloud.Runtime;
@@ -26,7 +27,7 @@ namespace Lokad.Cloud.Host
         readonly ILog _log;
         readonly ICloudRuntimeObserver _observer;
 
-        readonly ICloudEnvironment _environment;
+        readonly IApplicationEnvironment _environment;
         readonly CloudConfigurationSettings _settings;
 
         /// <summary>Main thread used to schedule services in <see cref="Execute()"/>.</summary>
@@ -36,11 +37,8 @@ namespace Lokad.Cloud.Host
         Scheduler _scheduler;
         IRuntimeFinalizer _applicationFinalizer;
 
-        /// <summary>Container used to populate cloud service properties.</summary>
-        public IContainer RuntimeContainer { get; set; }
-
         /// <summary>IoC constructor.</summary>
-        public Runtime(RuntimeProviders runtimeProviders, ICloudEnvironment environment, CloudConfigurationSettings settings, ICloudRuntimeObserver observer = null)
+        public Runtime(RuntimeProviders runtimeProviders, IApplicationEnvironment environment, CloudConfigurationSettings settings, ICloudRuntimeObserver observer = null)
         {
             _runtimeProviders = runtimeProviders;
             _runtimeFinalizer = runtimeProviders.RuntimeFinalizer;
@@ -55,7 +53,7 @@ namespace Lokad.Cloud.Host
         /// until stop is requested, or an uncaught exception is thrown.</summary>
         public void Execute()
         {
-            _log.DebugFormat("Runtime: started on worker {0}.", _environment.WorkerName);
+            _log.DebugFormat("Runtime: started on worker {0}.", _environment.Host.WorkerName);
 
             // hook on the current thread to force shut down
             _executeThread = Thread.CurrentThread;
@@ -85,19 +83,19 @@ namespace Lokad.Cloud.Host
             catch (ThreadInterruptedException)
             {
                 _log.WarnFormat("Runtime: execution was interrupted on worker {0} in service {1}. The Runtime will be restarted.",
-                    _environment.WorkerName, GetNameOfServiceInExecution());
+                    _environment.Host.WorkerName, GetNameOfServiceInExecution());
             }
             catch (ThreadAbortException)
             {
                 Thread.ResetAbort();
 
                 _log.DebugFormat("Runtime: execution was aborted on worker {0} in service {1}. The Runtime is stopping.",
-                    _environment.WorkerName, GetNameOfServiceInExecution());
+                    _environment.Host.WorkerName, GetNameOfServiceInExecution());
             }
             catch (TimeoutException)
             {
                 _log.WarnFormat("Runtime: execution timed out on worker {0} in service {1}. The Runtime will be restarted.",
-                    _environment.WorkerName, GetNameOfServiceInExecution());
+                    _environment.Host.WorkerName, GetNameOfServiceInExecution());
             }
             catch (TriggerRestartException)
             {
@@ -107,11 +105,11 @@ namespace Lokad.Cloud.Host
             catch (Exception ex)
             {
                 _log.ErrorFormat(ex, "Runtime: An unhandled {0} exception occurred on worker {1} in service {2}. The Runtime will be restarted.",
-                    ex.GetType().Name, _environment.WorkerName, GetNameOfServiceInExecution());
+                    ex.GetType().Name, _environment.Host.WorkerName, GetNameOfServiceInExecution());
             }
             finally
             {
-                _log.DebugFormat("Runtime: stopping on worker {0}.", _environment.WorkerName);
+                _log.DebugFormat("Runtime: stopping on worker {0}.", _environment.Host.WorkerName);
 
                 if (_runtimeFinalizer != null)
                 {
@@ -128,7 +126,7 @@ namespace Lokad.Cloud.Host
                     applicationContainer.Dispose();
                 }
 
-                _log.DebugFormat("Runtime: stopped on worker {0}.", _environment.WorkerName);
+                _log.DebugFormat("Runtime: stopped on worker {0}.", _environment.Host.WorkerName);
             }
         }
 
@@ -151,7 +149,7 @@ namespace Lokad.Cloud.Host
         public void Stop()
         {
             _isStopRequested = true;
-            _log.DebugFormat("Runtime: Stop() on worker {0}.", _environment.WorkerName);
+            _log.DebugFormat("Runtime: Stop() on worker {0}.", _environment.Host.WorkerName);
 
             if (_executeThread != null)
             {

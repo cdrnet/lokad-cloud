@@ -8,6 +8,7 @@ using System.Linq;
 using System.Reactive.Linq;
 using Lokad.Cloud.AppHost.Framework;
 using Lokad.Cloud.AppHost.Framework.Events;
+using Lokad.Cloud.Instrumentation;
 using Lokad.Cloud.Provisioning.Instrumentation;
 using Lokad.Cloud.Provisioning.Instrumentation.Events;
 using Lokad.Cloud.Storage.Instrumentation;
@@ -69,6 +70,13 @@ namespace Lokad.Cloud.Diagnostics
                         Environment.MachineName,
                         @event.DroppedItems > 0 ? string.Format(" There have been {0} similar events in the last 15 minutes.", @event.DroppedItems) : string.Empty);
                 });
+
+            return subject;
+        }
+
+        public static ICloudRuntimeObserver CreateRuntimeObserver(ILog log)
+        {
+            var subject = new CloudRuntimeInstrumentationSubject();
 
             return subject;
         }
