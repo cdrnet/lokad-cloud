@@ -6,7 +6,7 @@
 using System.Linq;
 using Microsoft.WindowsAzure.ServiceRuntime;
 
-namespace Lokad.Cloud
+namespace Lokad.Cloud.Host
 {
     /// <summary>
     /// Entry point, hosting the service fabric with one or more

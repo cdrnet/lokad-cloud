@@ -3,7 +3,9 @@
 // URL: http://www.lokad.com/
 #endregion
 
-using Lokad.Cloud.ServiceFabric.Runtime;
+using Lokad.Cloud.Diagnostics;
+using Lokad.Cloud.Host;
+using Lokad.Cloud.Storage;
 using Microsoft.WindowsAzure.ServiceRuntime;
 
 namespace Lokad.Cloud
@@ -11,12 +13,7 @@ namespace Lokad.Cloud
     /// <summary>Entry point of Lokad.Cloud.</summary>
     public class WorkerRole : RoleEntryPoint
     {
-        readonly ServiceFabricHost _serviceFabricHost;
-
-        public WorkerRole()
-        {
-            _serviceFabricHost = new ServiceFabricHost();
-        }
+        ServiceFabricHost _serviceFabricHost;
 
         /// <summary>
         /// Called by Windows Azure to initialize the role instance.
@@ -29,6 +26,22 @@ namespace Lokad.Cloud
         /// </remarks>
         public override bool OnStart()
         {
+            if (!RoleEnvironment.IsAvailable)
+            {
+                return false;
+            }
+
+            //var connectionString = RoleEnvironment.GetConfigurationSettingValue("DataConnectionString");
+            //var subscriptionId = RoleEnvironment.GetConfigurationSettingValue("SelfManagementSubscriptionId");
+            //var certificateThumbprint = RoleEnvironment.GetConfigurationSettingValue("SelfManagementCertificateThumbprint");
+
+            //var log = new CloudLogWriter(CloudStorage.ForAzureConnectionString(connectionString).BuildBlobStorage());
+
+            //var hostContext = new HostContext(null, certificateThumbprint, subscriptionId, log,
+            //    Observers.CreateHostObserver(log),
+            //    Observers.CreateProvisioningObserver(log));
+
+            _serviceFabricHost = new ServiceFabricHost();
             _serviceFabricHost.StartRuntime();
             return true;
         }

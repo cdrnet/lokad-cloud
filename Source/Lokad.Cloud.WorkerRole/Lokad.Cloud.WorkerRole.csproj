@@ -86,6 +86,9 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Reactive, Version=1.0.10621.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Rx-Main.1.0.10621\lib\Net4\System.Reactive.dll</HintPath>
+    </Reference>
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
@@ -96,11 +99,13 @@
     <Compile Include="..\VersionAssemblyInfo.cs">
       <Link>Properties\VersionAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="Diagnostics\Observers.cs" />
     <Compile Include="HostContext.cs" />
-    <Compile Include="NoRestartFloodPolicy.cs" />
-    <Compile Include="RuntimeEx.cs" />
-    <Compile Include="ServiceFabricHost.cs" />
-    <Compile Include="SingleRuntimeHost.cs" />
+    <Compile Include="Host\NoRestartFloodPolicy.cs" />
+    <Compile Include="Host\Runtime.cs" />
+    <Compile Include="Host\ServiceFabricHost.cs" />
+    <Compile Include="Host\SingleRuntimeHost.cs" />
+    <Compile Include="Diagnostics\TockenBucketThrottling.cs" />
     <Compile Include="WorkerRole.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

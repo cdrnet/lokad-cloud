@@ -13,11 +13,13 @@ using Autofac.Configuration;
 using Lokad.Cloud.Diagnostics;
 using Lokad.Cloud.Instrumentation;
 using Lokad.Cloud.Runtime;
+using Lokad.Cloud.ServiceFabric;
+using Lokad.Cloud.ServiceFabric.Runtime;
 
-namespace Lokad.Cloud.ServiceFabric.Runtime
+namespace Lokad.Cloud.Host
 {
     /// <summary>Organize the executions of the services.</summary>
-    internal class RuntimeEx
+    internal class Runtime
     {
         readonly RuntimeProviders _runtimeProviders;
         readonly IRuntimeFinalizer _runtimeFinalizer;
@@ -38,7 +40,7 @@ namespace Lokad.Cloud.ServiceFabric.Runtime
         public IContainer RuntimeContainer { get; set; }
 
         /// <summary>IoC constructor.</summary>
-        public RuntimeEx(RuntimeProviders runtimeProviders, ICloudEnvironment environment, CloudConfigurationSettings settings, ICloudRuntimeObserver observer = null)
+        public Runtime(RuntimeProviders runtimeProviders, ICloudEnvironment environment, CloudConfigurationSettings settings, ICloudRuntimeObserver observer = null)
         {
             _runtimeProviders = runtimeProviders;
             _runtimeFinalizer = runtimeProviders.RuntimeFinalizer;
