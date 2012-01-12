@@ -99,7 +99,7 @@ namespace Lokad.Cloud.EntryPoint
             }
             catch (TriggerRestartException)
             {
-                // Supposed to be handled by the runtime host (i.e. SingleRuntimeHost)
+                // Supposed to be handled by the runtime host (i.e. AppDomainEntryPoint)
                 throw;
             }
             catch (Exception ex)
