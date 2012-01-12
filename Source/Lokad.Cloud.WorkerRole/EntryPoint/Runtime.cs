@@ -30,10 +30,6 @@ namespace Lokad.Cloud.EntryPoint
         readonly IApplicationEnvironment _environment;
         readonly CloudConfigurationSettings _settings;
 
-        /// <summary>Main thread used to schedule services in <see cref="Execute()"/>.</summary>
-        Thread _executeThread;
-
-        volatile bool _isStopRequested;
         Scheduler _scheduler;
         IRuntimeFinalizer _applicationFinalizer;
 
@@ -51,12 +47,28 @@ namespace Lokad.Cloud.EntryPoint
 
         /// <summary>Called once by the service fabric. Call is not supposed to return
         /// until stop is requested, or an uncaught exception is thrown.</summary>
-        public void Execute()
+        public void Execute(CancellationToken cancellationToken)
         {
             _log.DebugFormat("Runtime: started on worker {0}.", _environment.Host.WorkerName);
 
-            // hook on the current thread to force shut down
-            _executeThread = Thread.CurrentThread;
+            if (cancellationToken.IsCancellationRequested)
+            {
+                return;
+            }
+
+            var currentThread = Thread.CurrentThread;
+            var cancellationRegistration = cancellationToken.Register(() =>
+                {
+                    _log.DebugFormat("Runtime: Cancel() on worker {0}.", _environment.Host.WorkerName);
+
+                    // TODO: Get rid of that!
+                    currentThread.Abort();
+
+                    if (_scheduler != null)
+                    {
+                        _scheduler.AbortWaitingSchedule();
+                    }
+                });
 
             IContainer applicationContainer = null;
             try
@@ -72,7 +84,7 @@ namespace Lokad.Cloud.EntryPoint
 
                 foreach (var action in _scheduler.Schedule())
                 {
-                    if (_isStopRequested)
+                    if (cancellationToken.IsCancellationRequested)
                     {
                         break;
                     }
@@ -109,6 +121,8 @@ namespace Lokad.Cloud.EntryPoint
             }
             finally
             {
+                cancellationRegistration.Dispose();
+
                 _log.DebugFormat("Runtime: stopping on worker {0}.", _environment.Host.WorkerName);
 
                 if (_runtimeFinalizer != null)
@@ -141,26 +155,6 @@ namespace Lokad.Cloud.EntryPoint
             }
 
             return service.Name;
-        }
-
-        /// <summary>Stops all services at once.</summary>
-        /// <remarks>Called once by the service fabric when environment is about to
-        /// be shut down.</remarks>
-        public void Stop()
-        {
-            _isStopRequested = true;
-            _log.DebugFormat("Runtime: Stop() on worker {0}.", _environment.Host.WorkerName);
-
-            if (_executeThread != null)
-            {
-                _executeThread.Abort();
-                return;
-            }
-
-            if (_scheduler != null)
-            {
-                _scheduler.AbortWaitingSchedule();
-            }
         }
 
         /// <summary>

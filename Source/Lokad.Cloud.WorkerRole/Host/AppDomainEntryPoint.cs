@@ -39,6 +39,8 @@ namespace Lokad.Cloud.Host
 
             try
             {
+                // Load Assemblies into AppDomain
+
                 var runtimeProviders = CloudStorage
                     .ForAzureConnectionString(settings.DataConnectionString)
                     .WithObserver(Observers.CreateStorageObserver(log))
@@ -47,6 +49,8 @@ namespace Lokad.Cloud.Host
                 var assemblyLoader = new AssemblyLoader(runtimeProviders);
                 assemblyLoader.LoadPackage();
 
+                // Create the EntryPoint
+
                 var cellSettings = new XElement("Settings",
                     new XElement("DataConnectionString", settings.DataConnectionString),
                     new XElement("CertificateThumbprint", settings.SelfManagementCertificateThumbprint),
@@ -54,7 +58,8 @@ namespace Lokad.Cloud.Host
 
                 var entryPoint = new EntryPoint.ApplicationEntryPoint();
 
-                // runtime endlessly keeps pinging queues for pending work
+                // Run
+
                 entryPoint.Run(cellSettings, deploymentReader, environment, _cancellationTokenSource.Token);
             }
             catch (TriggerRestartException)

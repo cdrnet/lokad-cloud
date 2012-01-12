@@ -1,4 +1,4 @@
-﻿#region Copyright (c) Lokad 2009-2011
+﻿#region Copyright (c) Lokad 2009-2012
 // This code is released under the terms of the new BSD licence.
 // URL: http://www.lokad.com/
 #endregion
@@ -8,8 +8,9 @@ using System.Collections.Generic;
 using System.Threading;
 using Lokad.Cloud.Instrumentation;
 using Lokad.Cloud.Instrumentation.Events;
+using Lokad.Cloud.ServiceFabric;
 
-namespace Lokad.Cloud.ServiceFabric.Runtime
+namespace Lokad.Cloud.EntryPoint
 {
     /// <summary>
     /// Round robin scheduler with adaptive modifications: tasks that claim to have
@@ -17,7 +18,7 @@ namespace Lokad.Cloud.ServiceFabric.Runtime
     /// time limit (greedy), and the scheduling is slowed down when all available
     /// services skip execution consecutively.
     /// </summary>
-    public class Scheduler
+    internal class Scheduler
     {
         readonly ICloudRuntimeObserver _observer;
 

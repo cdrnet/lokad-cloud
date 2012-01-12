@@ -176,7 +176,6 @@
     <Compile Include="Management\CloudServiceSchedulingInfo.cs" />
     <Compile Include="Management\CloudServiceScheduling.cs" />
     <Compile Include="Mock\MockStorageModule.cs" />
-    <Compile Include="ServiceFabric\Runtime\Scheduler.cs" />
     <Compile Include="Services\AssemblyConfigurationUpdateService.cs" />
     <Compile Include="Diagnostics\ILog.cs" />
     <Compile Include="Diagnostics\ILogExtensions.cs" />

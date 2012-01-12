@@ -43,7 +43,7 @@ namespace Lokad.Cloud.EntryPoint
             {
                 // Run
                 var runtime = new Runtime(runtimeProviders, environment, cloudSettings, Observers.CreateRuntimeObserver(log));
-                runtime.Execute();
+                runtime.Execute(cancellationToken);
 
                 log.DebugFormat("Runtime Host: Runtime has stopped cleanly on worker {0}.", environment.Host.WorkerName);
             }

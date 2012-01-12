@@ -104,6 +104,7 @@
     <Compile Include="ApplicationEnvironment.cs" />
     <Compile Include="Diagnostics\Observers.cs" />
     <Compile Include="EntryPoint\ApplicationEntryPoint.cs" />
+    <Compile Include="EntryPoint\Scheduler.cs" />
     <Compile Include="HostContext.cs" />
     <Compile Include="Host\IsolatedSingleRuntimeHost.cs" />
     <Compile Include="Host\NoRestartFloodPolicy.cs" />
