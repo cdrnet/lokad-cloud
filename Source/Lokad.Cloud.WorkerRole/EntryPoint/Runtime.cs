@@ -1,4 +1,4 @@
-﻿#region Copyright (c) Lokad 2009-2011
+﻿#region Copyright (c) Lokad 2009-2012
 // This code is released under the terms of the new BSD licence.
 // URL: http://www.lokad.com/
 #endregion
@@ -172,11 +172,8 @@ namespace Lokad.Cloud.EntryPoint
             applicationBuilder.RegisterModule(new CloudModule());
             applicationBuilder.RegisterInstance(_settings);
 
-            // Load Application Assemblies into the AppDomain
-            var loader = new AssemblyLoader(_runtimeProviders);
-            loader.LoadPackage();
-
             // Load Application IoC Configuration and apply it to the builder
+            var loader = new AssemblyLoader(_runtimeProviders);
             var config = loader.LoadConfiguration();
             if (config.HasValue)
             {
