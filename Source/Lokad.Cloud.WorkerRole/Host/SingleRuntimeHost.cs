@@ -8,6 +8,8 @@ using System.IO;
 using System.Reflection;
 using System.Security;
 using System.Threading;
+using System.Xml.Linq;
+using Lokad.Cloud.AppHost.Framework;
 using Lokad.Cloud.AppHost.Framework.Definition;
 using Lokad.Cloud.Diagnostics;
 using Lokad.Cloud.Runtime;
@@ -63,7 +65,7 @@ namespace Lokad.Cloud.Host
 
                 // This never throws, unless something went wrong with IoC setup and that's fine
                 // because it is not possible to execute the worker
-                restartForAssemblyUpdate = _isolatedInstance.Run(settings, environment);
+                restartForAssemblyUpdate = _isolatedInstance.Run(settings, _hostContext.DeploymentReader, environment);
             }
             finally
             {
@@ -96,43 +98,35 @@ namespace Lokad.Cloud.Host
     /// </summary>
     internal class SingleRuntimeHost : MarshalByRefObject, IDisposable
     {
-        /// <summary>Current hosted runtime instance.</summary>
-        volatile Runtime _runtime;
-
-        /// <summary>
-        /// Manual-reset wait handle, signaled once the host stopped running.
-        /// </summary>
-        readonly EventWaitHandle _stoppedWaitHandle = new ManualResetEvent(false);
+        private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
+        private readonly EventWaitHandle _stoppedWaitHandle = new ManualResetEvent(false);
 
         /// <summary>
         /// Run the hosted runtime, blocking the calling thread.
         /// </summary>
         /// <returns>True if the worker stopped as planned (e.g. due to updated assemblies)</returns>
-        public bool Run(CloudConfigurationSettings settings, ApplicationEnvironment environment)
+        public bool Run(CloudConfigurationSettings settings, IDeploymentReader deploymentReader, ApplicationEnvironment environment)
         {
             _stoppedWaitHandle.Reset();
 
             var log = new CloudLogWriter(CloudStorage.ForAzureConnectionString(settings.DataConnectionString).BuildBlobStorage());
-
-            var runtimeFinalizer = new ServiceFabric.RuntimeFinalizer();
-            var runtimeProviders = CloudStorage
-                    .ForAzureConnectionString(settings.DataConnectionString)
-                    .WithObserver(Observers.CreateStorageObserver(log))
-                    .WithRuntimeFinalizer(runtimeFinalizer)
-                    .BuildRuntimeProviders(log);
 
             AppDomain.CurrentDomain.UnhandledException += (sender, e) => log.ErrorFormat(
                 e.ExceptionObject as Exception,
                 "Runtime Host: An unhandled {0} exception occurred on worker {1} in a background thread. The Runtime Host will be restarted: {2}.",
                 e.ExceptionObject.GetType().Name, environment.Host.WorkerName, e.IsTerminating);
 
-            _runtime = null;
             try
             {
-                _runtime = new Runtime(runtimeProviders, environment, settings, Observers.CreateRuntimeObserver(log));
+                var cellSettings = new XElement("Settings",
+                    new XElement("DataConnectionString", settings.DataConnectionString),
+                    new XElement("CertificateThumbprint", settings.SelfManagementCertificateThumbprint),
+                    new XElement("SubscriptionId", settings.SelfManagementSubscriptionId));
+
+                var entryPoint = new EntryPoint.ApplicationEntryPoint();
 
                 // runtime endlessly keeps pinging queues for pending work
-                _runtime.Execute();
+                entryPoint.Run(cellSettings, deploymentReader, environment, _cancellationTokenSource.Token);
 
                 log.DebugFormat("Runtime Host: Runtime has stopped cleanly on worker {0}.",
                     environment.Host.WorkerName);
@@ -174,7 +168,6 @@ namespace Lokad.Cloud.Host
             finally
             {
                 _stoppedWaitHandle.Set();
-                _runtime = null;
             }
 
             return false;
@@ -185,15 +178,11 @@ namespace Lokad.Cloud.Host
         /// </summary>
         public void Stop()
         {
-            var runtime = _runtime;
-            if (null != runtime)
-            {
-                runtime.Stop();
+            _cancellationTokenSource.Cancel();
 
-                // note: we DO have to wait until the shut down has finished,
-                // or the Azure Fabric will tear us apart early!
-                _stoppedWaitHandle.WaitOne(TimeSpan.FromSeconds(25));
-            }
+            // note: we DO have to wait until the shut down has finished,
+            // or the Azure Fabric will tear us apart early!
+            _stoppedWaitHandle.WaitOne(TimeSpan.FromSeconds(25));
         }
 
         public void Dispose()

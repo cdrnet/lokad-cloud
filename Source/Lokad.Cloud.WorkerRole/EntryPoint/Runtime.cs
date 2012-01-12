@@ -17,7 +17,7 @@ using Lokad.Cloud.Runtime;
 using Lokad.Cloud.ServiceFabric;
 using Lokad.Cloud.ServiceFabric.Runtime;
 
-namespace Lokad.Cloud.Host
+namespace Lokad.Cloud.EntryPoint
 {
     /// <summary>Organize the executions of the services.</summary>
     internal class Runtime

@@ -103,9 +103,10 @@
     </Compile>
     <Compile Include="ApplicationEnvironment.cs" />
     <Compile Include="Diagnostics\Observers.cs" />
+    <Compile Include="EntryPoint\ApplicationEntryPoint.cs" />
     <Compile Include="HostContext.cs" />
     <Compile Include="Host\NoRestartFloodPolicy.cs" />
-    <Compile Include="Host\Runtime.cs" />
+    <Compile Include="EntryPoint\Runtime.cs" />
     <Compile Include="Host\SingleRuntimeHost.cs" />
     <Compile Include="Diagnostics\TockenBucketThrottling.cs" />
     <Compile Include="WorkerRole.cs" />
