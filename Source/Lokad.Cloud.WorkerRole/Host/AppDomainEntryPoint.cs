@@ -8,6 +8,7 @@ using System.Threading;
 using System.Xml.Linq;
 using Lokad.Cloud.AppHost.Framework;
 using Lokad.Cloud.Diagnostics;
+using Lokad.Cloud.Runtime;
 using Lokad.Cloud.ServiceFabric.Runtime;
 using Lokad.Cloud.Storage;
 
@@ -38,6 +39,14 @@ namespace Lokad.Cloud.Host
 
             try
             {
+                var runtimeProviders = CloudStorage
+                    .ForAzureConnectionString(settings.DataConnectionString)
+                    .WithObserver(Observers.CreateStorageObserver(log))
+                    .BuildRuntimeProviders(log);
+
+                var assemblyLoader = new AssemblyLoader(runtimeProviders);
+                assemblyLoader.LoadPackage();
+
                 var cellSettings = new XElement("Settings",
                     new XElement("DataConnectionString", settings.DataConnectionString),
                     new XElement("CertificateThumbprint", settings.SelfManagementCertificateThumbprint),

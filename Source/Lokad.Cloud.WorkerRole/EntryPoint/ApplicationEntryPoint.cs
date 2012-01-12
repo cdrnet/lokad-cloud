@@ -20,6 +20,8 @@ namespace Lokad.Cloud.EntryPoint
     {
         public void Run(XElement settings, IDeploymentReader deploymentReader, IApplicationEnvironment environment, CancellationToken cancellationToken)
         {
+            // NOTE: All assemblies of the app are already loaded at this point
+
             // Init
             var cloudSettings = new CloudConfigurationSettings
                 {
@@ -39,10 +41,6 @@ namespace Lokad.Cloud.EntryPoint
 
             try
             {
-                // Load Assemblies (legacy)
-                var assemblyLoader = new AssemblyLoader(runtimeProviders);
-                assemblyLoader.LoadPackage();
-
                 // Run
                 var runtime = new Runtime(runtimeProviders, environment, cloudSettings, Observers.CreateRuntimeObserver(log));
                 runtime.Execute();
