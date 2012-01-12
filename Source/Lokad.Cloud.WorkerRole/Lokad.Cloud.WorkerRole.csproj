@@ -105,9 +105,10 @@
     <Compile Include="Diagnostics\Observers.cs" />
     <Compile Include="EntryPoint\ApplicationEntryPoint.cs" />
     <Compile Include="HostContext.cs" />
+    <Compile Include="Host\IsolatedSingleRuntimeHost.cs" />
     <Compile Include="Host\NoRestartFloodPolicy.cs" />
     <Compile Include="EntryPoint\Runtime.cs" />
-    <Compile Include="Host\SingleRuntimeHost.cs" />
+    <Compile Include="Host\AppDomainEntryPoint.cs" />
     <Compile Include="Diagnostics\TockenBucketThrottling.cs" />
     <Compile Include="WorkerRole.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

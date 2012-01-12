@@ -10,10 +10,7 @@ namespace Lokad.Cloud.Host
     internal class IsolatedSingleRuntimeHost
     {
         private readonly HostContext _hostContext;
-
-        /// <summary>Refer to the callee instance (isolated). This property is not null
-        /// only for the caller instance (non-isolated).</summary>
-        volatile AppDomainEntryPoint _isolatedInstance;
+        volatile AppDomainEntryPoint _appDomainEntryPoint;
 
         public IsolatedSingleRuntimeHost(HostContext hostContext)
         {
@@ -36,7 +33,7 @@ namespace Lokad.Cloud.Host
 
             try
             {
-                _isolatedInstance = (AppDomainEntryPoint)domain.CreateInstanceAndUnwrap(
+                _appDomainEntryPoint = (AppDomainEntryPoint)domain.CreateInstanceAndUnwrap(
                     Assembly.GetExecutingAssembly().FullName,
                     typeof(AppDomainEntryPoint).FullName);
 
@@ -51,11 +48,11 @@ namespace Lokad.Cloud.Host
 
                 // This never throws, unless something went wrong with IoC setup and that's fine
                 // because it is not possible to execute the worker
-                restartForAssemblyUpdate = _isolatedInstance.Run(settings, _hostContext.DeploymentReader, environment);
+                restartForAssemblyUpdate = _appDomainEntryPoint.Run(settings, _hostContext.DeploymentReader, environment);
             }
             finally
             {
-                _isolatedInstance = null;
+                _appDomainEntryPoint = null;
 
                 // If this throws, it's because something went wrong when unloading the AppDomain
                 // The exception correctly pulls down the entire worker process so that no AppDomains are
@@ -71,10 +68,10 @@ namespace Lokad.Cloud.Host
         /// </summary>
         public void Stop()
         {
-            var instance = _isolatedInstance;
+            var instance = _appDomainEntryPoint;
             if (null != instance)
             {
-                _isolatedInstance.Stop();
+                _appDomainEntryPoint.Stop();
             }
         }
     }

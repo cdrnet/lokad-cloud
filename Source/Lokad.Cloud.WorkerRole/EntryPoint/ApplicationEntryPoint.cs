@@ -3,11 +3,15 @@
 // URL: http://www.lokad.com/
 #endregion
 
+using System;
+using System.IO;
+using System.Security;
 using System.Threading;
 using System.Xml.Linq;
 using Lokad.Cloud.AppHost.Framework;
 using Lokad.Cloud.Diagnostics;
 using Lokad.Cloud.Runtime;
+using Lokad.Cloud.ServiceFabric.Runtime;
 using Lokad.Cloud.Storage;
 
 namespace Lokad.Cloud.EntryPoint
@@ -33,13 +37,53 @@ namespace Lokad.Cloud.EntryPoint
                     .WithRuntimeFinalizer(runtimeFinalizer)
                     .BuildRuntimeProviders(log);
 
-            // Load Assemblies (legacy)
-            var assemblyLoader = new ServiceFabric.Runtime.AssemblyLoader(runtimeProviders);
-            assemblyLoader.LoadPackage();
+            try
+            {
+                // Load Assemblies (legacy)
+                var assemblyLoader = new AssemblyLoader(runtimeProviders);
+                assemblyLoader.LoadPackage();
 
-            // Run
-            var runtime = new Runtime(runtimeProviders, environment, cloudSettings, Observers.CreateRuntimeObserver(log));
-            runtime.Execute();
+                // Run
+                var runtime = new Runtime(runtimeProviders, environment, cloudSettings, Observers.CreateRuntimeObserver(log));
+                runtime.Execute();
+
+                log.DebugFormat("Runtime Host: Runtime has stopped cleanly on worker {0}.", environment.Host.WorkerName);
+            }
+            catch (TypeLoadException typeLoadException)
+            {
+                log.ErrorFormat(typeLoadException, "Runtime Host: Type {0} could not be loaded. The Runtime Host will be restarted.",
+                    typeLoadException.TypeName);
+            }
+            catch (FileLoadException fileLoadException)
+            {
+                // Tentatively: referenced assembly is missing
+                log.Fatal(fileLoadException, "Runtime Host: Could not load assembly probably due to a missing reference assembly. The Runtime Host will be restarted.");
+            }
+            catch (SecurityException securityException)
+            {
+                // Tentatively: assembly cannot be loaded due to security config
+                log.FatalFormat(securityException, "Runtime Host: Could not load assembly {0} probably due to security configuration. The Runtime Host will be restarted.",
+                    securityException.FailedAssemblyInfo);
+            }
+            catch (TriggerRestartException)
+            {
+                log.DebugFormat("Runtime Host: Triggered to stop execution on worker {0}. The Role Instance will be recycled and the Runtime Host restarted.",
+                    environment.Host.WorkerName);
+
+                environment.LoadCurrentHeadDeployment();
+                throw;
+            }
+            catch (ThreadAbortException)
+            {
+                Thread.ResetAbort();
+                log.DebugFormat("Runtime Host: execution was aborted on worker {0}. The Runtime is stopping.", environment.Host.WorkerName);
+            }
+            catch (Exception ex)
+            {
+                // Generic exception
+                log.ErrorFormat(ex, "Runtime Host: An unhandled {0} exception occurred on worker {1}. The Runtime Host will be restarted.",
+                    ex.GetType().Name, environment.Host.WorkerName);
+            }
         }
 
         public void OnSettingsChanged(XElement settings)
