@@ -6,6 +6,7 @@
     <LocalResources>
       <LocalStorage name="LokadCloudStorage" cleanOnRoleRecycle="true" sizeInMB="2" />
       <LocalStorage name="LocalCacheStorage" cleanOnRoleRecycle="true" sizeInMB="1024" />
+      <LocalStorage name="AssembliesTemp" cleanOnRoleRecycle="true" sizeInMB="256" />
     </LocalResources>
     <ConfigurationSettings>
       <Setting name="DataConnectionString" />
