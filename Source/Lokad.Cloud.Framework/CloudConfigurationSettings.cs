@@ -20,16 +20,6 @@ namespace Lokad.Cloud
         /// <value>The data connection string.</value>
         public string DataConnectionString { get; set; }
 
-        /// <summary>
-        /// Gets the Azure subscription Id to be used for self management (optional, can be null).
-        /// </summary>
-        public string SelfManagementSubscriptionId { get; set; }
-
-        /// <summary>
-        /// Gets the Azure certificate thumbpring to be used for self management (optional, can be null).
-        /// </summary>
-        public string SelfManagementCertificateThumbprint { get; set; }
-
         public static CloudConfigurationSettings LoadFromRoleEnvironment()
         {
             var settings = new CloudConfigurationSettings();
@@ -46,24 +36,16 @@ namespace Lokad.Cloud
                 return settings;
             }
 
-            ApplySettingFromRole("DataConnectionString", v => settings.DataConnectionString = v);
-            ApplySettingFromRole("SelfManagementSubscriptionId", v => settings.SelfManagementSubscriptionId = v);
-            ApplySettingFromRole("SelfManagementCertificateThumbprint", v => settings.SelfManagementCertificateThumbprint = v);
-            return settings;
-        }
-
-        static void ApplySettingFromRole(string setting, Action<string> setter)
-        {
             try
             {
-                var value = RoleEnvironment.GetConfigurationSettingValue(setting);
+                var value = RoleEnvironment.GetConfigurationSettingValue("DataConnectionString");
                 if (!String.IsNullOrEmpty(value))
                 {
                     value = value.Trim();
                 }
                 if (!String.IsNullOrEmpty(value))
                 {
-                    setter(value);
+                    settings.DataConnectionString = value;
                 }
             }
             catch (RoleEnvironmentException)
@@ -71,6 +53,8 @@ namespace Lokad.Cloud
                 // setting was removed from the csdef, skip
                 // (logging is usually not available at that stage)
             }
+
+            return settings;
         }
     }
 }

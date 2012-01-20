@@ -76,9 +76,7 @@ namespace Lokad.Cloud.EntryPoint
 
                 applicationBuilder.RegisterInstance(new CloudConfigurationSettings
                     {
-                        DataConnectionString = settings.Element("DataConnectionString").Value,
-                        SelfManagementCertificateThumbprint = settings.Element("CertificateThumbprint").Value,
-                        SelfManagementSubscriptionId = settings.Element("SubscriptionId").Value
+                        DataConnectionString = settings.Element("DataConnectionString").Value
                     });
 
                 // Load Application IoC Configuration and apply it to the builder

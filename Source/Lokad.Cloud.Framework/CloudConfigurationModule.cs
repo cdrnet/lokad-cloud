@@ -22,19 +22,11 @@ namespace Lokad.Cloud
         /// <summary>Azure storage connection string.</summary>
         public string DataConnectionString { get; set; }
 
-        /// <summary>Azure subscription Id (optional).</summary>
-        public string SelfManagementSubscriptionId { get; set; }
-
-        /// <summary>Azure management certificate thumbprint (optional).</summary>
-        public string SelfManagementCertificateThumbprint { get; set; }
-
         protected override void Load(ContainerBuilder builder)
         {
             var settings = new CloudConfigurationSettings
                 {
-                    DataConnectionString = DataConnectionString,
-                    SelfManagementSubscriptionId = SelfManagementSubscriptionId,
-                    SelfManagementCertificateThumbprint = SelfManagementCertificateThumbprint
+                    DataConnectionString = DataConnectionString
                 };
 
             if (string.IsNullOrEmpty(settings.DataConnectionString))
