@@ -5,7 +5,7 @@ using Microsoft.WindowsAzure.ServiceRuntime;
 
 namespace Lokad.Cloud.Mock
 {
-    public class MemoryEnvironment : ICloudEnvironment
+    public class MockEnvironment : ICloudEnvironment
     {
         private readonly string instance = Guid.NewGuid().ToString("N");
 

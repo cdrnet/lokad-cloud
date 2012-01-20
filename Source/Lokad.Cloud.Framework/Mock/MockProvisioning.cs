@@ -4,7 +4,7 @@ using Lokad.Cloud.Management;
 
 namespace Lokad.Cloud.Mock
 {
-    public class MemoryProvisioning : IProvisioningProvider
+    public class MockProvisioning : IProvisioningProvider
     {
         public bool IsAvailable
         {
