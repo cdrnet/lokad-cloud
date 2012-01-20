@@ -147,7 +147,6 @@
     <Compile Include="Diagnostics\XmlExtension.cs" />
     <Compile Include="EntryPoint\ApplicationEntryPoint.cs" />
     <Compile Include="EntryPoint\Observers.cs" />
-    <Compile Include="EntryPoint\Runtime.cs" />
     <Compile Include="EntryPoint\Scheduler.cs" />
     <Compile Include="ICloudEnvironment.cs" />
     <Compile Include="Instrumentation\CloudRuntimeInstrumentationSubject.cs" />
