@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Serialization;
+using System.Xml.Linq;
 using Ionic.Zip;
 using Lokad.Cloud.AppHost.Framework;
 using Lokad.Cloud.AppHost.Framework.Definition;
@@ -19,14 +20,18 @@ namespace Lokad.Cloud
     {
         private const string ContainerName = "lokad-cloud-assemblies";
         private const string PackageBlobName = "default";
-        private const string ConfigBlobName = "config";
+        private const string AutofacConfigBlobName = "config";
 
-        private readonly string _storageConnectionString;
-        
-        public DeploymentReader(string storageConnectionString)
+        private readonly string _connectionString;
+        private readonly string _subscriptionId;
+        private readonly string _certificateThumbprint;
+
+        public DeploymentReader(string connectionString, string subscriptionId, string certificateThumbprint)
         {
-            _storageConnectionString = storageConnectionString;
-            _storage = CloudStorage.ForAzureConnectionString(storageConnectionString).BuildStorageProviders();
+            _connectionString = connectionString;
+            _subscriptionId = subscriptionId;
+            _certificateThumbprint = certificateThumbprint;
+            _storage = CloudStorage.ForAzureConnectionString(connectionString).BuildStorageProviders();
         }
 
         [NonSerialized]
@@ -35,14 +40,14 @@ namespace Lokad.Cloud
         [OnDeserialized]
         private void OnDeserialized(StreamingContext context)
         {
-            _storage = CloudStorage.ForAzureConnectionString(_storageConnectionString).BuildStorageProviders();
+            _storage = CloudStorage.ForAzureConnectionString(_connectionString).BuildStorageProviders();
         }
 
         public SolutionHead GetDeploymentIfModified(string knownETag, out string newETag)
         {
             newETag = CombineEtags(
                 _storage.BlobStorage.GetBlobEtag(ContainerName, PackageBlobName),
-                _storage.BlobStorage.GetBlobEtag(ContainerName, ConfigBlobName));
+                _storage.BlobStorage.GetBlobEtag(ContainerName, AutofacConfigBlobName));
 
             if (newETag == null || knownETag != null && knownETag == newETag)
             {
@@ -54,12 +59,24 @@ namespace Lokad.Cloud
 
         public SolutionDefinition GetSolution(SolutionHead deployment)
         {
+            var settings = new XElement("Settings",
+                    new XElement("DataConnectionString", _connectionString),
+                    new XElement("CertificateThumbprint", _certificateThumbprint),
+                    new XElement("SubscriptionId", _subscriptionId));
+
+            string appConfigEtag;
+            var appConfig = _storage.BlobStorage.GetBlob<byte[]>(ContainerName, AutofacConfigBlobName, out appConfigEtag);
+            if (appConfig.HasValue && appConfigEtag == AutofacConfigEtagOfCombinedEtag(deployment.SolutionId))
+            {
+                settings.Add(new XElement("AutofacAppConfig", Convert.ToBase64String(appConfig.Value)));
+            }
+
             return new SolutionDefinition("Solution", new[]
                 {
                     new CellDefinition("Cell",
                         new AssembliesHead(PackageEtagOfCombinedEtag(deployment.SolutionId)),
                         typeof(EntryPoint.ApplicationEntryPoint).FullName,
-                        null)
+                        settings.ToString())
                 });
         }
 
@@ -102,7 +119,7 @@ namespace Lokad.Cloud
             return _storage.BlobStorage.GetBlob<T>(ContainerName, itemName).GetValue(default(T));
         }
 
-        static string CombineEtags(string packageEtag, string configEtag)
+        static string CombineEtags(string packageEtag, string autofacConfigEtag)
         {
             if (packageEtag == null)
             {
@@ -110,9 +127,9 @@ namespace Lokad.Cloud
             }
 
             var prefix = packageEtag.Length.ToString("0000");
-            return configEtag == null
+            return autofacConfigEtag == null
                 ? string.Concat(prefix, packageEtag)
-                : string.Concat(prefix, packageEtag, configEtag);
+                : string.Concat(prefix, packageEtag, autofacConfigEtag);
         }
 
         static string PackageEtagOfCombinedEtag(string combinedEtag)
@@ -122,7 +139,19 @@ namespace Lokad.Cloud
                 return null;
             }
 
-            return combinedEtag.Substring(4, Int32.Parse(combinedEtag.Substring(0, 4)));
+            var packageEtag = combinedEtag.Substring(4, Int32.Parse(combinedEtag.Substring(0, 4)));
+            return string.IsNullOrEmpty(packageEtag) ? null : packageEtag;
+        }
+
+        static string AutofacConfigEtagOfCombinedEtag(string combinedEtag)
+        {
+            if (combinedEtag == null || combinedEtag.Length <= 5)
+            {
+                return null;
+            }
+
+            var configEtag = combinedEtag.Substring(4 + Int32.Parse(combinedEtag.Substring(0, 4)));
+            return string.IsNullOrEmpty(configEtag) ? null : configEtag;
         }
     }
 }
