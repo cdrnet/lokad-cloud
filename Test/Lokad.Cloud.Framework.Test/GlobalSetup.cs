@@ -3,8 +3,18 @@
 // URL: http://www.lokad.com/
 #endregion
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using Autofac;
 using Autofac.Configuration;
+using Lokad.Cloud.Diagnostics;
+using Lokad.Cloud.Management;
+using Lokad.Cloud.Mock;
+using Lokad.Cloud.Provisioning.Instrumentation;
+using Lokad.Cloud.Provisioning.Instrumentation.Events;
+using Lokad.Cloud.ServiceFabric;
+using Lokad.Cloud.Storage.Azure;
 
 namespace Lokad.Cloud.Test
 {
@@ -15,7 +25,21 @@ namespace Lokad.Cloud.Test
         static IContainer Setup()
         {
             var builder = new ContainerBuilder();
-            builder.RegisterModule(new CloudModule());
+
+            builder.RegisterModule(new StorageModule());
+            builder.RegisterModule(new DiagnosticsModule());
+
+            builder.RegisterType<Jobs.JobManager>();
+            builder.RegisterType<RuntimeFinalizer>().As<IRuntimeFinalizer>().InstancePerLifetimeScope();
+
+            builder.RegisterType<MockEnvironment>().As<ICloudEnvironment>();
+            builder.RegisterType<MockProvisioning>().As<IProvisioningProvider>();
+
+            // Provisioning Observer Subject
+            builder.Register(c => new CloudProvisioningInstrumentationSubject(c.Resolve<IEnumerable<IObserver<ICloudProvisioningEvent>>>().ToArray()))
+                .As<ICloudProvisioningObserver, IObservable<ICloudProvisioningEvent>>()
+                .SingleInstance();
+
             builder.RegisterModule(new ConfigurationSettingsReader("autofac"));
 
             return builder.Build();

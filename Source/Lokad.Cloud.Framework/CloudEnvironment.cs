@@ -9,6 +9,7 @@ using System.Net;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using System.Threading.Tasks;
+using Lokad.Cloud.AppHost.Framework;
 using Lokad.Cloud.Diagnostics;
 using Lokad.Cloud.Management;
 using Lokad.Cloud.Provisioning;
@@ -26,16 +27,16 @@ namespace Lokad.Cloud
     public sealed class CloudEnvironment : ICloudEnvironment, IProvisioningProvider
     {
         static bool _runtimeAvailable;
-        private readonly Lazy<string> _hostName = new Lazy<string>(Dns.GetHostName);
-        private readonly string _uniqueInstanceName;
+
+        private readonly IApplicationEnvironment _appEnvironment;
 
         private readonly ILog _log;
         private readonly AzureCurrentDeployment _currentDeployment;
         private readonly AzureProvisioning _provisioning;
 
-        public CloudEnvironment(string uniqueInstanceName, CloudConfigurationSettings settings, ILog log, ICloudProvisioningObserver provisioningObserver = null)
+        public CloudEnvironment(IApplicationEnvironment appEnvironment, CloudConfigurationSettings settings, ILog log, ICloudProvisioningObserver provisioningObserver = null)
         {
-            _uniqueInstanceName = uniqueInstanceName;
+            _appEnvironment = appEnvironment;
             _log = log;
 
             // try get settings and certificate
@@ -87,93 +88,42 @@ namespace Lokad.Cloud
 
         public string WorkerName
         {
-            get { return _hostName.Value; }
+            get { return _appEnvironment.Host.WorkerName; }
         }
 
        public string UniqueWorkerInstanceName
         {
-            get { return _uniqueInstanceName; }
+            get { return _appEnvironment.Host.UniqueWorkerInstanceName; }
         }
 
         public int CurrentWorkerInstanceCount
         {
-            get
-            {
-                return GetWorkerInstanceCount(CancellationToken.None).Result;
-            }
+            get { return _appEnvironment.CurrentWorkerInstanceCount; }
         }
 
         public void ProvisionWorkerInstances(int numberOfInstances)
         {
-            SetWorkerInstanceCount(numberOfInstances, CancellationToken.None);
+            _appEnvironment.ProvisionWorkerInstances(numberOfInstances);
         }
 
         public void ProvisionWorkerInstancesAtLeast(int minNumberOfInstances)
         {
-            GetWorkerInstanceCount(CancellationToken.None).ContinueWith(task =>
-                {
-                    if (task.Result < minNumberOfInstances)
-                    {
-                        SetWorkerInstanceCount(minNumberOfInstances, CancellationToken.None);
-                    }
-                });
+            _appEnvironment.ProvisionWorkerInstancesAtLeast(minNumberOfInstances);
         }
 
         public string GetSettingValue(string settingName)
         {
-            if (!IsAvailable)
-            {
-                return null;
-            }
-
-            try
-            {
-                var value = RoleEnvironment.GetConfigurationSettingValue(settingName);
-                if (!String.IsNullOrEmpty(value))
-                {
-                    value = value.Trim();
-                }
-
-                return String.IsNullOrEmpty(value) ? null : value;
-            }
-            catch (RoleEnvironmentException)
-            {
-                return null;
-                // setting was removed from the csdef, skip
-                // (logging is usually not available at that stage)
-            }
+            return _appEnvironment.GetSettingValue(settingName);
         }
 
         public X509Certificate2 GetCertificate(string thumbprint)
         {
-            var store = new X509Store(StoreName.My, StoreLocation.CurrentUser);
-            try
-            {
-                store.Open(OpenFlags.ReadOnly);
-                var certs = store.Certificates.Find(X509FindType.FindByThumbprint, thumbprint, false);
-                if(certs.Count != 1)
-                {
-                    return null;
-                }
-
-                return certs[0];
-            }
-            finally
-            {
-                store.Close();
-            }
+            return _appEnvironment.GetCertificate(thumbprint);
         }
 
         public string GetLocalResourcePath(string resourceName)
         {
-            if (IsAvailable)
-            {
-                return RoleEnvironment.GetLocalResource(resourceName).RootPath;
-            }
-
-            var dir = Path.Combine(Path.GetTempPath(), resourceName);
-            Directory.CreateDirectory(dir);
-            return dir;
+            return _appEnvironment.GetLocalResourcePath(resourceName);
         }
 
         bool IProvisioningProvider.IsAvailable

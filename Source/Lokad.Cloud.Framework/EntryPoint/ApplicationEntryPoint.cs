@@ -4,6 +4,7 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Security;
@@ -13,9 +14,13 @@ using Autofac;
 using Autofac.Configuration;
 using Lokad.Cloud.AppHost.Framework;
 using Lokad.Cloud.Diagnostics;
+using Lokad.Cloud.Management;
+using Lokad.Cloud.Provisioning.Instrumentation;
+using Lokad.Cloud.Provisioning.Instrumentation.Events;
 using Lokad.Cloud.ServiceFabric;
 using Lokad.Cloud.ServiceFabric.Runtime;
 using Lokad.Cloud.Storage;
+using Lokad.Cloud.Storage.Azure;
 
 namespace Lokad.Cloud.EntryPoint
 {
@@ -56,7 +61,27 @@ namespace Lokad.Cloud.EntryPoint
                 log.DebugFormat("Runtime: started on worker {0}.", environment.Host.WorkerName);
 
                 var applicationBuilder = new ContainerBuilder();
-                applicationBuilder.RegisterModule(new CloudModule());
+
+                applicationBuilder.RegisterModule(new StorageModule());
+                applicationBuilder.RegisterModule(new DiagnosticsModule());
+
+                applicationBuilder.RegisterType<Jobs.JobManager>();
+                applicationBuilder.RegisterType<RuntimeFinalizer>().As<IRuntimeFinalizer>().InstancePerLifetimeScope();
+
+                // NOTE: Guid is not very nice, but this will be replaced anyway once fully ported to AppHost
+                applicationBuilder.Register(c =>
+                    new CloudEnvironment(
+                        environment,
+                        c.Resolve<CloudConfigurationSettings>(),
+                        c.Resolve<ILog>(),
+                        c.ResolveOptional<ICloudProvisioningObserver>()))
+                    .As<ICloudEnvironment, IProvisioningProvider>().SingleInstance();
+
+                // Provisioning Observer Subject
+                applicationBuilder.Register(c => new CloudProvisioningInstrumentationSubject(c.Resolve<IEnumerable<IObserver<ICloudProvisioningEvent>>>().ToArray()))
+                    .As<ICloudProvisioningObserver, IObservable<ICloudProvisioningEvent>>()
+                    .SingleInstance();
+
                 applicationBuilder.RegisterInstance(new CloudConfigurationSettings
                     {
                         DataConnectionString = settings.Element("DataConnectionString").Value,

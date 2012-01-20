@@ -137,7 +137,6 @@
     <Compile Include="Application\CloudApplicationDefinition.cs" />
     <Compile Include="CloudConfigurationModule.cs" />
     <Compile Include="CloudEnvironment.cs" />
-    <Compile Include="CloudModule.cs" />
     <Compile Include="Diagnostics\CloudLogWriter.cs" />
     <Compile Include="Diagnostics\CloudLogReader.cs" />
     <Compile Include="Diagnostics\CloudStorageLogger.cs" />
@@ -157,8 +156,8 @@
     <Compile Include="Jobs\Job.cs" />
     <Compile Include="Jobs\JobManager.cs" />
     <Compile Include="Management\IProvisioningProvider.cs" />
-    <Compile Include="Mock\MemoryEnvironment.cs" />
-    <Compile Include="Mock\MemoryProvisioning.cs" />
+    <Compile Include="Mock\MockEnvironment.cs" />
+    <Compile Include="Mock\MockProvisioning.cs" />
     <Compile Include="CloudConfigurationSettings.cs" />
     <Compile Include="Runtime\CloudStorageExtensions.cs" />
     <Compile Include="Runtime\RuntimeProviders.cs" />

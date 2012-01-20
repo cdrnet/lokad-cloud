@@ -16,7 +16,6 @@ namespace Lokad.Cloud
     /// When only using the storage (O/C mapping) toolkit standalone it is easier
     /// to let the <see cref="Storage.CloudStorage"/> factory create the storage providers on demand.
     /// </remarks>
-    /// <seealso cref="CloudModule"/>
     /// <seealso cref="Storage.CloudStorage"/>
     public sealed class CloudConfigurationModule : Module
     {
