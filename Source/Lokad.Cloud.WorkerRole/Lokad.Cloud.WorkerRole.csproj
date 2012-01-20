@@ -79,6 +79,7 @@
     <Reference Include="Lokad.Cloud.Storage, Version=1.4.109.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Lokad.Cloud.Storage.1.4.109.0\lib\Lokad.Cloud.Storage.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.CSharp" />
     <Reference Include="Microsoft.Net.Http, Version=0.3.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\packages\HttpClient.0.3.0\lib\40\Microsoft.Net.Http.dll</HintPath>
     </Reference>
@@ -107,14 +108,9 @@
     <Compile Include="ApplicationEnvironment.cs" />
     <Compile Include="Diagnostics\HostLogLevel.cs" />
     <Compile Include="Diagnostics\HostLogWriter.cs" />
-    <Compile Include="Host\AssemblyLoader.cs" />
     <Compile Include="DeploymentReader.cs" />
     <Compile Include="Diagnostics\Observers.cs" />
     <Compile Include="HostContext.cs" />
-    <Compile Include="Host\AssemblyResolver.cs" />
-    <Compile Include="Host\IsolatedSingleRuntimeHost.cs" />
-    <Compile Include="Host\NoRestartFloodPolicy.cs" />
-    <Compile Include="Host\AppDomainEntryPoint.cs" />
     <Compile Include="Diagnostics\TockenBucketThrottling.cs" />
     <Compile Include="WorkerRole.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

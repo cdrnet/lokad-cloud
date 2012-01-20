@@ -42,7 +42,6 @@ namespace Lokad.Cloud.Test.ServiceFabric
 
             var loader = new AssemblyLoader(runtimeProviders);
             loader.LoadPackage();
-            loader.LoadConfiguration();
 
             // validate that 'sample.dll' has been loaded
             var assemblies = AppDomain.CurrentDomain.GetAssemblies();

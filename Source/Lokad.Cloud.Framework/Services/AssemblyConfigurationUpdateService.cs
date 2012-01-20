@@ -3,9 +3,7 @@
 // URL: http://www.lokad.com/
 #endregion
 
-using Lokad.Cloud.Runtime;
 using Lokad.Cloud.ServiceFabric;
-using Lokad.Cloud.ServiceFabric.Runtime;
 
 namespace Lokad.Cloud.Services
 {
@@ -20,21 +18,9 @@ namespace Lokad.Cloud.Services
            SchedulePerWorker = true)]
     public class AssemblyConfigurationUpdateService : ScheduledService
     {
-        readonly AssemblyLoader _assemblyLoader;
-
-        public AssemblyConfigurationUpdateService(RuntimeProviders runtimeProviders)
-        {
-            // NOTE: we can't use the BlobStorage as provided by the base class
-            // as this is not available at constructur time, but we want to reset
-            // the status as soon as possible to avoid missing any changes
-
-            _assemblyLoader = new AssemblyLoader(runtimeProviders);
-            _assemblyLoader.ResetUpdateStatus();
-        }
-
         protected override void StartOnSchedule()
         {
-            _assemblyLoader.CheckUpdate(false);
+            Environment.LoadCurrentHeadDeployment();
         }
     }
 }

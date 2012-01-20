@@ -4,8 +4,9 @@
 #endregion
 
 using System.Linq;
+using System.Threading;
+using Lokad.Cloud.AppHost;
 using Lokad.Cloud.Diagnostics;
-using Lokad.Cloud.Host;
 using Lokad.Cloud.Storage;
 using Microsoft.WindowsAzure.ServiceRuntime;
 
@@ -14,14 +15,8 @@ namespace Lokad.Cloud
     /// <summary>Entry point of Lokad.Cloud.</summary>
     public class WorkerRole : RoleEntryPoint
     {
-        private readonly NoRestartFloodPolicy _restartPolicy;
-        private HostContext _hostContext;
-        private volatile IsolatedSingleRuntimeHost _primaryRuntimeHost;
-
-        public WorkerRole()
-        {
-            _restartPolicy = new NoRestartFloodPolicy();
-        }
+        private CancellationTokenSource _cancellationTokenSource;
+        private Host _host;
 
         /// <summary>
         /// Called by Windows Azure to initialize the role instance.
@@ -46,9 +41,12 @@ namespace Lokad.Cloud
 
             var log = new HostLogWriter(CloudStorage.ForAzureConnectionString(connectionString).BuildBlobStorage());
 
-            _hostContext = new HostContext(deploymentReader, certificateThumbprint, subscriptionId, log,
+             var context = new HostContext(deploymentReader, certificateThumbprint, subscriptionId, log,
                 Observers.CreateHostObserver(log),
                 Observers.CreateProvisioningObserver(log));
+
+            _cancellationTokenSource = new CancellationTokenSource();
+            _host = new Host(context);
 
             RoleEnvironment.Changing += OnRoleEnvironmentChanging;
 
@@ -81,12 +79,7 @@ namespace Lokad.Cloud
         {
             RoleEnvironment.Changing -= OnRoleEnvironmentChanging;
 
-            _restartPolicy.IsStopRequested = true;
-
-            if (null != _primaryRuntimeHost)
-            {
-                _primaryRuntimeHost.Stop();
-            }
+            _cancellationTokenSource.Cancel(true);
         }
 
         /// <summary>
@@ -99,20 +92,16 @@ namespace Lokad.Cloud
         /// </remarks>
         public override void Run()
         {
-            // restart policy cease restarts if stop is requested
-            _restartPolicy.Do(() =>
-                {
-                    _primaryRuntimeHost = new IsolatedSingleRuntimeHost(_hostContext);
-                    _primaryRuntimeHost.Run();
-                });
+            _host.RunSync(_cancellationTokenSource.Token);
         }
 
-        static void OnRoleEnvironmentChanging(object sender, RoleEnvironmentChangingEventArgs e)
+        void OnRoleEnvironmentChanging(object sender, RoleEnvironmentChangingEventArgs e)
         {
             // We restart all workers if the configuration changed (e.g. the storage account)
             // We do not request a recycle if only the topology changed, e.g. if some instances have been removed or added.
             if (e.Changes.OfType<RoleEnvironmentConfigurationSettingChange>().Any())
             {
+                _cancellationTokenSource.Cancel();
                 RoleEnvironment.RequestRecycle();
             }
         }
