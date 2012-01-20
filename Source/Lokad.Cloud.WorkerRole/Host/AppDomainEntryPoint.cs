@@ -9,7 +9,6 @@ using System.Threading;
 using System.Xml.Linq;
 using Lokad.Cloud.AppHost.Framework;
 using Lokad.Cloud.AppHost.Framework.Definition;
-using Lokad.Cloud.ServiceFabric.Runtime;
 
 namespace Lokad.Cloud.Host
 {
@@ -25,7 +24,7 @@ namespace Lokad.Cloud.Host
         /// Run the hosted runtime, blocking the calling thread.
         /// </summary>
         /// <returns>True if the worker stopped as planned (e.g. due to updated assemblies)</returns>
-        public bool Run(CellDefinition cellDefinition, IDeploymentReader deploymentReader, ApplicationEnvironment environment)
+        public void Run(CellDefinition cellDefinition, IDeploymentReader deploymentReader, ApplicationEnvironment environment)
         {
             _stoppedWaitHandle.Reset();
             try
@@ -48,16 +47,10 @@ namespace Lokad.Cloud.Host
                 // Run
                 entryPoint.Run(settings, deploymentReader, environment, _cancellationTokenSource.Token);
             }
-            catch (TriggerRestartException)
-            {
-                return true;
-            }
             finally
             {
                 _stoppedWaitHandle.Set();
             }
-
-            return false;
         }
 
         /// <summary>

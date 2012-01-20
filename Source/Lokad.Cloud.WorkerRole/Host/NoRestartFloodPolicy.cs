@@ -42,7 +42,7 @@ namespace Lokad.Cloud.Host
         /// Endlessly restart the provided action, but avoiding restart flooding
         /// patterns.
         /// </summary>
-        public void Do(Func<bool> workButNotFloodRestart)
+        public void Do(Action workButNotFloodRestart)
         {
             // once stop is requested, we stop
             while (!_isStopRequested)
@@ -51,9 +51,9 @@ namespace Lokad.Cloud.Host
                 // In such case, the worker would be reported as unhealthy virtually forever if no more restarts occur
 
                 var lastRestart = DateTimeOffset.UtcNow;
-                var assemblyUpdated = workButNotFloodRestart();
+                workButNotFloodRestart();
 
-                if (!assemblyUpdated && DateTimeOffset.UtcNow.Subtract(lastRestart) < FloodFrequencyThreshold)
+                if (DateTimeOffset.UtcNow.Subtract(lastRestart) < FloodFrequencyThreshold)
                 {
                     // Unhealthy
                     Thread.Sleep(DelayWhenFlooding);

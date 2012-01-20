@@ -21,12 +21,9 @@ namespace Lokad.Cloud.Host
         /// Run the hosted runtime, blocking the calling thread.
         /// </summary>
         /// <returns>True if the worker stopped as planned (e.g. due to updated assemblies)</returns>
-        public bool Run()
+        public void Run()
         {
             var domain = AppDomain.CreateDomain("WorkerDomain", null, AppDomain.CurrentDomain.SetupInformation);
-
-            bool restartForAssemblyUpdate;
-
             try
             {
                 _appDomainEntryPoint = (AppDomainEntryPoint)domain.CreateInstanceAndUnwrap(
@@ -49,7 +46,7 @@ namespace Lokad.Cloud.Host
 
                 // This never throws, unless something went wrong with IoC setup and that's fine
                 // because it is not possible to execute the worker
-                restartForAssemblyUpdate = _appDomainEntryPoint.Run(cell, deploymentReader, environment);
+                _appDomainEntryPoint.Run(cell, deploymentReader, environment);
             }
             finally
             {
@@ -60,8 +57,6 @@ namespace Lokad.Cloud.Host
                 // left in memory
                 AppDomain.Unload(domain);
             }
-
-            return restartForAssemblyUpdate;
         }
 
         /// <summary>

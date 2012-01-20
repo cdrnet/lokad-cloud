@@ -103,7 +103,7 @@ namespace Lokad.Cloud
             _restartPolicy.Do(() =>
                 {
                     _primaryRuntimeHost = new IsolatedSingleRuntimeHost(_hostContext);
-                    return _primaryRuntimeHost.Run();
+                    _primaryRuntimeHost.Run();
                 });
         }
 
