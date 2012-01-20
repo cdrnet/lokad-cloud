@@ -162,7 +162,6 @@
     <Compile Include="ServiceFabric\QueueService.cs" />
     <Compile Include="ServiceFabric\QueueServiceSettingsAttribute.cs" />
     <Compile Include="ServiceFabric\RuntimeFinalizer.cs" />
-    <Compile Include="ServiceFabric\Runtime\TriggerRestartException.cs" />
     <Compile Include="ServiceFabric\ScheduledService.cs" />
     <Compile Include="ServiceFabric\ScheduledServiceSettingsAttribute.cs" />
     <Compile Include="ServiceFabric\ServiceExecutionFeedback.cs" />

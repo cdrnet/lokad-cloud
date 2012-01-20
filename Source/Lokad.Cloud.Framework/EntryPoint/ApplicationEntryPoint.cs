@@ -17,7 +17,6 @@ using Lokad.Cloud.Diagnostics;
 using Lokad.Cloud.Provisioning.Instrumentation;
 using Lokad.Cloud.Provisioning.Instrumentation.Events;
 using Lokad.Cloud.ServiceFabric;
-using Lokad.Cloud.ServiceFabric.Runtime;
 using Lokad.Cloud.Storage;
 using Lokad.Cloud.Storage.Azure;
 
@@ -158,14 +157,6 @@ namespace Lokad.Cloud.EntryPoint
                 // Tentatively: assembly cannot be loaded due to security config
                 log.FatalFormat(securityException, "Runtime: Could not load assembly {0} probably due to security configuration. The Runtime will be restarted.",
                     securityException.FailedAssemblyInfo);
-            }
-            catch (TriggerRestartException)
-            {
-                log.DebugFormat("Runtime: Triggered to stop execution on worker {0} in service {1}. The Role Instance will be recycled and the Runtime restarted.",
-                    environment.Host.WorkerName, GetNameOfServiceInExecution());
-
-                environment.LoadCurrentHeadDeployment();
-                throw;
             }
             catch (ThreadInterruptedException)
             {

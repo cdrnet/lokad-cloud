@@ -9,7 +9,6 @@ using System.Threading;
 using System.Xml.Linq;
 using Autofac;
 using Lokad.Cloud.Diagnostics;
-using Lokad.Cloud.ServiceFabric.Runtime;
 using Lokad.Cloud.Storage;
 using NUnit.Framework;
 
@@ -35,7 +34,7 @@ namespace Lokad.Cloud.Test.Diagnostics
                 new InvalidOperationException("CloudLoggerTests.Log"),
                 "My message with CloudLoggerTests.Log.");
 
-            _logWriter.Info(new TriggerRestartException("CloudLoggerTests.Log"), "Not a restart, just a test.");
+            _logWriter.Info(new InvalidOperationException("CloudLoggerTests.Log"), "Not a restart, just a test.");
 
             _logWriter.Warn().WithException(new Exception())
                 .WithMeta("JobId", "123").WithMeta(new XElement("abc", "def"))
@@ -53,8 +52,8 @@ namespace Lokad.Cloud.Test.Diagnostics
                 new InvalidOperationException("CloudLoggerTests.Log"),
                 "My message with CloudLoggerTests.Log.");
 
-            _logWriter.Info(new TriggerRestartException("CloudLoggerTests.Log"), "Not a restart, just a test.");
-            _logWriter.Info(new TriggerRestartException("CloudLoggerTests.Log"), "Not a restart, just a test II.");
+            _logWriter.Info(new InvalidOperationException("CloudLoggerTests.Log"), "Not a restart, just a test.");
+            _logWriter.Info(new InvalidOperationException("CloudLoggerTests.Log"), "Not a restart, just a test II.");
 
             Assert.AreEqual(0, _logReader.GetLogsOfLevel(LogLevel.Fatal).Count(l => l.DateTimeUtc > now));
             Assert.AreEqual(1, _logReader.GetLogsOfLevel(LogLevel.Error).Count(l => l.DateTimeUtc > now));
@@ -74,8 +73,8 @@ namespace Lokad.Cloud.Test.Diagnostics
                 new InvalidOperationException("CloudLoggerTests.Log"),
                 "My message with CloudLoggerTests.Log.");
 
-            _logWriter.Info(new TriggerRestartException("CloudLoggerTests.Log"), "Not a restart, just a test.");
-            _logWriter.Info(new TriggerRestartException("CloudLoggerTests.Log"), "Not a restart, just a test II.");
+            _logWriter.Info(new InvalidOperationException("CloudLoggerTests.Log"), "Not a restart, just a test.");
+            _logWriter.Info(new InvalidOperationException("CloudLoggerTests.Log"), "Not a restart, just a test II.");
 
             Assert.AreEqual(0, _logReader.GetLogsOfLevelOrHigher(LogLevel.Fatal).Count(l => l.DateTimeUtc > now));
             Assert.AreEqual(1, _logReader.GetLogsOfLevelOrHigher(LogLevel.Error).Count(l => l.DateTimeUtc > now));
@@ -98,7 +97,7 @@ namespace Lokad.Cloud.Test.Diagnostics
                     new InvalidOperationException("CloudLoggerTests.Log"),
                     "My message with CloudLoggerTests.Log.");
                 _logWriter.Warn("A test warning");
-                _logWriter.Info(new TriggerRestartException("CloudLoggerTests.Log"), "Not a restart, just a test.");
+                _logWriter.Info(new InvalidOperationException("CloudLoggerTests.Log"), "Not a restart, just a test.");
             }
 
             Assert.AreEqual(10, _logReader.GetLogs().Take(10).Count());
@@ -116,11 +115,11 @@ namespace Lokad.Cloud.Test.Diagnostics
             Thread.Sleep(100);
             var before = DateTime.UtcNow;
             Thread.Sleep(100);
-            _logWriter.Error(new TriggerRestartException("CloudLoggerTests.Log"), "Not a restart, just a test.");
+            _logWriter.Error(new InvalidOperationException("CloudLoggerTests.Log"), "Not a restart, just a test.");
             Thread.Sleep(100);
-            _logWriter.Info(new TriggerRestartException("CloudLoggerTests.Log"), "Not a restart, just a test II.");
+            _logWriter.Info(new InvalidOperationException("CloudLoggerTests.Log"), "Not a restart, just a test II.");
             Thread.Sleep(100);
-            _logWriter.Warn(new TriggerRestartException("CloudLoggerTests.Log"), "Not a restart, just a test III.");
+            _logWriter.Warn(new InvalidOperationException("CloudLoggerTests.Log"), "Not a restart, just a test III.");
             Thread.Sleep(100);
             var after = DateTime.UtcNow;
 
