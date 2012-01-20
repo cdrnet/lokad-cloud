@@ -1,50 +1,73 @@
 ﻿using System;
 using System.IO;
+using System.Net;
 using System.Security.Cryptography.X509Certificates;
+using Lokad.Cloud.AppHost.Framework;
+using Lokad.Cloud.AppHost.Framework.Definition;
 using Microsoft.WindowsAzure.ServiceRuntime;
 
 namespace Lokad.Cloud.Mock
 {
-    public class MockEnvironment : ICloudEnvironment
+    public class MockEnvironment : IApplicationEnvironment
     {
-        private readonly string instance = Guid.NewGuid().ToString("N");
+        private readonly string _instance = Guid.NewGuid().ToString("N");
 
-        string ICloudEnvironment.WorkerName
+        public MockEnvironment()
         {
-            get { return "MockHost"; }
+            Deployment = new SolutionHead("Solution");
+            Host = new HostLifeIdentity("MockHost", "MockHost-" + _instance);
+            Cell = new CellLifeIdentity(Host, "Solution", "Cell", "Cell" + _instance);
+            Assemblies = new AssembliesHead("Assemblies");
         }
 
-        string ICloudEnvironment.UniqueWorkerInstanceName
-        {
-            get { return "MockHost-" + instance; }
-        }
+        public SolutionHead Deployment { get; private set; }
+        public HostLifeIdentity Host { get; private set; }
+        public CellLifeIdentity Cell { get; private set; }
+        public AssembliesHead Assemblies { get; private set; }
 
-        int ICloudEnvironment.CurrentWorkerInstanceCount
+        public int CurrentWorkerInstanceCount
         {
             get { return 1; }
         }
 
-        void ICloudEnvironment.ProvisionWorkerInstances(int numberOfInstances)
+        public void LoadDeployment(SolutionHead deployment)
         {
         }
 
-        void ICloudEnvironment.ProvisionWorkerInstancesAtLeast(int minNumberOfInstances)
+        public void LoadCurrentHeadDeployment()
         {
         }
 
-        string ICloudEnvironment.GetSettingValue(string settingName)
+        public void ProvisionWorkerInstances(int numberOfInstances)
+        {
+        }
+
+        public void ProvisionWorkerInstancesAtLeast(int minNumberOfInstances)
+        {
+        }
+
+        public string GetSettingValue(string settingName)
         {
             return RoleEnvironment.GetConfigurationSettingValue(settingName);
         }
 
-        X509Certificate2 ICloudEnvironment.GetCertificate(string thumbprint)
+        public X509Certificate2 GetCertificate(string thumbprint)
         {
             return null;
         }
 
-        string ICloudEnvironment.GetLocalResourcePath(string resourceName)
+        public string GetLocalResourcePath(string resourceName)
         {
-            return Path.Combine(Path.GetTempPath(), instance, resourceName);
+            return Path.Combine(Path.GetTempPath(), _instance, resourceName);
+        }
+
+        public IPEndPoint GetEndpoint(string endpointName)
+        {
+            return null;
+        }
+
+        public void SendCommand(IHostCommand command)
+        {
         }
     }
 }

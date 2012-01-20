@@ -118,7 +118,7 @@ namespace Lokad.Cloud.ServiceFabric
         {
             base.Initialize();
 
-            _workerKey = CloudEnvironment.WorkerName;
+            _workerKey = Environment.Host.WorkerName;
 
             // Auto-register the service for finalization:
             // 1) Registration should not be made within the constructor

@@ -8,8 +8,8 @@ using System.Collections.Generic;
 using System.Linq;
 using Autofac;
 using Autofac.Configuration;
+using Lokad.Cloud.AppHost.Framework;
 using Lokad.Cloud.Diagnostics;
-using Lokad.Cloud.Management;
 using Lokad.Cloud.Mock;
 using Lokad.Cloud.Provisioning.Instrumentation;
 using Lokad.Cloud.Provisioning.Instrumentation.Events;
@@ -29,10 +29,10 @@ namespace Lokad.Cloud.Test
             builder.RegisterModule(new StorageModule());
             builder.RegisterModule(new DiagnosticsModule());
 
-            builder.RegisterType<Jobs.JobManager>();
             builder.RegisterType<RuntimeFinalizer>().As<IRuntimeFinalizer>().InstancePerLifetimeScope();
+            builder.RegisterType<MockEnvironment>().As<IApplicationEnvironment>().InstancePerLifetimeScope();
 
-            builder.RegisterType<MockEnvironment>().As<ICloudEnvironment>();
+            builder.RegisterType<Jobs.JobManager>();
 
             // Provisioning Observer Subject
             builder.Register(c => new CloudProvisioningInstrumentationSubject(c.Resolve<IEnumerable<IObserver<ICloudProvisioningEvent>>>().ToArray()))

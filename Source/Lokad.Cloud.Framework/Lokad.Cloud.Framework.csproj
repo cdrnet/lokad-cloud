@@ -136,7 +136,6 @@
     <Compile Include="Application\CloudApplicationPackageReader.cs" />
     <Compile Include="Application\CloudApplicationDefinition.cs" />
     <Compile Include="CloudConfigurationModule.cs" />
-    <Compile Include="CloudEnvironment.cs" />
     <Compile Include="Diagnostics\CloudLogWriter.cs" />
     <Compile Include="Diagnostics\CloudLogReader.cs" />
     <Compile Include="Diagnostics\CloudStorageLogger.cs" />
@@ -147,7 +146,6 @@
     <Compile Include="EntryPoint\ApplicationEntryPoint.cs" />
     <Compile Include="EntryPoint\Observers.cs" />
     <Compile Include="EntryPoint\Scheduler.cs" />
-    <Compile Include="ICloudEnvironment.cs" />
     <Compile Include="Instrumentation\CloudRuntimeInstrumentationSubject.cs" />
     <Compile Include="Instrumentation\Events\CloudRuntimeBusyEvent.cs" />
     <Compile Include="Instrumentation\Events\ICloudRuntimeEvent.cs" />

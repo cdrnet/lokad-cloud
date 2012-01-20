@@ -14,7 +14,6 @@ using Autofac;
 using Autofac.Configuration;
 using Lokad.Cloud.AppHost.Framework;
 using Lokad.Cloud.Diagnostics;
-using Lokad.Cloud.Management;
 using Lokad.Cloud.Provisioning.Instrumentation;
 using Lokad.Cloud.Provisioning.Instrumentation.Events;
 using Lokad.Cloud.ServiceFabric;
@@ -27,7 +26,6 @@ namespace Lokad.Cloud.EntryPoint
     public class ApplicationEntryPoint : IApplicationEntryPoint
     {
         Scheduler _scheduler;
-        IRuntimeFinalizer _applicationFinalizer;
 
         public void Run(XElement settings, IDeploymentReader deploymentReader, IApplicationEnvironment environment, CancellationToken cancellationToken)
         {
@@ -55,6 +53,7 @@ namespace Lokad.Cloud.EntryPoint
             // we need to keep the container alive until the finally block
             // because the finalizer (of the container) is called there.
             IContainer applicationContainer = null;
+            var applicationFinalizer = new RuntimeFinalizer();
 
             try
             {
@@ -62,13 +61,14 @@ namespace Lokad.Cloud.EntryPoint
 
                 var applicationBuilder = new ContainerBuilder();
 
+                applicationBuilder.RegisterInstance(environment);
+                applicationBuilder.RegisterInstance(applicationFinalizer).As<IRuntimeFinalizer>();
+
                 applicationBuilder.RegisterModule(new StorageModule());
                 applicationBuilder.RegisterModule(new DiagnosticsModule());
 
                 applicationBuilder.RegisterType<Jobs.JobManager>();
                 applicationBuilder.RegisterType<RuntimeFinalizer>().As<IRuntimeFinalizer>().InstancePerLifetimeScope();
-
-                applicationBuilder.Register(c => new CloudEnvironment(environment)).As<ICloudEnvironment>().SingleInstance();
 
                 // Provisioning Observer Subject
                 applicationBuilder.Register(c => new CloudProvisioningInstrumentationSubject(c.Resolve<IEnumerable<IObserver<ICloudProvisioningEvent>>>().ToArray()))
@@ -128,7 +128,6 @@ namespace Lokad.Cloud.EntryPoint
 
                 // Instanciate and return all the cloud services
                 var services = serviceTypes.Select(type => (CloudService)applicationContainer.Resolve(type)).ToList();
-                _applicationFinalizer = applicationContainer.ResolveOptional<IRuntimeFinalizer>();
 
                 // Execute
                 _scheduler = new Scheduler(services, service => service.Start(), Observers.CreateRuntimeObserver(log));
@@ -195,9 +194,9 @@ namespace Lokad.Cloud.EntryPoint
 
                 log.DebugFormat("Runtime: stopping on worker {0}.", environment.Host.WorkerName);
 
-                if (_applicationFinalizer != null)
+                if (applicationFinalizer != null)
                 {
-                    _applicationFinalizer.FinalizeRuntime();
+                    applicationFinalizer.FinalizeRuntime();
                 }
 
                 if (applicationContainer != null)
