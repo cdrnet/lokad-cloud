@@ -4,13 +4,13 @@
 #endregion
 
 using System;
+using System.Linq;
 using System.Threading;
 using System.Xml.Linq;
 using Lokad.Cloud.AppHost.Framework;
-using Lokad.Cloud.Diagnostics;
-using Lokad.Cloud.Runtime;
+using Lokad.Cloud.AppHost.Framework.Definition;
 using Lokad.Cloud.ServiceFabric.Runtime;
-using Lokad.Cloud.Storage;
+using AssemblyLoader = Lokad.Cloud.AssemblyLoading.AssemblyLoader;
 
 namespace Lokad.Cloud.Host
 {
@@ -26,46 +26,22 @@ namespace Lokad.Cloud.Host
         /// Run the hosted runtime, blocking the calling thread.
         /// </summary>
         /// <returns>True if the worker stopped as planned (e.g. due to updated assemblies)</returns>
-        public bool Run(CloudConfigurationSettings settings, IDeploymentReader deploymentReader, ApplicationEnvironment environment)
+        public bool Run(CellDefinition cellDefinition, IDeploymentReader deploymentReader, ApplicationEnvironment environment)
         {
             _stoppedWaitHandle.Reset();
-
-            var log = new CloudLogWriter(CloudStorage.ForAzureConnectionString(settings.DataConnectionString).BuildBlobStorage());
-
-            AppDomain.CurrentDomain.UnhandledException += (sender, e) => log.ErrorFormat(
-                e.ExceptionObject as Exception,
-                "Runtime Host: An unhandled {0} exception occurred on worker {1} in a background thread. The Runtime Host will be restarted: {2}.",
-                e.ExceptionObject.GetType().Name, environment.Host.WorkerName, e.IsTerminating);
-
             try
             {
                 // Load Assemblies into AppDomain
+                var assemblies = deploymentReader.GetAssembliesAndSymbols(cellDefinition.Assemblies).ToList();
+                var loader = new AssemblyLoader();
+                loader.LoadAssembliesIntoAppDomain(assemblies, environment);
 
-                var runtimeProviders = CloudStorage
-                    .ForAzureConnectionString(settings.DataConnectionString)
-                    .WithObserver(Observers.CreateStorageObserver(log))
-                    .BuildRuntimeProviders(log);
-
-                var assemblyLoader = new AssemblyLoader(runtimeProviders);
-                assemblyLoader.LoadPackage();
-
-                // Collect and build unified settings
-
-                var cellSettings = new XElement("Settings",
-                    new XElement("DataConnectionString", settings.DataConnectionString),
-                    new XElement("CertificateThumbprint", settings.SelfManagementCertificateThumbprint),
-                    new XElement("SubscriptionId", settings.SelfManagementSubscriptionId));
-
-                var appConfig = assemblyLoader.LoadConfiguration();
-                if (appConfig.HasValue && appConfig.Value != null && appConfig.Value.Length > 0)
-                {
-                    cellSettings.Add(new XElement("AutofacAppConfig", Convert.ToBase64String(appConfig.Value)));
-                }
-
-                // Create and run the EntryPoint
-
+                // Create the EntryPoint
                 var entryPoint = new EntryPoint.ApplicationEntryPoint();
-                entryPoint.Run(cellSettings, deploymentReader, environment, _cancellationTokenSource.Token);
+                var settings = String.IsNullOrEmpty(cellDefinition.SettingsXml) ? new XElement("Settings") : XElement.Parse(cellDefinition.SettingsXml);
+
+                // Run
+                entryPoint.Run(settings, deploymentReader, environment, _cancellationTokenSource.Token);
             }
             catch (TriggerRestartException)
             {

@@ -1,6 +1,6 @@
 using System;
+using System.Linq;
 using System.Reflection;
-using Lokad.Cloud.AppHost.Framework.Definition;
 
 namespace Lokad.Cloud.Host
 {
@@ -23,10 +23,6 @@ namespace Lokad.Cloud.Host
         /// <returns>True if the worker stopped as planned (e.g. due to updated assemblies)</returns>
         public bool Run()
         {
-            var settings = CloudConfigurationSettings.LoadFromRoleEnvironment();
-
-            // The trick is to load this same assembly in another domain, then
-            // instantiate this same class and invoke Run
             var domain = AppDomain.CreateDomain("WorkerDomain", null, AppDomain.CurrentDomain.SetupInformation);
 
             bool restartForAssemblyUpdate;
@@ -37,18 +33,23 @@ namespace Lokad.Cloud.Host
                     Assembly.GetExecutingAssembly().FullName,
                     typeof(AppDomainEntryPoint).FullName);
 
-                var solution = new SolutionHead("Solution");
-                var assemblies = new AssembliesHead("Assemblies");
+                var deploymentReader = _hostContext.DeploymentReader;
+
+                string etag;
+                var deployment = deploymentReader.GetDeploymentIfModified(null, out etag);
+                var solution = deploymentReader.GetSolution(deployment);
+                var cell = solution.Cells.Single();
+
                 var environment = new ApplicationEnvironment(
                     _hostContext,
-                    _hostContext.GetNewCellLifeIdentity("Lokad.Cloud", "Cell", solution),
-                    solution,
-                    assemblies,
+                    _hostContext.GetNewCellLifeIdentity(solution.SolutionName, cell.CellName, deployment),
+                    deployment,
+                    cell.Assemblies,
                     cmd => { });
 
                 // This never throws, unless something went wrong with IoC setup and that's fine
                 // because it is not possible to execute the worker
-                restartForAssemblyUpdate = _appDomainEntryPoint.Run(settings, _hostContext.DeploymentReader, environment);
+                restartForAssemblyUpdate = _appDomainEntryPoint.Run(cell, deploymentReader, environment);
             }
             finally
             {
