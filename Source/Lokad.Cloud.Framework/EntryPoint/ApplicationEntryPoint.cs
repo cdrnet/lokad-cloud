@@ -68,14 +68,7 @@ namespace Lokad.Cloud.EntryPoint
                 applicationBuilder.RegisterType<Jobs.JobManager>();
                 applicationBuilder.RegisterType<RuntimeFinalizer>().As<IRuntimeFinalizer>().InstancePerLifetimeScope();
 
-                // NOTE: Guid is not very nice, but this will be replaced anyway once fully ported to AppHost
-                applicationBuilder.Register(c =>
-                    new CloudEnvironment(
-                        environment,
-                        c.Resolve<CloudConfigurationSettings>(),
-                        c.Resolve<ILog>(),
-                        c.ResolveOptional<ICloudProvisioningObserver>()))
-                    .As<ICloudEnvironment, IProvisioningProvider>().SingleInstance();
+                applicationBuilder.Register(c => new CloudEnvironment(environment)).As<ICloudEnvironment>().SingleInstance();
 
                 // Provisioning Observer Subject
                 applicationBuilder.Register(c => new CloudProvisioningInstrumentationSubject(c.Resolve<IEnumerable<IObserver<ICloudProvisioningEvent>>>().ToArray()))

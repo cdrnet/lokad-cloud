@@ -33,7 +33,6 @@ namespace Lokad.Cloud.Test
             builder.RegisterType<RuntimeFinalizer>().As<IRuntimeFinalizer>().InstancePerLifetimeScope();
 
             builder.RegisterType<MockEnvironment>().As<ICloudEnvironment>();
-            builder.RegisterType<MockProvisioning>().As<IProvisioningProvider>();
 
             // Provisioning Observer Subject
             builder.Register(c => new CloudProvisioningInstrumentationSubject(c.Resolve<IEnumerable<IObserver<ICloudProvisioningEvent>>>().ToArray()))

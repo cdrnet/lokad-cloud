@@ -155,9 +155,7 @@
     <Compile Include="Instrumentation\ICloudRuntimeObserver.cs" />
     <Compile Include="Jobs\Job.cs" />
     <Compile Include="Jobs\JobManager.cs" />
-    <Compile Include="Management\IProvisioningProvider.cs" />
     <Compile Include="Mock\MockEnvironment.cs" />
-    <Compile Include="Mock\MockProvisioning.cs" />
     <Compile Include="CloudConfigurationSettings.cs" />
     <Compile Include="Runtime\CloudStorageExtensions.cs" />
     <Compile Include="Runtime\RuntimeProviders.cs" />
