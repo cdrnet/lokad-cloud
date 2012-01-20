@@ -11,7 +11,7 @@ using System.Reflection;
 using Lokad.Cloud.AppHost.Framework;
 using Lokad.Cloud.Application;
 
-namespace Lokad.Cloud.AssemblyLoading
+namespace Lokad.Cloud.Host
 {
     internal sealed class AssemblyLoader
     {

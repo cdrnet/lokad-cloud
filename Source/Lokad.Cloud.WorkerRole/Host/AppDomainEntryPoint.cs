@@ -10,7 +10,6 @@ using System.Xml.Linq;
 using Lokad.Cloud.AppHost.Framework;
 using Lokad.Cloud.AppHost.Framework.Definition;
 using Lokad.Cloud.ServiceFabric.Runtime;
-using AssemblyLoader = Lokad.Cloud.AssemblyLoading.AssemblyLoader;
 
 namespace Lokad.Cloud.Host
 {
