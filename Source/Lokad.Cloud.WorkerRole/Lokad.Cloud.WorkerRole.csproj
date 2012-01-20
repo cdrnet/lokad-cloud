@@ -109,6 +109,7 @@
     <Compile Include="DeploymentReader.cs" />
     <Compile Include="Diagnostics\Observers.cs" />
     <Compile Include="HostContext.cs" />
+    <Compile Include="Host\AssemblyResolver.cs" />
     <Compile Include="Host\IsolatedSingleRuntimeHost.cs" />
     <Compile Include="Host\NoRestartFloodPolicy.cs" />
     <Compile Include="Host\AppDomainEntryPoint.cs" />
@@ -143,9 +144,7 @@
       <Name>Lokad.Cloud.Framework</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="EntryPoint\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
