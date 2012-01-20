@@ -75,7 +75,7 @@ namespace Lokad.Cloud
                 {
                     new CellDefinition("Cell",
                         new AssembliesHead(PackageEtagOfCombinedEtag(deployment.SolutionId)),
-                        typeof(EntryPoint.ApplicationEntryPoint).FullName,
+                        "Lokad.Cloud.EntryPoint.ApplicationEntryPoint, Lokad.Cloud.Framework",
                         settings.ToString())
                 });
         }

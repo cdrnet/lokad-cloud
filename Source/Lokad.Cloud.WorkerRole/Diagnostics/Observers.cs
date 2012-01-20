@@ -17,22 +17,22 @@ namespace Lokad.Cloud.Diagnostics
 {
     public static class Observers
     {
-        public static IHostObserver CreateHostObserver(ILog log)
+        public static IHostObserver CreateHostObserver(IHostLog log)
         {
             var subject = new HostObserverSubject();
-            subject.OfType<HostStartedEvent>().Subscribe(e => TryLog(log, LogLevel.Debug, "AppHost started on {0}.", e.Host.WorkerName));
-            subject.OfType<HostStoppedEvent>().Subscribe(e => TryLog(log, LogLevel.Debug, "AppHost stopped on {0}.", e.Host.WorkerName));
-            subject.OfType<NewDeploymentDetectedEvent>().Subscribe(e => TryLog(log, LogLevel.Info, "New deployment {0} detected for solution {1} on {2}.", e.Deployment.SolutionId, e.Solution.SolutionName, e.Host.WorkerName));
-            subject.OfType<NewUnrelatedSolutionDetectedEvent>().Subscribe(e => TryLog(log, LogLevel.Info, "New unrelated solution {0} detected on {1}.", e.Solution.SolutionName, e.Host.WorkerName));
-            subject.OfType<CellStartedEvent>().Subscribe(e => TryLog(log, LogLevel.Debug, "Cell {0} of solution {1} started on {2}.", e.Cell.CellName, e.Cell.SolutionName, e.Cell.Host.WorkerName));
-            subject.OfType<CellStoppedEvent>().Subscribe(e => TryLog(log, LogLevel.Debug, "Cell {0} of solution {1} stopped on {2}.", e.Cell.CellName, e.Cell.SolutionName, e.Cell.Host.WorkerName));
-            subject.OfType<CellExceptionRestartedEvent>().Subscribe(e => TryLog(log, LogLevel.Error, "Cell {0} of solution {1} exception: {2}", e.Cell.CellName, e.Cell.SolutionName, e.Exception));
-            subject.OfType<CellFatalErrorRestartedEvent>().Subscribe(e => TryLog(log, LogLevel.Fatal, "Cell {0} of solution {1} fatal error: {2}", e.Cell.CellName, e.Cell.SolutionName, e.Exception));
+            subject.OfType<HostStartedEvent>().Subscribe(e => TryLog(log, HostLogLevel.Debug, "AppHost started on {0}.", e.Host.WorkerName));
+            subject.OfType<HostStoppedEvent>().Subscribe(e => TryLog(log, HostLogLevel.Debug, "AppHost stopped on {0}.", e.Host.WorkerName));
+            subject.OfType<NewDeploymentDetectedEvent>().Subscribe(e => TryLog(log, HostLogLevel.Info, "New deployment {0} detected for solution {1} on {2}.", e.Deployment.SolutionId, e.Solution.SolutionName, e.Host.WorkerName));
+            subject.OfType<NewUnrelatedSolutionDetectedEvent>().Subscribe(e => TryLog(log, HostLogLevel.Info, "New unrelated solution {0} detected on {1}.", e.Solution.SolutionName, e.Host.WorkerName));
+            subject.OfType<CellStartedEvent>().Subscribe(e => TryLog(log, HostLogLevel.Debug, "Cell {0} of solution {1} started on {2}.", e.Cell.CellName, e.Cell.SolutionName, e.Cell.Host.WorkerName));
+            subject.OfType<CellStoppedEvent>().Subscribe(e => TryLog(log, HostLogLevel.Debug, "Cell {0} of solution {1} stopped on {2}.", e.Cell.CellName, e.Cell.SolutionName, e.Cell.Host.WorkerName));
+            subject.OfType<CellExceptionRestartedEvent>().Subscribe(e => TryLog(log, HostLogLevel.Error, "Cell {0} of solution {1} exception: {2}", e.Cell.CellName, e.Cell.SolutionName, e.Exception));
+            subject.OfType<CellFatalErrorRestartedEvent>().Subscribe(e => TryLog(log, HostLogLevel.Fatal, "Cell {0} of solution {1} fatal error: {2}", e.Cell.CellName, e.Cell.SolutionName, e.Exception));
 
             return subject;
         }
 
-        public static ICloudProvisioningObserver CreateProvisioningObserver(ILog log)
+        public static ICloudProvisioningObserver CreateProvisioningObserver(IHostLog log)
         {
             var subject = new CloudProvisioningInstrumentationSubject();
             subject.OfType<ProvisioningOperationRetriedEvent>()
@@ -41,7 +41,7 @@ namespace Lokad.Cloud.Diagnostics
                     {
                         foreach (var group in events.GroupBy(e => e.Policy))
                         {
-                            TryLog(log, LogLevel.Debug, "Provisioning: {0} retries in 5 min for the {1} policy on {2}. {3}",
+                            TryLog(log, HostLogLevel.Debug, "Provisioning: {0} retries in 5 min for the {1} policy on {2}. {3}",
                                 group.Count(), group.Key, Environment.MachineName,
                                 string.Join(", ", group.Where(e => e.Exception != null).Select(e => e.Exception.GetType().Name).Distinct().ToArray()));
                         }
@@ -50,20 +50,20 @@ namespace Lokad.Cloud.Diagnostics
             return subject;
         }
 
-        public static ICloudStorageObserver CreateStorageObserver(ILog log)
+        public static ICloudStorageObserver CreateStorageObserver(IHostLog log)
         {
             var subject = new CloudStorageInstrumentationSubject();
-            subject.OfType<BlobDeserializationFailedEvent>().Subscribe(e => TryLog(log, LogLevel.Error, e.Exception, e.ToString()));
-            subject.OfType<MessageDeserializationFailedQuarantinedEvent>().Subscribe(e => TryLog(log, LogLevel.Warn, e.Exceptions, e.ToString()));
-            subject.OfType<MessageProcessingFailedQuarantinedEvent>().Subscribe(e => TryLog(log, LogLevel.Warn, e.ToString()));
-            subject.OfType<MessagesRevivedEvent>().Subscribe(e => TryLog(log, LogLevel.Warn, e.ToString()));
+            subject.OfType<BlobDeserializationFailedEvent>().Subscribe(e => TryLog(log, HostLogLevel.Error, e.Exception, e.ToString()));
+            subject.OfType<MessageDeserializationFailedQuarantinedEvent>().Subscribe(e => TryLog(log, HostLogLevel.Warn, e.Exceptions, e.ToString()));
+            subject.OfType<MessageProcessingFailedQuarantinedEvent>().Subscribe(e => TryLog(log, HostLogLevel.Warn, e.ToString()));
+            subject.OfType<MessagesRevivedEvent>().Subscribe(e => TryLog(log, HostLogLevel.Warn, e.ToString()));
             subject.OfType<StorageOperationRetriedEvent>()
                 .Where(@event => @event.Policy != "OptimisticConcurrency")
                 .ThrottleTokenBucket(TimeSpan.FromMinutes(15), 2)
                 .Subscribe(@event =>
                 {
                     var e = @event.Item;
-                    TryLog(log, LogLevel.Debug, e.Exception, "Storage: Retried on policy {0}{1} on {2}.{3}",
+                    TryLog(log, HostLogLevel.Debug, e.Exception, "Storage: Retried on policy {0}{1} on {2}.{3}",
                         e.Policy,
                         e.Exception != null ? " because of " + e.Exception.GetType().Name : string.Empty,
                         Environment.MachineName,
@@ -73,7 +73,7 @@ namespace Lokad.Cloud.Diagnostics
             return subject;
         }
 
-        private static void TryLog(ILog log, LogLevel level, string message, params object[] args)
+        private static void TryLog(IHostLog log, HostLogLevel level, string message, params object[] args)
         {
             try
             {
@@ -85,7 +85,7 @@ namespace Lokad.Cloud.Diagnostics
             }
         }
 
-        static void TryLog(ILog log, LogLevel level, Exception exception, string message, params object[] args)
+        static void TryLog(IHostLog log, HostLogLevel level, Exception exception, string message, params object[] args)
         {
             try
             {

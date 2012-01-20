@@ -22,12 +22,12 @@ namespace Lokad.Cloud
     {
         static bool _runtimeAvailable;
 
-        private readonly ILog _log;
+        private readonly IHostLog _log;
         private readonly HostLifeIdentity _identity;
         private readonly AzureCurrentDeployment _currentDeployment;
         private readonly AzureProvisioning _provisioning;
 
-        public HostContext(IDeploymentReader deploymentReader, string certificateThumbprint, string subscriptionId, ILog log, IHostObserver observer, ICloudProvisioningObserver provisioningObserver)
+        public HostContext(IDeploymentReader deploymentReader, string certificateThumbprint, string subscriptionId, IHostLog log, IHostObserver observer, ICloudProvisioningObserver provisioningObserver)
         {
             Observer = observer;
             DeploymentReader = deploymentReader;

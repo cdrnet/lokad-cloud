@@ -44,7 +44,7 @@ namespace Lokad.Cloud
             var certificateThumbprint = RoleEnvironment.GetConfigurationSettingValue("SelfManagementCertificateThumbprint");
             var deploymentReader = new DeploymentReader(connectionString, subscriptionId, certificateThumbprint);
 
-            var log = new CloudLogWriter(CloudStorage.ForAzureConnectionString(connectionString).BuildBlobStorage());
+            var log = new HostLogWriter(CloudStorage.ForAzureConnectionString(connectionString).BuildBlobStorage());
 
             _hostContext = new HostContext(deploymentReader, certificateThumbprint, subscriptionId, log,
                 Observers.CreateHostObserver(log),
