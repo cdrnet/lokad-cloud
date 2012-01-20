@@ -62,7 +62,7 @@ namespace Lokad.Cloud.EntryPoint
 
             if (_observer != null)
             {
-                _observer.Notify(new CloudRuntimeBusyEvent(DateTimeOffset.UtcNow));
+                _observer.Notify(new SchedulerBusyEvent(DateTimeOffset.UtcNow));
             }
 
             while (_isRunning)
@@ -95,7 +95,7 @@ namespace Lokad.Cloud.EntryPoint
 
                     if (_observer != null)
                     {
-                        _observer.Notify(new CloudRuntimeIdleEvent(DateTimeOffset.UtcNow));
+                        _observer.Notify(new SchedulerIdleEvent(DateTimeOffset.UtcNow));
                     }
 
                     lock (_sync)
@@ -105,7 +105,7 @@ namespace Lokad.Cloud.EntryPoint
 
                     if (_observer != null)
                     {
-                        _observer.Notify(new CloudRuntimeBusyEvent(DateTimeOffset.UtcNow));
+                        _observer.Notify(new SchedulerBusyEvent(DateTimeOffset.UtcNow));
                     }
 
                     skippedConsecutively = 0;

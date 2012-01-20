@@ -146,9 +146,9 @@
     <Compile Include="EntryPoint\Observers.cs" />
     <Compile Include="EntryPoint\Scheduler.cs" />
     <Compile Include="Instrumentation\CloudRuntimeInstrumentationSubject.cs" />
-    <Compile Include="Instrumentation\Events\CloudRuntimeBusyEvent.cs" />
+    <Compile Include="Instrumentation\Events\SchedulerBusyEvent.cs" />
     <Compile Include="Instrumentation\Events\ICloudRuntimeEvent.cs" />
-    <Compile Include="Instrumentation\Events\CloudRuntimeIdleEvent.cs" />
+    <Compile Include="Instrumentation\Events\SchedulerIdleEvent.cs" />
     <Compile Include="Instrumentation\ICloudRuntimeObserver.cs" />
     <Compile Include="Jobs\Job.cs" />
     <Compile Include="Jobs\JobManager.cs" />

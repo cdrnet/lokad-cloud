@@ -10,11 +10,11 @@ namespace Lokad.Cloud.Instrumentation.Events
     /// <summary>
     /// Raised whenever the runtime scheduler becomes busy.
     /// </summary>
-    public class CloudRuntimeBusyEvent : ICloudRuntimeEvent
+    public class SchedulerBusyEvent : ICloudRuntimeEvent
     {
         public DateTimeOffset Timestamp { get; private set; }
 
-        public CloudRuntimeBusyEvent(DateTimeOffset timestamp)
+        public SchedulerBusyEvent(DateTimeOffset timestamp)
         {
             Timestamp = timestamp;
         }

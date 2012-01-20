@@ -10,11 +10,11 @@ namespace Lokad.Cloud.Instrumentation.Events
     /// <summary>
     /// Raised whenever the runtime scheduler becomes idle.
     /// </summary>
-    public class CloudRuntimeIdleEvent : ICloudRuntimeEvent
+    public class SchedulerIdleEvent : ICloudRuntimeEvent
     {
         public DateTimeOffset Timestamp { get; private set; }
 
-        public CloudRuntimeIdleEvent(DateTimeOffset timestamp)
+        public SchedulerIdleEvent(DateTimeOffset timestamp)
         {
             Timestamp = timestamp;
         }
