@@ -6,7 +6,6 @@
 using System;
 using System.Text;
 using Lokad.Cloud.Runtime;
-using Lokad.Cloud.ServiceFabric.Runtime;
 using Lokad.Cloud.Storage;
 
 namespace Lokad.Cloud.Management
@@ -16,6 +15,12 @@ namespace Lokad.Cloud.Management
     /// </summary>
     public class CloudConfiguration
     {
+        /// <summary>Name of the container used to store the assembly package.</summary>
+        public const string ContainerName = "lokad-cloud-assemblies";
+
+        /// <summary>Name of the blob used to store the optional dependency injection configuration.</summary>
+        public const string ConfigurationBlobName = "config";
+
         readonly IBlobStorageProvider _blobProvider;
         readonly UTF8Encoding _encoding = new UTF8Encoding();
 
@@ -32,10 +37,7 @@ namespace Lokad.Cloud.Management
         /// </summary>
         public string GetConfigurationString()
         {
-            var buffer = _blobProvider.GetBlob<byte[]>(
-                AssemblyLoader.ContainerName,
-                AssemblyLoader.ConfigurationBlobName);
-
+            var buffer = _blobProvider.GetBlob<byte[]>(ContainerName, ConfigurationBlobName);
             return buffer.Convert(bytes => _encoding.GetString(bytes), String.Empty);
         }
 
@@ -57,10 +59,7 @@ namespace Lokad.Cloud.Management
                 return;
             }
 
-            _blobProvider.PutBlob(
-                AssemblyLoader.ContainerName,
-                AssemblyLoader.ConfigurationBlobName,
-                _encoding.GetBytes(configuration));
+            _blobProvider.PutBlob(ContainerName, ConfigurationBlobName, _encoding.GetBytes(configuration));
         }
 
         /// <summary>
@@ -68,9 +67,7 @@ namespace Lokad.Cloud.Management
         /// </summary>
         public void RemoveConfiguration()
         {
-            _blobProvider.DeleteBlobIfExist(
-                AssemblyLoader.ContainerName,
-                AssemblyLoader.ConfigurationBlobName);
+            _blobProvider.DeleteBlobIfExist(ContainerName, ConfigurationBlobName);
         }
     }
 }

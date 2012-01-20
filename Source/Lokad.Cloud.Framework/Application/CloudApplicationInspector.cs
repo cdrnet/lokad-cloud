@@ -7,10 +7,10 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Lokad.Cloud.Management;
 using Lokad.Cloud.Runtime;
 using Lokad.Cloud.ServiceFabric;
 using Lokad.Cloud.Storage;
-using Lokad.Cloud.ServiceFabric.Runtime;
 using Mono.Cecil;
 
 namespace Lokad.Cloud.Application
@@ -43,7 +43,7 @@ namespace Lokad.Cloud.Application
 
             if (definitionBlob.HasValue)
             {
-                packageBlob = _blobs.GetBlobIfModified<byte[]>(AssemblyLoader.ContainerName, AssemblyLoader.PackageBlobName, definitionBlob.Value.PackageETag, out packageETag);
+                packageBlob = _blobs.GetBlobIfModified<byte[]>(CloudAssemblies.ContainerName, CloudAssemblies.PackageBlobName, definitionBlob.Value.PackageETag, out packageETag);
                 if (!packageBlob.HasValue || definitionBlob.Value.PackageETag == packageETag)
                 {
                     return definitionBlob.Value;
@@ -51,7 +51,7 @@ namespace Lokad.Cloud.Application
             }
             else
             {
-                packageBlob = _blobs.GetBlob<byte[]>(AssemblyLoader.ContainerName, AssemblyLoader.PackageBlobName, out packageETag);
+                packageBlob = _blobs.GetBlob<byte[]>(CloudAssemblies.ContainerName, CloudAssemblies.PackageBlobName, out packageETag);
             }
 
             if (!packageBlob.HasValue)

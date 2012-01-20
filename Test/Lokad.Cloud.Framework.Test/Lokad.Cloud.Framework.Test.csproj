@@ -105,7 +105,6 @@
     <Compile Include="Diagnostics\CloudLoggerTests.cs" />
     <Compile Include="GlobalSetup.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ServiceFabric\AssemblyLoaderTests.cs" />
     <Compile Include="ServiceFabric\RuntimeFinalizerTests.cs" />
     <Compile Include="Services\QueueServiceTests.cs" />
     <Compile Include="Shared\Range.cs" />
