@@ -108,12 +108,9 @@
     <Compile Include="Host\AssemblyLoader.cs" />
     <Compile Include="DeploymentReader.cs" />
     <Compile Include="Diagnostics\Observers.cs" />
-    <Compile Include="EntryPoint\ApplicationEntryPoint.cs" />
-    <Compile Include="EntryPoint\Scheduler.cs" />
     <Compile Include="HostContext.cs" />
     <Compile Include="Host\IsolatedSingleRuntimeHost.cs" />
     <Compile Include="Host\NoRestartFloodPolicy.cs" />
-    <Compile Include="EntryPoint\Runtime.cs" />
     <Compile Include="Host\AppDomainEntryPoint.cs" />
     <Compile Include="Diagnostics\TockenBucketThrottling.cs" />
     <Compile Include="WorkerRole.cs" />
@@ -145,6 +142,9 @@
       <Project>{BA84F8E7-F8B9-4912-BF93-9F4D0DDC5C29}</Project>
       <Name>Lokad.Cloud.Framework</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="EntryPoint\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

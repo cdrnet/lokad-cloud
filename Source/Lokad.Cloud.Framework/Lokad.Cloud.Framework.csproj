@@ -76,6 +76,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll</HintPath>
     </Reference>
+    <Reference Include="Lokad.Cloud.AppHost.Framework">
+      <HintPath>..\..\packages\Lokad.Cloud.AppHost.Framework.0.6.0\lib\Lokad.Cloud.AppHost.Framework.dll</HintPath>
+    </Reference>
     <Reference Include="Lokad.Cloud.Provisioning">
       <HintPath>..\..\packages\Lokad.Cloud.Provisioning.1.4.103.0\lib\Lokad.Cloud.Provisioning.dll</HintPath>
     </Reference>
@@ -142,6 +145,10 @@
     <Compile Include="Diagnostics\CloudLogEntry.cs" />
     <Compile Include="Diagnostics\TockenBucketThrottling.cs" />
     <Compile Include="Diagnostics\XmlExtension.cs" />
+    <Compile Include="EntryPoint\ApplicationEntryPoint.cs" />
+    <Compile Include="EntryPoint\Observers.cs" />
+    <Compile Include="EntryPoint\Runtime.cs" />
+    <Compile Include="EntryPoint\Scheduler.cs" />
     <Compile Include="ICloudEnvironment.cs" />
     <Compile Include="Instrumentation\CloudRuntimeInstrumentationSubject.cs" />
     <Compile Include="Instrumentation\Events\CloudRuntimeBusyEvent.cs" />

@@ -36,7 +36,13 @@ namespace Lokad.Cloud.Host
                 loader.LoadAssembliesIntoAppDomain(assemblies, environment);
 
                 // Create the EntryPoint
-                var entryPoint = new EntryPoint.ApplicationEntryPoint();
+                var entryPointType = Type.GetType(cellDefinition.EntryPointTypeName);
+                if (entryPointType == null)
+                {
+                    throw new InvalidOperationException("Typ " + cellDefinition.EntryPointTypeName + " not found.");
+                }
+
+                var entryPoint = (IApplicationEntryPoint)Activator.CreateInstance(entryPointType);
                 var settings = String.IsNullOrEmpty(cellDefinition.SettingsXml) ? new XElement("Settings") : XElement.Parse(cellDefinition.SettingsXml);
 
                 // Run
