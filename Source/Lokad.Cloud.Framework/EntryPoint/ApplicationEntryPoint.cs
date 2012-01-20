@@ -29,7 +29,8 @@ namespace Lokad.Cloud.EntryPoint
 
         public void Run(XElement settings, IDeploymentReader deploymentReader, IApplicationEnvironment environment, CancellationToken cancellationToken)
         {
-            var log = new CloudLogWriter(CloudStorage.ForAzureConnectionString(settings.Element("DataConnectionString").Value).BuildBlobStorage());
+            var connectionString = settings.Element("DataConnectionString").Value;
+            var log = new CloudLogWriter(CloudStorage.ForAzureConnectionString(connectionString).BuildBlobStorage());
 
             if (cancellationToken.IsCancellationRequested)
             {
@@ -64,7 +65,7 @@ namespace Lokad.Cloud.EntryPoint
                 applicationBuilder.RegisterInstance(environment);
                 applicationBuilder.RegisterInstance(applicationFinalizer).As<IRuntimeFinalizer>();
 
-                applicationBuilder.RegisterModule(new StorageModule(CloudStorageAccount.Parse(settings.Element("DataConnectionString").Value)));
+                applicationBuilder.RegisterModule(new StorageModule(CloudStorageAccount.Parse(connectionString)));
                 applicationBuilder.RegisterModule(new DiagnosticsModule());
 
                 applicationBuilder.RegisterType<Jobs.JobManager>();
