@@ -13,7 +13,6 @@ using Autofac.Configuration;
 using Lokad.Cloud.AppHost.Framework;
 using Lokad.Cloud.Diagnostics;
 using Lokad.Cloud.Instrumentation;
-using Lokad.Cloud.Runtime;
 using Lokad.Cloud.ServiceFabric;
 using Lokad.Cloud.ServiceFabric.Runtime;
 
@@ -22,27 +21,27 @@ namespace Lokad.Cloud.EntryPoint
     /// <summary>Organize the executions of the services.</summary>
     internal class Runtime
     {
-        readonly RuntimeProviders _runtimeProviders;
         readonly IRuntimeFinalizer _runtimeFinalizer;
         readonly ILog _log;
         readonly ICloudRuntimeObserver _observer;
 
         readonly IApplicationEnvironment _environment;
         readonly CloudConfigurationSettings _settings;
+        readonly byte[] _autofacAppConfig;
 
         Scheduler _scheduler;
         IRuntimeFinalizer _applicationFinalizer;
 
         /// <summary>IoC constructor.</summary>
-        public Runtime(RuntimeProviders runtimeProviders, IApplicationEnvironment environment, CloudConfigurationSettings settings, ICloudRuntimeObserver observer = null)
+        public Runtime(IRuntimeFinalizer runtimeFinalizer, IApplicationEnvironment environment, CloudConfigurationSettings settings, byte[] autofacAppConfig, ILog log, ICloudRuntimeObserver observer = null)
         {
-            _runtimeProviders = runtimeProviders;
-            _runtimeFinalizer = runtimeProviders.RuntimeFinalizer;
+            _runtimeFinalizer = runtimeFinalizer;
             _environment = environment;
-            _log = runtimeProviders.Log;
+            _log = log;
             _observer = observer;
 
             _settings = settings;
+            _autofacAppConfig = autofacAppConfig;
         }
 
         /// <summary>Called once by the service fabric. Call is not supposed to return
@@ -167,9 +166,7 @@ namespace Lokad.Cloud.EntryPoint
             applicationBuilder.RegisterInstance(_settings);
 
             // Load Application IoC Configuration and apply it to the builder
-            var loader = new AssemblyLoader(_runtimeProviders);
-            var config = loader.LoadConfiguration();
-            if (config.HasValue)
+            if (_autofacAppConfig != null && _autofacAppConfig.Length > 0)
             {
                 // HACK: need to copy settings locally first
                 // HACK: hard-code string for local storage name
@@ -177,7 +174,7 @@ namespace Lokad.Cloud.EntryPoint
                 const string resourceName = "LokadCloudStorage";
 
                 var pathToFile = Path.Combine(_environment.GetLocalResourcePath(resourceName), fileName);
-                File.WriteAllBytes(pathToFile, config.Value);
+                File.WriteAllBytes(pathToFile, _autofacAppConfig);
                 applicationBuilder.RegisterModule(new ConfigurationSettingsReader("autofac", pathToFile));
             }
 

@@ -49,17 +49,22 @@ namespace Lokad.Cloud.Host
                 var assemblyLoader = new AssemblyLoader(runtimeProviders);
                 assemblyLoader.LoadPackage();
 
-                // Create the EntryPoint
+                // Collect and build unified settings
 
                 var cellSettings = new XElement("Settings",
                     new XElement("DataConnectionString", settings.DataConnectionString),
                     new XElement("CertificateThumbprint", settings.SelfManagementCertificateThumbprint),
                     new XElement("SubscriptionId", settings.SelfManagementSubscriptionId));
 
+                var appConfig = assemblyLoader.LoadConfiguration();
+                if (appConfig.HasValue && appConfig.Value != null && appConfig.Value.Length > 0)
+                {
+                    cellSettings.Add(new XElement("AutofacAppConfig", Convert.ToBase64String(appConfig.Value)));
+                }
+
+                // Create and run the EntryPoint
+
                 var entryPoint = new EntryPoint.ApplicationEntryPoint();
-
-                // Run
-
                 entryPoint.Run(cellSettings, deploymentReader, environment, _cancellationTokenSource.Token);
             }
             catch (TriggerRestartException)

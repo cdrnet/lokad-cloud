@@ -10,7 +10,6 @@ using System.Threading;
 using System.Xml.Linq;
 using Lokad.Cloud.AppHost.Framework;
 using Lokad.Cloud.Diagnostics;
-using Lokad.Cloud.Runtime;
 using Lokad.Cloud.ServiceFabric.Runtime;
 using Lokad.Cloud.Storage;
 
@@ -30,19 +29,18 @@ namespace Lokad.Cloud.EntryPoint
                     SelfManagementSubscriptionId = settings.Element("SubscriptionId").Value
                 };
 
-            var log = new CloudLogWriter(CloudStorage.ForAzureConnectionString(settings.Element("DataConnectionString").Value).BuildBlobStorage());
+            var autofacXml = settings.Element("AutofacAppConfig");
+            var autofacAppConfig = autofacXml != null && !String.IsNullOrEmpty(autofacXml.Value)
+                ? Convert.FromBase64String(autofacXml.Value)
+                : null;
 
+            var log = new CloudLogWriter(CloudStorage.ForAzureConnectionString(settings.Element("DataConnectionString").Value).BuildBlobStorage());
             var runtimeFinalizer = new ServiceFabric.RuntimeFinalizer();
-            var runtimeProviders = CloudStorage
-                    .ForAzureConnectionString(settings.Element("DataConnectionString").Value)
-                    .WithObserver(Observers.CreateStorageObserver(log))
-                    .WithRuntimeFinalizer(runtimeFinalizer)
-                    .BuildRuntimeProviders(log);
 
             try
             {
                 // Run
-                var runtime = new Runtime(runtimeProviders, environment, cloudSettings, Observers.CreateRuntimeObserver(log));
+                var runtime = new Runtime(runtimeFinalizer, environment, cloudSettings, autofacAppConfig, log, Observers.CreateRuntimeObserver(log));
                 runtime.Execute(cancellationToken);
 
                 log.DebugFormat("Runtime Host: Runtime has stopped cleanly on worker {0}.", environment.Host.WorkerName);
