@@ -45,7 +45,9 @@ namespace Lokad.Cloud
 
             var log = new CloudLogWriter(CloudStorage.ForAzureConnectionString(connectionString).BuildBlobStorage());
 
-            _hostContext = new HostContext(null, certificateThumbprint, subscriptionId, log,
+            var deploymentReader = new DeploymentReader(connectionString);
+
+            _hostContext = new HostContext(deploymentReader, certificateThumbprint, subscriptionId, log,
                 Observers.CreateHostObserver(log),
                 Observers.CreateProvisioningObserver(log));
 
