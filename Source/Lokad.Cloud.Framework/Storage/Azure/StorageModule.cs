@@ -16,14 +16,26 @@ using Microsoft.WindowsAzure;
 
 namespace Lokad.Cloud.Storage.Azure
 {
-    /// <summary>IoC module that registers
-    /// <see cref="BlobStorageProvider"/>, <see cref="QueueStorageProvider"/> and
-    /// <see cref="TableStorageProvider"/> from the <see cref="ICloudConfigurationSettings"/>.</summary>
+    /// <summary>
+    /// IoC module that registers <see cref="BlobStorageProvider"/>,
+    /// <see cref="QueueStorageProvider"/> and <see cref="TableStorageProvider"/>.
+    /// </summary>
     public sealed class StorageModule : Module
     {
+        private readonly CloudStorageAccount _storageAccount;
+
+        public StorageModule(CloudStorageAccount storageAccount)
+        {
+            _storageAccount = storageAccount;
+
+            ServicePointManager.FindServicePoint(storageAccount.BlobEndpoint).UseNagleAlgorithm = false;
+            ServicePointManager.FindServicePoint(storageAccount.TableEndpoint).UseNagleAlgorithm = false;
+            ServicePointManager.FindServicePoint(storageAccount.QueueEndpoint).UseNagleAlgorithm = false;
+        }
+
         protected override void Load(ContainerBuilder builder)
         {
-            builder.Register(StorageAccountFromSettings);
+            builder.RegisterInstance(_storageAccount);
             builder.RegisterType<CloudFormatter>().As<IDataSerializer>();
 
             builder.Register(BlobStorageProvider);
@@ -39,65 +51,49 @@ namespace Lokad.Cloud.Storage.Azure
                 .SingleInstance();
         }
 
-        private static CloudStorageAccount StorageAccountFromSettings(IComponentContext c)
-        {
-            var settings = c.Resolve<CloudConfigurationSettings>();
-            CloudStorageAccount account;
-            if (CloudStorageAccount.TryParse(settings.DataConnectionString, out account))
-            {
-                // http://blogs.msdn.com/b/windowsazurestorage/archive/2010/06/25/nagle-s-algorithm-is-not-friendly-towards-small-requests.aspx
-                ServicePointManager.FindServicePoint(account.BlobEndpoint).UseNagleAlgorithm = false;
-                ServicePointManager.FindServicePoint(account.TableEndpoint).UseNagleAlgorithm = false;
-                ServicePointManager.FindServicePoint(account.QueueEndpoint).UseNagleAlgorithm = false;
-
-                return account;
-            }
-            throw new InvalidOperationException("Failed to get valid connection string");
-        }
-
-        static RuntimeProviders RuntimeProviders(IComponentContext c)
+        RuntimeProviders RuntimeProviders(IComponentContext c)
         {
             return CloudStorage
-                .ForAzureAccount(c.Resolve<CloudStorageAccount>())
+                .ForAzureAccount(_storageAccount)
                 .WithObserver(c.Resolve<ICloudStorageObserver>())
                 .WithRuntimeFinalizer(c.ResolveOptional<IRuntimeFinalizer>())
                 .BuildRuntimeProviders(c.ResolveOptional<ILog>());
         }
 
-        static CloudStorageProviders CloudStorageProviders(IComponentContext c)
+        CloudStorageProviders CloudStorageProviders(IComponentContext c)
         {
             return CloudStorage
-                .ForAzureAccount(c.Resolve<CloudStorageAccount>())
+                .ForAzureAccount(_storageAccount)
                 .WithDataSerializer(c.Resolve<IDataSerializer>())
                 .WithObserver(c.Resolve<ICloudStorageObserver>())
                 .WithRuntimeFinalizer(c.ResolveOptional<IRuntimeFinalizer>())
                 .BuildStorageProviders();
         }
 
-        static ITableStorageProvider TableStorageProvider(IComponentContext c)
+        ITableStorageProvider TableStorageProvider(IComponentContext c)
         {
             return CloudStorage
-                .ForAzureAccount(c.Resolve<CloudStorageAccount>())
+                .ForAzureAccount(_storageAccount)
                 .WithDataSerializer(c.Resolve<IDataSerializer>())
                 .WithObserver(c.Resolve<ICloudStorageObserver>())
                 .WithRuntimeFinalizer(c.ResolveOptional<IRuntimeFinalizer>())
                 .BuildTableStorage();
         }
 
-        static IQueueStorageProvider QueueStorageProvider(IComponentContext c)
+        IQueueStorageProvider QueueStorageProvider(IComponentContext c)
         {
             return CloudStorage
-                .ForAzureAccount(c.Resolve<CloudStorageAccount>())
+                .ForAzureAccount(_storageAccount)
                 .WithDataSerializer(c.Resolve<IDataSerializer>())
                 .WithObserver(c.Resolve<ICloudStorageObserver>())
                 .WithRuntimeFinalizer(c.ResolveOptional<IRuntimeFinalizer>())
                 .BuildQueueStorage();
         }
 
-        static IBlobStorageProvider BlobStorageProvider(IComponentContext c)
+        IBlobStorageProvider BlobStorageProvider(IComponentContext c)
         {
             return CloudStorage
-                .ForAzureAccount(c.Resolve<CloudStorageAccount>())
+                .ForAzureAccount(_storageAccount)
                 .WithDataSerializer(c.Resolve<IDataSerializer>())
                 .WithObserver(c.Resolve<ICloudStorageObserver>())
                 .WithRuntimeFinalizer(c.ResolveOptional<IRuntimeFinalizer>())

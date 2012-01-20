@@ -7,7 +7,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Autofac;
-using Autofac.Configuration;
 using Lokad.Cloud.AppHost.Framework;
 using Lokad.Cloud.Diagnostics;
 using Lokad.Cloud.Mock;
@@ -15,6 +14,7 @@ using Lokad.Cloud.Provisioning.Instrumentation;
 using Lokad.Cloud.Provisioning.Instrumentation.Events;
 using Lokad.Cloud.ServiceFabric;
 using Lokad.Cloud.Storage.Azure;
+using Microsoft.WindowsAzure;
 
 namespace Lokad.Cloud.Test
 {
@@ -26,7 +26,7 @@ namespace Lokad.Cloud.Test
         {
             var builder = new ContainerBuilder();
 
-            builder.RegisterModule(new StorageModule());
+            builder.RegisterModule(new StorageModule(CloudStorageAccount.DevelopmentStorageAccount));
             builder.RegisterModule(new DiagnosticsModule());
 
             builder.RegisterType<RuntimeFinalizer>().As<IRuntimeFinalizer>().InstancePerLifetimeScope();
@@ -38,8 +38,6 @@ namespace Lokad.Cloud.Test
             builder.Register(c => new CloudProvisioningInstrumentationSubject(c.Resolve<IEnumerable<IObserver<ICloudProvisioningEvent>>>().ToArray()))
                 .As<ICloudProvisioningObserver, IObservable<ICloudProvisioningEvent>>()
                 .SingleInstance();
-
-            builder.RegisterModule(new ConfigurationSettingsReader("autofac"));
 
             return builder.Build();
         }

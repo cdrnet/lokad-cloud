@@ -19,6 +19,7 @@ using Lokad.Cloud.Provisioning.Instrumentation.Events;
 using Lokad.Cloud.ServiceFabric;
 using Lokad.Cloud.Storage;
 using Lokad.Cloud.Storage.Azure;
+using Microsoft.WindowsAzure;
 
 namespace Lokad.Cloud.EntryPoint
 {
@@ -63,7 +64,7 @@ namespace Lokad.Cloud.EntryPoint
                 applicationBuilder.RegisterInstance(environment);
                 applicationBuilder.RegisterInstance(applicationFinalizer).As<IRuntimeFinalizer>();
 
-                applicationBuilder.RegisterModule(new StorageModule());
+                applicationBuilder.RegisterModule(new StorageModule(CloudStorageAccount.Parse(settings.Element("DataConnectionString").Value)));
                 applicationBuilder.RegisterModule(new DiagnosticsModule());
 
                 applicationBuilder.RegisterType<Jobs.JobManager>();
@@ -73,11 +74,6 @@ namespace Lokad.Cloud.EntryPoint
                 applicationBuilder.Register(c => new CloudProvisioningInstrumentationSubject(c.Resolve<IEnumerable<IObserver<ICloudProvisioningEvent>>>().ToArray()))
                     .As<ICloudProvisioningObserver, IObservable<ICloudProvisioningEvent>>()
                     .SingleInstance();
-
-                applicationBuilder.RegisterInstance(new CloudConfigurationSettings
-                    {
-                        DataConnectionString = settings.Element("DataConnectionString").Value
-                    });
 
                 // Load Application IoC Configuration and apply it to the builder
                 var autofacXml = settings.Element("AutofacAppConfig");
