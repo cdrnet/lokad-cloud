@@ -36,7 +36,7 @@ namespace Lokad.Cloud.Diagnostics
     /// code paths while reading is almost never time-critical.
     /// </para>
     /// </remarks>
-    internal class HostLogWriter : IHostLog
+    internal class HostLogWriter
     {
         private const string ContainerNamePrefix = "lokad-cloud-logs";
 

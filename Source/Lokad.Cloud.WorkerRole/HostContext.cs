@@ -22,12 +22,12 @@ namespace Lokad.Cloud
     {
         static bool _runtimeAvailable;
 
-        private readonly IHostLog _log;
+        private readonly HostLogWriter _log;
         private readonly HostLifeIdentity _identity;
         private readonly AzureCurrentDeployment _currentDeployment;
         private readonly AzureProvisioning _provisioning;
 
-        public HostContext(IDeploymentReader deploymentReader, string certificateThumbprint, string subscriptionId, IHostLog log, IHostObserver observer, ICloudProvisioningObserver provisioningObserver)
+        public HostContext(IDeploymentReader deploymentReader, string certificateThumbprint, string subscriptionId, HostLogWriter log, IHostObserver observer, ICloudProvisioningObserver provisioningObserver)
         {
             Observer = observer;
             DeploymentReader = deploymentReader;
@@ -39,7 +39,7 @@ namespace Lokad.Cloud
             // try get settings and certificate
             if (!IsAvailable)
             {
-                log.WarnFormat("Provisioning: RoleEnvironment not available on worker {0}.", _identity.WorkerName);
+                log.Log(HostLogLevel.Warn, string.Format("Provisioning: RoleEnvironment not available on worker {0}.", _identity.WorkerName));
                 return;
             }
 
@@ -53,7 +53,7 @@ namespace Lokad.Cloud
             }
             catch (TypeInitializationException)
             {
-                log.WarnFormat("Provisioning: RoleEnvironment not available on worker {0}.", _identity.WorkerName);
+                log.Log(HostLogLevel.Warn, string.Format("Provisioning: RoleEnvironment not available on worker {0}.", _identity.WorkerName));
                 return;
             }
 
@@ -67,14 +67,14 @@ namespace Lokad.Cloud
             // early evaluate management status for intrinsic fault states, to skip further processing
             if (currentDeploymentPrivateId == null || certificate == null || string.IsNullOrWhiteSpace(subscriptionId))
             {
-                log.DebugFormat("Provisioning: Not available because either the certificate or the subscription was not provided correctly.");
+                log.Log(HostLogLevel.Debug, "Provisioning: Not available because either the certificate or the subscription was not provided correctly.");
                 return;
             }
 
             // detect dev fabric
             if (currentDeploymentPrivateId.StartsWith("deployment("))
             {
-                log.Debug("Provisioning: Not available in dev fabric instance.");
+                log.Log(HostLogLevel.Debug, "Provisioning: Not available in dev fabric instance.");
                 return;
             }
 
@@ -203,11 +203,11 @@ namespace Lokad.Cloud
                     {
                         if (ProvisioningErrorHandling.IsTransientError(t.Exception))
                         {
-                            _log.DebugFormat(task.Exception.GetBaseException(), "Provisioning: Getting the current worker instance count failed with a transient error.");
+                            _log.Log(HostLogLevel.Debug, task.Exception.GetBaseException(), "Provisioning: Getting the current worker instance count failed with a transient error.");
                         }
                         else
                         {
-                            _log.WarnFormat(task.Exception.GetBaseException(), "Provisioning: Getting the current worker instance count failed with a permanent error.");
+                            _log.Log(HostLogLevel.Warn, task.Exception.GetBaseException(), "Provisioning: Getting the current worker instance count failed with a permanent error.");
                         }
                     }
                 }
@@ -231,7 +231,7 @@ namespace Lokad.Cloud
                 throw new ArgumentOutOfRangeException("count");
             }
 
-            _log.InfoFormat("Provisioning: Updating the worker instance count to {0}.", count);
+            _log.Log(HostLogLevel.Info, string.Format("Provisioning: Updating the worker instance count to {0}.", count));
 
             var task = _provisioning.UpdateCurrentLokadCloudWorkerCount(_currentDeployment, count, cancellationToken);
 
@@ -248,20 +248,20 @@ namespace Lokad.Cloud
                             switch (httpStatus)
                             {
                                 case HttpStatusCode.Conflict:
-                                    _log.DebugFormat("Provisioning: Updating the worker instance count to {0} failed because another deployment update is already in progress.", count);
+                                    _log.Log(HostLogLevel.Debug, string.Format("Provisioning: Updating the worker instance count to {0} failed because another deployment update is already in progress.", count));
                                     break;
                                 default:
-                                    _log.DebugFormat("Provisioning: Updating the worker instance count failed with HTTP Status {0} ({1}).", httpStatus, (int)httpStatus);
+                                    _log.Log(HostLogLevel.Debug, string.Format("Provisioning: Updating the worker instance count failed with HTTP Status {0} ({1}).", httpStatus));
                                     break;
                             }
                         }
                         else if (ProvisioningErrorHandling.IsTransientError(t.Exception))
                         {
-                            _log.DebugFormat(task.Exception.GetBaseException(), "Provisioning: Updating the worker instance count failed with a transient error.");
+                            _log.Log(HostLogLevel.Debug, task.Exception.GetBaseException(), "Provisioning: Updating the worker instance count failed with a transient error.");
                         }
                         else
                         {
-                            _log.WarnFormat(task.Exception.GetBaseException(), "Provisioning: Updating the worker instance count failed with a permanent error.");
+                            _log.Log(HostLogLevel.Warn, task.Exception.GetBaseException(), "Provisioning: Updating the worker instance count failed with a permanent error.");
                         }
                     }
                 }

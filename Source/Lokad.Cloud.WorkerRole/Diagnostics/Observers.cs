@@ -15,9 +15,9 @@ using Lokad.Cloud.Storage.Instrumentation.Events;
 
 namespace Lokad.Cloud.Diagnostics
 {
-    public static class Observers
+    internal static class Observers
     {
-        public static IHostObserver CreateHostObserver(IHostLog log)
+        public static IHostObserver CreateHostObserver(HostLogWriter log)
         {
             var subject = new HostObserverSubject();
             subject.OfType<HostStartedEvent>().Subscribe(e => TryLog(log, HostLogLevel.Debug, "AppHost started on {0}.", e.Host.WorkerName));
@@ -32,7 +32,7 @@ namespace Lokad.Cloud.Diagnostics
             return subject;
         }
 
-        public static ICloudProvisioningObserver CreateProvisioningObserver(IHostLog log)
+        public static ICloudProvisioningObserver CreateProvisioningObserver(HostLogWriter log)
         {
             var subject = new CloudProvisioningInstrumentationSubject();
             subject.OfType<ProvisioningOperationRetriedEvent>()
@@ -50,7 +50,7 @@ namespace Lokad.Cloud.Diagnostics
             return subject;
         }
 
-        public static ICloudStorageObserver CreateStorageObserver(IHostLog log)
+        public static ICloudStorageObserver CreateStorageObserver(HostLogWriter log)
         {
             var subject = new CloudStorageInstrumentationSubject();
             subject.OfType<BlobDeserializationFailedEvent>().Subscribe(e => TryLog(log, HostLogLevel.Error, e.Exception, e.ToString()));
@@ -73,7 +73,7 @@ namespace Lokad.Cloud.Diagnostics
             return subject;
         }
 
-        private static void TryLog(IHostLog log, HostLogLevel level, string message, params object[] args)
+        private static void TryLog(HostLogWriter log, HostLogLevel level, string message, params object[] args)
         {
             try
             {
@@ -85,7 +85,7 @@ namespace Lokad.Cloud.Diagnostics
             }
         }
 
-        static void TryLog(IHostLog log, HostLogLevel level, Exception exception, string message, params object[] args)
+        static void TryLog(HostLogWriter log, HostLogLevel level, Exception exception, string message, params object[] args)
         {
             try
             {

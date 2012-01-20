@@ -11,6 +11,7 @@ using System.Xml.Linq;
 using Ionic.Zip;
 using Lokad.Cloud.AppHost.Framework;
 using Lokad.Cloud.AppHost.Framework.Definition;
+using Lokad.Cloud.Diagnostics;
 using Lokad.Cloud.Storage;
 
 namespace Lokad.Cloud
@@ -31,16 +32,22 @@ namespace Lokad.Cloud
             _connectionString = connectionString;
             _subscriptionId = subscriptionId;
             _certificateThumbprint = certificateThumbprint;
-            _storage = CloudStorage.ForAzureConnectionString(connectionString).BuildStorageProviders();
+
+            _log = new HostLogWriter(CloudStorage.ForAzureConnectionString(connectionString).BuildBlobStorage());
+            _storage = CloudStorage.ForAzureConnectionString(connectionString).WithObserver(Observers.CreateStorageObserver(_log)).BuildStorageProviders();
         }
 
         [NonSerialized]
         private CloudStorageProviders _storage;
 
+        [NonSerialized]
+        private HostLogWriter _log;
+
         [OnDeserialized]
         private void OnDeserialized(StreamingContext context)
         {
-            _storage = CloudStorage.ForAzureConnectionString(_connectionString).BuildStorageProviders();
+            _log = new HostLogWriter(CloudStorage.ForAzureConnectionString(_connectionString).BuildBlobStorage());
+            _storage = CloudStorage.ForAzureConnectionString(_connectionString).WithObserver(Observers.CreateStorageObserver(_log)).BuildStorageProviders();
         }
 
         public SolutionHead GetDeploymentIfModified(string knownETag, out string newETag)

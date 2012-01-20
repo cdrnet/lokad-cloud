@@ -105,10 +105,8 @@
       <Link>Properties\VersionAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="ApplicationEnvironment.cs" />
-    <Compile Include="Diagnostics\IHostLog.cs" />
     <Compile Include="Diagnostics\HostLogLevel.cs" />
     <Compile Include="Diagnostics\HostLogWriter.cs" />
-    <Compile Include="Diagnostics\IHostLogExtensions.cs" />
     <Compile Include="Host\AssemblyLoader.cs" />
     <Compile Include="DeploymentReader.cs" />
     <Compile Include="Diagnostics\Observers.cs" />
