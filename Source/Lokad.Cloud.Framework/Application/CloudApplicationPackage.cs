@@ -4,7 +4,6 @@
 #endregion
 
 using System.Collections.Generic;
-using System.Reflection;
 
 namespace Lokad.Cloud.Application
 {
@@ -29,29 +28,6 @@ namespace Lokad.Cloud.Application
         public byte[] GetSymbol(CloudApplicationAssemblyInfo assemblyInfo)
         {
             return _symbolBytes[assemblyInfo.AssemblyName.ToLowerInvariant()];
-        }
-
-        public void LoadAssemblies()
-        {
-            var resolver = new AssemblyResolver();
-            resolver.Attach();
-
-            foreach (var info in Assemblies)
-            {
-                if (!info.IsValid)
-                {
-                    continue;
-                }
-
-                if (info.HasSymbols)
-                {
-                    Assembly.Load(GetAssembly(info), GetSymbol(info));
-                }
-                else
-                {
-                    Assembly.Load(GetAssembly(info));
-                }
-            }
         }
     }
 }
