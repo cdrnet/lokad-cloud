@@ -174,7 +174,6 @@
     <Compile Include="Management\CloudServiceSchedulingInfo.cs" />
     <Compile Include="Management\CloudServiceScheduling.cs" />
     <Compile Include="Mock\MockStorageModule.cs" />
-    <Compile Include="Services\AssemblyConfigurationUpdateService.cs" />
     <Compile Include="Diagnostics\ILog.cs" />
     <Compile Include="Diagnostics\ILogExtensions.cs" />
     <Compile Include="Diagnostics\LogLevel.cs" />
@@ -194,7 +193,6 @@
     <Content Include="Jobs\_ReadMe.txt" />
     <Content Include="Management\ReadMe.txt" />
     <Content Include="ServiceFabric\ReadMe.txt" />
-    <Content Include="ServiceFabric\Runtime\ReadMe.txt" />
     <Content Include="Shared\_ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
