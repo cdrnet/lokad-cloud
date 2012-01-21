@@ -30,7 +30,7 @@ namespace Lokad.Cloud.EntryPoint
         {
             base.Configure();
 
-            var autofacXml = Settings.Element("AutofacAppConfig");
+            var autofacXml = Settings.Element("RawConfig");
             _autofacConfig = autofacXml != null && !string.IsNullOrEmpty(autofacXml.Value)
                 ? Convert.FromBase64String(autofacXml.Value)
                 : null;

@@ -21,7 +21,7 @@ namespace Lokad.Cloud
     {
         private const string ContainerName = "lokad-cloud-assemblies";
         private const string PackageBlobName = "default";
-        private const string AutofacConfigBlobName = "config";
+        private const string ConfigBlobName = "config";
 
         private readonly string _connectionString;
         private readonly string _subscriptionId;
@@ -54,7 +54,7 @@ namespace Lokad.Cloud
         {
             newETag = CombineEtags(
                 _storage.BlobStorage.GetBlobEtag(ContainerName, PackageBlobName),
-                _storage.BlobStorage.GetBlobEtag(ContainerName, AutofacConfigBlobName));
+                _storage.BlobStorage.GetBlobEtag(ContainerName, ConfigBlobName));
 
             if (newETag == null || knownETag != null && knownETag == newETag)
             {
@@ -71,11 +71,29 @@ namespace Lokad.Cloud
                     new XElement("CertificateThumbprint", _certificateThumbprint),
                     new XElement("SubscriptionId", _subscriptionId));
 
-            string appConfigEtag;
-            var appConfig = _storage.BlobStorage.GetBlob<byte[]>(ContainerName, AutofacConfigBlobName, out appConfigEtag);
-            if (appConfig.HasValue && appConfigEtag == AutofacConfigEtagOfCombinedEtag(deployment.SolutionId))
+            string configEtag;
+            var appConfig = _storage.BlobStorage.GetBlob<byte[]>(ContainerName, ConfigBlobName, out configEtag);
+            if (appConfig.HasValue && configEtag == ConfigEtagOfCombinedEtag(deployment.SolutionId))
             {
-                settings.Add(new XElement("AutofacAppConfig", Convert.ToBase64String(appConfig.Value)));
+                // add raw config to settings (Base64)
+                settings.Add(new XElement("RawConfig", Convert.ToBase64String(appConfig.Value)));
+
+                // directly insert config xml root as element, if possible
+                try
+                {
+                    using (var configStream = new MemoryStream(appConfig.Value))
+                    {
+                        var configDoc = XDocument.Load(configStream);
+                        if (configDoc != null && configDoc.Root != null)
+                        {
+                            settings.Add(configDoc.Root);
+                        }
+                    }
+                }
+                catch (Exception)
+                {
+                    // don't care, unfortunately there's no TryLoad
+                }
             }
 
             return new SolutionDefinition("Solution", new[]
@@ -126,7 +144,7 @@ namespace Lokad.Cloud
             return _storage.BlobStorage.GetBlob<T>(ContainerName, itemName).GetValue(default(T));
         }
 
-        static string CombineEtags(string packageEtag, string autofacConfigEtag)
+        static string CombineEtags(string packageEtag, string configEtag)
         {
             if (packageEtag == null)
             {
@@ -134,9 +152,9 @@ namespace Lokad.Cloud
             }
 
             var prefix = packageEtag.Length.ToString("0000");
-            return autofacConfigEtag == null
+            return configEtag == null
                 ? string.Concat(prefix, packageEtag)
-                : string.Concat(prefix, packageEtag, autofacConfigEtag);
+                : string.Concat(prefix, packageEtag, configEtag);
         }
 
         static string PackageEtagOfCombinedEtag(string combinedEtag)
@@ -150,7 +168,7 @@ namespace Lokad.Cloud
             return string.IsNullOrEmpty(packageEtag) ? null : packageEtag;
         }
 
-        static string AutofacConfigEtagOfCombinedEtag(string combinedEtag)
+        static string ConfigEtagOfCombinedEtag(string combinedEtag)
         {
             if (combinedEtag == null || combinedEtag.Length <= 5)
             {
