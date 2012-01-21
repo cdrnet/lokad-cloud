@@ -5,8 +5,9 @@
 
 using System;
 using System.Xml.Linq;
+using Lokad.Cloud.Diagnostics;
 
-namespace Lokad.Cloud.Diagnostics
+namespace Lokad.Cloud.Management
 {
     /// <summary>
     /// Log entry (when retrieving logs with the <see cref="CloudLogReader"/>).

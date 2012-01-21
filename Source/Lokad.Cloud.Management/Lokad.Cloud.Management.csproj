@@ -70,11 +70,14 @@
     <Compile Include="Application\CloudApplicationPackageReader.cs" />
     <Compile Include="CloudAssemblies.cs" />
     <Compile Include="CloudConfiguration.cs" />
+    <Compile Include="CloudLogEntry.cs" />
+    <Compile Include="CloudLogReader.cs" />
     <Compile Include="CloudServiceInfo.cs" />
     <Compile Include="CloudServices.cs" />
     <Compile Include="CloudServiceScheduling.cs" />
     <Compile Include="CloudServiceSchedulingInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="XmlExtension.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Lokad.Cloud.Framework\Lokad.Cloud.Framework.csproj">

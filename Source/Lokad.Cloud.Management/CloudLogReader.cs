@@ -8,9 +8,10 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Xml.Linq;
+using Lokad.Cloud.Diagnostics;
 using Lokad.Cloud.Storage;
 
-namespace Lokad.Cloud.Diagnostics
+namespace Lokad.Cloud.Management
 {
     public class CloudLogReader
     {

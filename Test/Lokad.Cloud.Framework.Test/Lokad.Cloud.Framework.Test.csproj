@@ -115,6 +115,10 @@
       <Project>{BA84F8E7-F8B9-4912-BF93-9F4D0DDC5C29}</Project>
       <Name>Lokad.Cloud.Framework</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Source\Lokad.Cloud.Management\Lokad.Cloud.Management.csproj">
+      <Project>{CE66B408-AFC1-46A3-BFF5-4574F5EBFEC2}</Project>
+      <Name>Lokad.Cloud.Management</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Content Include="Shared\_ReadMe.txt" />

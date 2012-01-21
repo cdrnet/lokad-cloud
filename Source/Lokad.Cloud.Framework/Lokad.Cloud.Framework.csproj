@@ -126,12 +126,9 @@
       <Link>Properties\VersionAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="Diagnostics\CloudLogWriter.cs" />
-    <Compile Include="Diagnostics\CloudLogReader.cs" />
     <Compile Include="Diagnostics\CloudStorageLogger.cs" />
     <Compile Include="Diagnostics\CloudProvisioningLogger.cs" />
-    <Compile Include="Diagnostics\CloudLogEntry.cs" />
     <Compile Include="Diagnostics\TockenBucketThrottling.cs" />
-    <Compile Include="Diagnostics\XmlExtension.cs" />
     <Compile Include="EntryPoint\ApplicationEntryPoint.cs" />
     <Compile Include="EntryPoint\Observers.cs" />
     <Compile Include="EntryPoint\Scheduler.cs" />

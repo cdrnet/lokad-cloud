@@ -6,7 +6,7 @@
 using System;
 using System.Xml.Linq;
 
-namespace Lokad.Cloud.Diagnostics
+namespace Lokad.Cloud.Management
 {
     internal static class XmlExtension
     {

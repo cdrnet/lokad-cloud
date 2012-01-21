@@ -9,6 +9,7 @@ using System.Threading;
 using System.Xml.Linq;
 using Autofac;
 using Lokad.Cloud.Diagnostics;
+using Lokad.Cloud.Management;
 using Lokad.Cloud.Storage;
 using NUnit.Framework;
 
