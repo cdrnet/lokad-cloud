@@ -24,7 +24,6 @@ namespace Lokad.Cloud.EntryPoint
 
         readonly List<CloudService> _services;
         readonly Func<CloudService, ServiceExecutionFeedback> _schedule;
-        readonly object _sync = new object();
 
         /// <summary>Duration to keep pinging the same cloud service if service is active.</summary>
         readonly TimeSpan _moreOfTheSame = TimeSpan.FromSeconds(60);
@@ -33,7 +32,6 @@ namespace Lokad.Cloud.EntryPoint
         readonly TimeSpan _idleSleep = TimeSpan.FromSeconds(10);
 
         CloudService _currentService;
-        volatile bool _isRunning;
 
         /// <summary>
         /// Creates a new instance of the Scheduler class.
@@ -52,20 +50,19 @@ namespace Lokad.Cloud.EntryPoint
             get { return _currentService; }
         }
 
-        public IEnumerable<Action> Schedule()
+        public void RunSchedule(CancellationToken cancellationToken)
         {
+            var currentThread = Thread.CurrentThread;
             var services = _services;
             var currentServiceIndex = -1;
             var skippedConsecutively = 0;
-
-            _isRunning = true;
 
             if (_observer != null)
             {
                 _observer.Notify(new SchedulerBusyEvent(DateTimeOffset.UtcNow));
             }
 
-            while (_isRunning)
+            while (!cancellationToken.IsCancellationRequested)
             {
                 currentServiceIndex = (currentServiceIndex + 1) % services.Count;
                 _currentService = services[currentServiceIndex];
@@ -78,17 +75,15 @@ namespace Lokad.Cloud.EntryPoint
                 // for at least 1min (in order to avoid a single service to monopolize CPU)
                 var start = DateTimeOffset.UtcNow;
                 
-                while (DateTimeOffset.UtcNow.Subtract(start) < _moreOfTheSame && _isRunning && DemandsImmediateStart(result))
+                using(cancellationToken.Register(currentThread.Abort))
+                while (DateTimeOffset.UtcNow.Subtract(start) < _moreOfTheSame && !cancellationToken.IsCancellationRequested && DemandsImmediateStart(result))
                 {
-                    yield return () =>
-                        {
-                            result = _schedule(_currentService);
-                        };
+                    result = _schedule(_currentService);
                     isRunOnce |= WasSuccessfullyExecuted(result);
                 }
 
                 skippedConsecutively = isRunOnce ? 0 : skippedConsecutively + 1;
-                if (skippedConsecutively >= services.Count && _isRunning)
+                if (skippedConsecutively >= services.Count && !cancellationToken.IsCancellationRequested)
                 {
                     // We are not using 'Thread.Sleep' because we want the worker
                     // to terminate fast if 'Stop' is requested.
@@ -98,10 +93,7 @@ namespace Lokad.Cloud.EntryPoint
                         _observer.Notify(new SchedulerIdleEvent(DateTimeOffset.UtcNow));
                     }
 
-                    lock (_sync)
-                    {
-                        Monitor.Wait(_sync, _idleSleep);
-                    }
+                    cancellationToken.WaitHandle.WaitOne(_idleSleep);
 
                     if (_observer != null)
                     {
@@ -113,18 +105,6 @@ namespace Lokad.Cloud.EntryPoint
             }
 
             _currentService = null;
-        }
-
-        /// <summary>Waits until the current service completes, and stop the scheduling.</summary>
-        /// <remarks>This method CANNOT be used in case the environment is stopping,
-        /// because the termination is going to be way too slow.</remarks>
-        public void AbortWaitingSchedule()
-        {
-            _isRunning = false;
-            lock (_sync)
-            {
-                Monitor.Pulse(_sync);
-            }
         }
 
         /// <summary>

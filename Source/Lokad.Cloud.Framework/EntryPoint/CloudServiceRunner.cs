@@ -21,20 +21,6 @@ namespace Lokad.Cloud.EntryPoint
 
         public void Run(IApplicationEnvironment environment, Func<IRuntimeFinalizer, List<CloudService>> createServices, Action disposeServices, ILog log, ICloudRuntimeObserver runtimeObserver, CancellationToken cancellationToken)
         {
-            var currentThread = Thread.CurrentThread;
-            var cancellationRegistration = cancellationToken.Register(() =>
-            {
-                log.DebugFormat("Runtime: Cancel() on worker {0}.", environment.Host.WorkerName);
-
-                // TODO: Get rid of that!
-                currentThread.Abort();
-
-                if (_scheduler != null)
-                {
-                    _scheduler.AbortWaitingSchedule();
-                }
-            });
-
             var finalizer = new RuntimeFinalizer();
             try
             {
@@ -44,15 +30,7 @@ namespace Lokad.Cloud.EntryPoint
 
                 // Execute
                 _scheduler = new Scheduler(services, service => service.Start(), runtimeObserver);
-                foreach (var action in _scheduler.Schedule())
-                {
-                    if (cancellationToken.IsCancellationRequested)
-                    {
-                        break;
-                    }
-
-                    action();
-                }
+                _scheduler.RunSchedule(cancellationToken);
 
                 log.DebugFormat("Runtime: Runtime has stopped cleanly on worker {0}.", environment.Host.WorkerName);
             }
@@ -95,10 +73,9 @@ namespace Lokad.Cloud.EntryPoint
             }
             finally
             {
-                log.DebugFormat("Runtime: stopping on worker {0}.", environment.Host.WorkerName);
-
-                cancellationRegistration.Dispose();
                 finalizer.FinalizeRuntime();
+
+                log.DebugFormat("Runtime: stopped on worker {0}.", environment.Host.WorkerName);
 
                 if (disposeServices != null)
                 {
