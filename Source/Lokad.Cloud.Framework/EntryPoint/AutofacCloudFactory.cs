@@ -23,11 +23,13 @@ using Microsoft.WindowsAzure;
 namespace Lokad.Cloud.EntryPoint
 {
     // NOTE: referred to by name in WorkerRole DeploymentReader
-    public class AutofacCloudFactory : ICloudFactory
+    public class AutofacCloudFactory : ICloudFactory, IDisposable
     {
         private IApplicationEnvironment _environment;
         private string _connectionString;
         private byte[] _autofacConfig;
+
+        private IDisposable _disposable;
 
         public void Initialize(IApplicationEnvironment environment, XElement settings)
         {
@@ -49,7 +51,7 @@ namespace Lokad.Cloud.EntryPoint
             return Observers.CreateRuntimeObserver(Log);
         }
 
-        public List<CloudService> CreateServices(IRuntimeFinalizer finalizer, out IContainer container)
+        public List<CloudService> CreateServices(IRuntimeFinalizer finalizer)
         {
             var applicationBuilder = new ContainerBuilder();
 
@@ -108,10 +110,21 @@ namespace Lokad.Cloud.EntryPoint
                 // e.g. RuntimeFinalizer
             }
 
-            var applicationContainer = container = applicationBuilder.Build();
+            var applicationContainer = applicationBuilder.Build();
+            _disposable = applicationContainer;
 
             // Instanciate and return all the cloud services
             return serviceTypes.Select(type => (CloudService)applicationContainer.Resolve(type)).ToList();
+        }
+
+        public void Dispose()
+        {
+            var disposable = _disposable;
+            if (disposable != null)
+            {
+                disposable.Dispose();
+                _disposable = null;
+            }
         }
     }
 }

@@ -46,16 +46,12 @@ namespace Lokad.Cloud.EntryPoint
                 }
             });
 
-            // we need to keep the container alive until the finally block
-            // because the finalizer (of the container) is called there.
-            IContainer applicationContainer = null;
             var applicationFinalizer = new RuntimeFinalizer();
-
             try
             {
                 log.DebugFormat("Runtime: started on worker {0}.", environment.Host.WorkerName);
 
-                var services = factory.CreateServices(applicationFinalizer, out applicationContainer);
+                var services = factory.CreateServices(applicationFinalizer);
 
                 // Execute
                 _scheduler = new Scheduler(services, service => service.Start(), factory.CreateRuntimeObserverOptional());
@@ -110,21 +106,16 @@ namespace Lokad.Cloud.EntryPoint
             }
             finally
             {
-                cancellationRegistration.Dispose();
-
                 log.DebugFormat("Runtime: stopping on worker {0}.", environment.Host.WorkerName);
 
-                if (applicationFinalizer != null)
-                {
-                    applicationFinalizer.FinalizeRuntime();
-                }
+                cancellationRegistration.Dispose();
+                applicationFinalizer.FinalizeRuntime();
 
-                if (applicationContainer != null)
+                var disposable = factory as IDisposable;
+                if (disposable != null)
                 {
-                    applicationContainer.Dispose();
+                    disposable.Dispose();
                 }
-
-                log.DebugFormat("Runtime: stopped on worker {0}.", environment.Host.WorkerName);
             }
         }
 

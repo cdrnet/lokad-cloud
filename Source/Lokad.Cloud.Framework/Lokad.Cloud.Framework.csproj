@@ -134,6 +134,7 @@
     <Compile Include="EntryPoint\ICloudFactory.cs" />
     <Compile Include="EntryPoint\Observers.cs" />
     <Compile Include="EntryPoint\Scheduler.cs" />
+    <Compile Include="EntryPoint\SimpleCloudFactory.cs" />
     <Compile Include="Instrumentation\CloudRuntimeInstrumentationSubject.cs" />
     <Compile Include="Instrumentation\Events\SchedulerBusyEvent.cs" />
     <Compile Include="Instrumentation\Events\ICloudRuntimeEvent.cs" />

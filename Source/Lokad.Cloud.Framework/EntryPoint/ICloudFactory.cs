@@ -21,6 +21,6 @@ namespace Lokad.Cloud.EntryPoint
 
         ICloudRuntimeObserver CreateRuntimeObserverOptional();
 
-        List<CloudService> CreateServices(IRuntimeFinalizer finalizer, out IContainer container);
+        List<CloudService> CreateServices(IRuntimeFinalizer finalizer);
     }
 }
