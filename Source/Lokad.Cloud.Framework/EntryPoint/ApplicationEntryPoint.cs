@@ -4,38 +4,33 @@
 #endregion
 
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Security;
 using System.Threading;
 using System.Xml.Linq;
 using Autofac;
-using Autofac.Configuration;
 using Lokad.Cloud.AppHost.Framework;
 using Lokad.Cloud.Diagnostics;
-using Lokad.Cloud.Provisioning.Instrumentation;
-using Lokad.Cloud.Provisioning.Instrumentation.Events;
 using Lokad.Cloud.ServiceFabric;
-using Lokad.Cloud.Storage;
-using Lokad.Cloud.Storage.Azure;
-using Microsoft.WindowsAzure;
 
 namespace Lokad.Cloud.EntryPoint
 {
+    // NOTE: referred to by name in WorkerRole DeploymentReader
     public class ApplicationEntryPoint : IApplicationEntryPoint
     {
         Scheduler _scheduler;
 
         public void Run(XElement settings, IDeploymentReader deploymentReader, IApplicationEnvironment environment, CancellationToken cancellationToken)
         {
-            var connectionString = settings.Element("DataConnectionString").Value;
-            var log = new CloudLogWriter(CloudStorage.ForAzureConnectionString(connectionString).BuildBlobStorage());
-
             if (cancellationToken.IsCancellationRequested)
             {
                 return;
             }
+
+            var factory = (ICloudFactory)Activator.CreateInstance(Type.GetType(settings.Element("CloudFactoryTypeName").Value));
+            factory.Initialize(environment, settings);
+
+            var log = factory.Log;
 
             var currentThread = Thread.CurrentThread;
             var cancellationRegistration = cancellationToken.Register(() =>
@@ -60,71 +55,10 @@ namespace Lokad.Cloud.EntryPoint
             {
                 log.DebugFormat("Runtime: started on worker {0}.", environment.Host.WorkerName);
 
-                var applicationBuilder = new ContainerBuilder();
-
-                applicationBuilder.RegisterInstance(environment);
-                applicationBuilder.RegisterInstance(applicationFinalizer).As<IRuntimeFinalizer>();
-
-                applicationBuilder.RegisterModule(new StorageModule(CloudStorageAccount.Parse(connectionString)));
-                applicationBuilder.RegisterModule(new DiagnosticsModule());
-
-                applicationBuilder.RegisterType<Jobs.JobManager>();
-                applicationBuilder.RegisterType<RuntimeFinalizer>().As<IRuntimeFinalizer>().InstancePerLifetimeScope();
-
-                // Provisioning Observer Subject
-                applicationBuilder.Register(c => new CloudProvisioningInstrumentationSubject(c.Resolve<IEnumerable<IObserver<ICloudProvisioningEvent>>>().ToArray()))
-                    .As<ICloudProvisioningObserver, IObservable<ICloudProvisioningEvent>>()
-                    .SingleInstance();
-
-                // Load Application IoC Configuration and apply it to the builder
-                var autofacXml = settings.Element("AutofacAppConfig");
-                if (autofacXml != null && !string.IsNullOrEmpty(autofacXml.Value))
-                {
-                    // HACK: need to copy settings locally first
-                    // HACK: hard-code string for local storage name
-                    const string fileName = "lokad.cloud.clientapp.config";
-                    const string resourceName = "LokadCloudStorage";
-
-                    var pathToFile = Path.Combine(environment.GetLocalResourcePath(resourceName), fileName);
-                    File.WriteAllBytes(pathToFile, Convert.FromBase64String(autofacXml.Value));
-                    applicationBuilder.RegisterModule(new ConfigurationSettingsReader("autofac", pathToFile));
-                }
-
-                // Look for all cloud services currently loaded in the AppDomain
-                var serviceTypes = AppDomain.CurrentDomain.GetAssemblies()
-                    .Select(a => a.GetExportedTypes()).SelectMany(x => x)
-                    .Where(t => t.IsSubclassOf(typeof(CloudService)) && !t.IsAbstract && !t.IsGenericType)
-                    .ToList();
-
-                // Register the cloud services in the IoC Builder so we can support dependencies
-                foreach (var type in serviceTypes)
-                {
-                    applicationBuilder.RegisterType(type)
-                        .OnActivating(e =>
-                        {
-                            e.Context.InjectUnsetProperties(e.Instance);
-
-                            var initializable = e.Instance as IInitializable;
-                            if (initializable != null)
-                            {
-                                initializable.Initialize();
-                            }
-                        })
-                        .InstancePerDependency()
-                        .ExternallyOwned();
-
-                    // ExternallyOwned: to prevent the container from disposing the
-                    // cloud services - we manage their lifetime on our own using
-                    // e.g. RuntimeFinalizer
-                }
-
-                applicationContainer = applicationBuilder.Build();
-
-                // Instanciate and return all the cloud services
-                var services = serviceTypes.Select(type => (CloudService)applicationContainer.Resolve(type)).ToList();
+                var services = factory.CreateServices(applicationFinalizer, out applicationContainer);
 
                 // Execute
-                _scheduler = new Scheduler(services, service => service.Start(), Observers.CreateRuntimeObserver(log));
+                _scheduler = new Scheduler(services, service => service.Start(), factory.CreateRuntimeObserverOptional());
                 foreach (var action in _scheduler.Schedule())
                 {
                     if (cancellationToken.IsCancellationRequested)

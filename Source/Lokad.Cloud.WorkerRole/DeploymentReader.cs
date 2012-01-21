@@ -69,7 +69,8 @@ namespace Lokad.Cloud
             var settings = new XElement("Settings",
                     new XElement("DataConnectionString", _connectionString),
                     new XElement("CertificateThumbprint", _certificateThumbprint),
-                    new XElement("SubscriptionId", _subscriptionId));
+                    new XElement("SubscriptionId", _subscriptionId),
+                    new XElement("CloudFactoryTypeName", "Lokad.Cloud.EntryPoint.AutofacCloudFactory, Lokad.Cloud.Framework"));
 
             string appConfigEtag;
             var appConfig = _storage.BlobStorage.GetBlob<byte[]>(ContainerName, AutofacConfigBlobName, out appConfigEtag);

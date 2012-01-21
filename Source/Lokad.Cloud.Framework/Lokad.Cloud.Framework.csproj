@@ -130,6 +130,8 @@
     <Compile Include="Diagnostics\CloudProvisioningLogger.cs" />
     <Compile Include="Diagnostics\TockenBucketThrottling.cs" />
     <Compile Include="EntryPoint\ApplicationEntryPoint.cs" />
+    <Compile Include="EntryPoint\AutofacCloudFactory.cs" />
+    <Compile Include="EntryPoint\ICloudFactory.cs" />
     <Compile Include="EntryPoint\Observers.cs" />
     <Compile Include="EntryPoint\Scheduler.cs" />
     <Compile Include="Instrumentation\CloudRuntimeInstrumentationSubject.cs" />
