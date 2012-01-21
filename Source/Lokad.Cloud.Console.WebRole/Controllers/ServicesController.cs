@@ -24,7 +24,7 @@ namespace Lokad.Cloud.Console.WebRole.Controllers
         public override ActionResult ByHostedService(string hostedServiceName)
         {
             InitializeDeploymentTenant(hostedServiceName);
-            var provider = new AppDefinitionWithLiveDataProvider(Providers);
+            var provider = new AppDefinitionWithLiveDataProvider(Storage);
             return View(provider.QueryServices());
         }
 
@@ -32,7 +32,7 @@ namespace Lokad.Cloud.Console.WebRole.Controllers
         public ActionResult Status(string hostedServiceName, string id, bool isStarted)
         {
             InitializeDeploymentTenant(hostedServiceName);
-            var cloudServices = new CloudServices(Providers);
+            var cloudServices = new CloudServices(Blobs);
 
             if (isStarted)
             {

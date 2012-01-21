@@ -143,8 +143,6 @@
     <Compile Include="Jobs\Job.cs" />
     <Compile Include="Jobs\JobManager.cs" />
     <Compile Include="Mock\MockEnvironment.cs" />
-    <Compile Include="Runtime\CloudStorageExtensions.cs" />
-    <Compile Include="Runtime\RuntimeProviders.cs" />
     <Compile Include="ServiceFabric\CloudService.cs" />
     <Compile Include="ServiceFabric\CloudServiceSettingsAttribute.cs" />
     <Compile Include="ServiceFabric\IInitializable.cs" />
@@ -180,7 +178,9 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Runtime\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

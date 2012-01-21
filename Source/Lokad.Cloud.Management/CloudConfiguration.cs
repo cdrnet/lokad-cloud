@@ -5,7 +5,6 @@
 
 using System;
 using System.Text;
-using Lokad.Cloud.Runtime;
 using Lokad.Cloud.Storage;
 
 namespace Lokad.Cloud.Management
@@ -21,15 +20,17 @@ namespace Lokad.Cloud.Management
         /// <summary>Name of the blob used to store the optional dependency injection configuration.</summary>
         public const string ConfigurationBlobName = "config";
 
-        readonly IBlobStorageProvider _blobProvider;
-        readonly UTF8Encoding _encoding = new UTF8Encoding();
+        private readonly IBlobStorageProvider _blobs;
+        private readonly IDataSerializer _runtimeFormatter;
+        private readonly UTF8Encoding _encoding = new UTF8Encoding();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CloudConfiguration"/> class.
         /// </summary>
-        public CloudConfiguration(RuntimeProviders runtimeProviders)
+        public CloudConfiguration(IBlobStorageProvider blobStorage)
         {
-            _blobProvider = runtimeProviders.BlobStorage;
+            _blobs = blobStorage;
+            _runtimeFormatter = new CloudFormatter();
         }
 
         /// <summary>
@@ -37,7 +38,7 @@ namespace Lokad.Cloud.Management
         /// </summary>
         public string GetConfigurationString()
         {
-            var buffer = _blobProvider.GetBlob<byte[]>(ContainerName, ConfigurationBlobName);
+            var buffer = _blobs.GetBlob<byte[]>(ContainerName, ConfigurationBlobName, _runtimeFormatter);
             return buffer.Convert(bytes => _encoding.GetString(bytes), String.Empty);
         }
 
@@ -59,7 +60,7 @@ namespace Lokad.Cloud.Management
                 return;
             }
 
-            _blobProvider.PutBlob(ContainerName, ConfigurationBlobName, _encoding.GetBytes(configuration));
+            _blobs.PutBlob(ContainerName, ConfigurationBlobName, _encoding.GetBytes(configuration), _runtimeFormatter);
         }
 
         /// <summary>
@@ -67,7 +68,7 @@ namespace Lokad.Cloud.Management
         /// </summary>
         public void RemoveConfiguration()
         {
-            _blobProvider.DeleteBlobIfExist(ContainerName, ConfigurationBlobName);
+            _blobs.DeleteBlobIfExist(ContainerName, ConfigurationBlobName);
         }
     }
 }

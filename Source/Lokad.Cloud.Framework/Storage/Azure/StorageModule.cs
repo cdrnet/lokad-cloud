@@ -8,8 +8,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using Autofac;
-using Lokad.Cloud.Diagnostics;
-using Lokad.Cloud.Runtime;
 using Lokad.Cloud.Storage.Instrumentation;
 using Lokad.Cloud.Storage.Instrumentation.Events;
 using Microsoft.WindowsAzure;
@@ -42,22 +40,12 @@ namespace Lokad.Cloud.Storage.Azure
             builder.Register(QueueStorageProvider);
             builder.Register(TableStorageProvider);
 
-            builder.Register(RuntimeProviders);
             builder.Register(CloudStorageProviders);
 
             // Storage Observer Subject
             builder.Register(StorageObserver)
                 .As<ICloudStorageObserver, IObservable<ICloudStorageEvent>>()
                 .SingleInstance();
-        }
-
-        RuntimeProviders RuntimeProviders(IComponentContext c)
-        {
-            return CloudStorage
-                .ForAzureAccount(_storageAccount)
-                .WithObserver(c.Resolve<ICloudStorageObserver>())
-                .WithRuntimeFinalizer(c.ResolveOptional<IRuntimeFinalizer>())
-                .BuildRuntimeProviders(c.ResolveOptional<ILog>());
         }
 
         CloudStorageProviders CloudStorageProviders(IComponentContext c)

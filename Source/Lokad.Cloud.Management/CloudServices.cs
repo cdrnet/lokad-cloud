@@ -5,7 +5,6 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using Lokad.Cloud.Runtime;
 using Lokad.Cloud.ServiceFabric;
 using Lokad.Cloud.Services;
 using Lokad.Cloud.Storage;
@@ -18,14 +17,16 @@ namespace Lokad.Cloud.Management
     /// <summary>Management facade for cloud services.</summary>
     public class CloudServices
     {
-        readonly IBlobStorageProvider _blobProvider;
+        private readonly IBlobStorageProvider _blobs;
+        private readonly IDataSerializer _runtimeFormatter;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CloudServices"/> class.
         /// </summary>
-        public CloudServices(RuntimeProviders runtimeProviders)
+        public CloudServices(IBlobStorageProvider blobStorage)
         {
-            _blobProvider = runtimeProviders.BlobStorage;
+            _blobs = blobStorage;
+            _runtimeFormatter = new CloudFormatter();
         }
 
         /// <summary>
@@ -35,8 +36,8 @@ namespace Lokad.Cloud.Management
         {
             // TODO: Redesign to make it self-contained (so that we don't need to pass the name as well)
 
-            return _blobProvider.ListBlobNames(CloudServiceStateName.GetPrefix())
-                .Select(name => System.Tuple.Create(name, _blobProvider.GetBlob(name)))
+            return _blobs.ListBlobNames(CloudServiceStateName.GetPrefix())
+                .Select(name => System.Tuple.Create(name, _blobs.GetBlob(name, _runtimeFormatter)))
                 .Where(pair => pair.Item2.HasValue)
                 .Select(pair => new CloudServiceInfo
                     {
@@ -51,7 +52,7 @@ namespace Lokad.Cloud.Management
         /// </summary>
         public CloudServiceInfo GetService(string serviceName)
         {
-            var blob = _blobProvider.GetBlob(new CloudServiceStateName(serviceName));
+            var blob = _blobs.GetBlob(new CloudServiceStateName(serviceName), _runtimeFormatter);
             return new CloudServiceInfo
                 {
                     ServiceName = serviceName,
@@ -64,7 +65,7 @@ namespace Lokad.Cloud.Management
         /// </summary>
         public List<string> GetServiceNames()
         {
-            return _blobProvider.ListBlobNames(CloudServiceStateName.GetPrefix())
+            return _blobs.ListBlobNames(CloudServiceStateName.GetPrefix())
                 .Select(reference => reference.ServiceName).ToList();
         }
 
@@ -91,7 +92,7 @@ namespace Lokad.Cloud.Management
         /// </summary>
         public void EnableService(string serviceName)
         {
-            _blobProvider.PutBlob(new CloudServiceStateName(serviceName), CloudServiceState.Started);
+            _blobs.PutBlob(new CloudServiceStateName(serviceName), CloudServiceState.Started, _runtimeFormatter);
         }
 
         /// <summary>
@@ -99,7 +100,7 @@ namespace Lokad.Cloud.Management
         /// </summary>
         public void DisableService(string serviceName)
         {
-            _blobProvider.PutBlob(new CloudServiceStateName(serviceName), CloudServiceState.Stopped);
+            _blobs.PutBlob(new CloudServiceStateName(serviceName), CloudServiceState.Stopped, _runtimeFormatter);
         }
 
         /// <summary>
@@ -107,7 +108,7 @@ namespace Lokad.Cloud.Management
         /// </summary>
         public void ResetServiceState(string serviceName)
         {
-            _blobProvider.DeleteBlobIfExist(new CloudServiceStateName(serviceName));
+            _blobs.DeleteBlobIfExist(new CloudServiceStateName(serviceName));
         }
     }
 }

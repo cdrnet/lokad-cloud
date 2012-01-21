@@ -7,7 +7,6 @@ using System.IO;
 using System.Linq;
 using Ionic.Zip;
 using Lokad.Cloud.Management.Application;
-using Lokad.Cloud.Runtime;
 using Lokad.Cloud.Storage;
 
 namespace Lokad.Cloud.Management
@@ -21,19 +20,21 @@ namespace Lokad.Cloud.Management
         /// <summary>Name of the blob used to store the assembly package.</summary>
         public const string PackageBlobName = "default";
 
-        readonly RuntimeProviders _runtimeProviders;
+        private readonly IBlobStorageProvider _blobs;
+        private readonly IDataSerializer _runtimeFormatter;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CloudAssemblies"/> class.
         /// </summary>
-        public CloudAssemblies(RuntimeProviders runtimeProviders)
+        public CloudAssemblies(IBlobStorageProvider blobStorage)
         {
-            _runtimeProviders = runtimeProviders;
+            _blobs = blobStorage;
+            _runtimeFormatter = new CloudFormatter();
         }
 
         public Maybe<CloudApplicationDefinition> GetApplicationDefinition()
         {
-            var inspector = new CloudApplicationInspector(_runtimeProviders);
+            var inspector = new CloudApplicationInspector(_blobs);
             return inspector.Inspect();
         }
 
@@ -56,7 +57,7 @@ namespace Lokad.Cloud.Management
         /// </summary>
         public void UploadApplicationZipContainer(byte[] data)
         {
-            _runtimeProviders.BlobStorage.PutBlob(ContainerName, PackageBlobName, data, true);
+            _blobs.PutBlob(ContainerName, PackageBlobName, data, true, _runtimeFormatter);
         }
 
         /// <summary>

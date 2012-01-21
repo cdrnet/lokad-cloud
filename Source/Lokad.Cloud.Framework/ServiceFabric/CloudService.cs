@@ -9,7 +9,6 @@ using System.Linq;
 using Lokad.Cloud.AppHost.Framework;
 using Lokad.Cloud.Diagnostics;
 using Lokad.Cloud.Jobs;
-using Lokad.Cloud.Runtime;
 using Lokad.Cloud.Shared.Threading;
 using Lokad.Cloud.Storage;
 
@@ -95,7 +94,6 @@ namespace Lokad.Cloud.ServiceFabric
         // IoC Injected Services:
         public CloudStorageProviders Storage { get; set; }
         public IApplicationEnvironment Environment { get; set; }
-        public RuntimeProviders RuntimeProviders { get; set; }
         public ILog Log { get; set; }
         public JobManager Jobs { get; set; }
 
@@ -104,11 +102,15 @@ namespace Lokad.Cloud.ServiceFabric
         public IQueueStorageProvider Queues { get { return Storage.QueueStorage; } }
         public ITableStorageProvider Tables { get { return Storage.TableStorage; } }
 
+        protected internal readonly IDataSerializer _runtimeFormatter;
+
         /// <summary>
         /// Default constructor
         /// </summary>
         protected CloudService()
         {
+            _runtimeFormatter = new CloudFormatter();
+
             // default setting
             _defaultState = CloudServiceState.Started;
             _state = _defaultState;
@@ -155,13 +157,13 @@ namespace Lokad.Cloud.ServiceFabric
             {
                 var stateBlobName = new CloudServiceStateName(Name);
 
-                var state = RuntimeProviders.BlobStorage.GetBlob(stateBlobName);
+                var state = Blobs.GetBlob(stateBlobName, _runtimeFormatter);
 
                 // no state can be retrieved, update blob storage
                 if(!state.HasValue)
                 {
                     state = _defaultState;
-                    RuntimeProviders.BlobStorage.PutBlob(stateBlobName, state.Value);
+                    Blobs.PutBlob(stateBlobName, state.Value, _runtimeFormatter);
                 }
 
                 _state = state.Value;

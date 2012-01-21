@@ -10,7 +10,6 @@ using System.Xml.Linq;
 using Lokad.Cloud.AppHost.Framework;
 using Lokad.Cloud.Diagnostics;
 using Lokad.Cloud.Instrumentation;
-using Lokad.Cloud.Runtime;
 using Lokad.Cloud.ServiceFabric;
 using Lokad.Cloud.Storage;
 
@@ -47,10 +46,6 @@ namespace Lokad.Cloud.EntryPoint
                 .WithRuntimeFinalizer(finalizer)
                 .BuildStorageProviders();
 
-            var runtimeStorage = CloudStorage
-                .ForAzureConnectionString(ConnectionString)
-                .BuildRuntimeProviders();
-
             var jobs = new Jobs.JobManager(Log);
 
             return AppDomain.CurrentDomain.GetAssemblies()
@@ -62,7 +57,6 @@ namespace Lokad.Cloud.EntryPoint
 
                         service.Storage = storage;
                         service.Environment = Environment;
-                        service.RuntimeProviders = runtimeStorage;
                         service.Log = Log;
                         service.Jobs = jobs;
 
