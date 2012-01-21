@@ -1,4 +1,4 @@
-﻿#region Copyright (c) Lokad 2009-2012
+#region Copyright (c) Lokad 2009-2012
 // This code is released under the terms of the new BSD licence.
 // URL: http://www.lokad.com/
 #endregion
@@ -7,58 +7,43 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Xml.Linq;
 using Autofac;
 using Autofac.Configuration;
-using Lokad.Cloud.AppHost.Framework;
 using Lokad.Cloud.Diagnostics;
-using Lokad.Cloud.Instrumentation;
 using Lokad.Cloud.Provisioning.Instrumentation;
 using Lokad.Cloud.Provisioning.Instrumentation.Events;
 using Lokad.Cloud.ServiceFabric;
-using Lokad.Cloud.Storage;
 using Lokad.Cloud.Storage.Azure;
 using Microsoft.WindowsAzure;
 
 namespace Lokad.Cloud.EntryPoint
 {
-    // NOTE: referred to by name in WorkerRole DeploymentReader
-    public class AutofacCloudFactory : ICloudFactory, IDisposable
+    /// <summary>
+    /// Custom EntryPoint that allows service creation and extension using Autofac IoC
+    /// </summary>
+    public class AutofacApplicationEntryPoint : ApplicationEntryPoint
     {
-        private IApplicationEnvironment _environment;
-        private string _connectionString;
         private byte[] _autofacConfig;
-
         private IDisposable _disposable;
 
-        public void Initialize(IApplicationEnvironment environment, XElement settings)
+        protected override void Configure()
         {
-            _environment = environment;
-            _connectionString = settings.Element("DataConnectionString").Value;
+            base.Configure();
 
-            Log = new CloudLogWriter(CloudStorage.ForAzureConnectionString(_connectionString).BuildBlobStorage());
-            
-            var autofacXml = settings.Element("AutofacAppConfig");
+            var autofacXml = Settings.Element("AutofacAppConfig");
             _autofacConfig = autofacXml != null && !string.IsNullOrEmpty(autofacXml.Value)
                 ? Convert.FromBase64String(autofacXml.Value)
                 : null;
         }
 
-        public CloudLogWriter Log { get; private set; }
-
-        public ICloudRuntimeObserver CreateRuntimeObserverOptional()
-        {
-            return Observers.CreateRuntimeObserver(Log);
-        }
-
-        public List<CloudService> CreateServices(IRuntimeFinalizer finalizer)
+        protected override List<CloudService> CreateServices(IRuntimeFinalizer finalizer)
         {
             var applicationBuilder = new ContainerBuilder();
 
-            applicationBuilder.RegisterInstance(_environment);
+            applicationBuilder.RegisterInstance(Environment);
             applicationBuilder.RegisterInstance(finalizer).As<IRuntimeFinalizer>();
 
-            applicationBuilder.RegisterModule(new StorageModule(CloudStorageAccount.Parse(_connectionString)));
+            applicationBuilder.RegisterModule(new StorageModule(CloudStorageAccount.Parse(DataConnectionString)));
             applicationBuilder.RegisterModule(new DiagnosticsModule());
 
             applicationBuilder.RegisterType<Jobs.JobManager>();
@@ -77,7 +62,7 @@ namespace Lokad.Cloud.EntryPoint
                 const string fileName = "lokad.cloud.clientapp.config";
                 const string resourceName = "LokadCloudStorage";
 
-                var pathToFile = Path.Combine(_environment.GetLocalResourcePath(resourceName), fileName);
+                var pathToFile = Path.Combine(Environment.GetLocalResourcePath(resourceName), fileName);
                 File.WriteAllBytes(pathToFile, _autofacConfig);
                 applicationBuilder.RegisterModule(new ConfigurationSettingsReader("autofac", pathToFile));
             }
@@ -95,6 +80,8 @@ namespace Lokad.Cloud.EntryPoint
                     .OnActivating(e =>
                     {
                         e.Context.InjectUnsetProperties(e.Instance);
+
+                        Inject(e.Instance as CloudService);
 
                         var initializable = e.Instance as IInitializable;
                         if (initializable != null)
@@ -117,7 +104,7 @@ namespace Lokad.Cloud.EntryPoint
             return serviceTypes.Select(type => (CloudService)applicationContainer.Resolve(type)).ToList();
         }
 
-        public void Dispose()
+        protected override void DisposeServices()
         {
             var disposable = _disposable;
             if (disposable != null)

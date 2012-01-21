@@ -69,8 +69,7 @@ namespace Lokad.Cloud
             var settings = new XElement("Settings",
                     new XElement("DataConnectionString", _connectionString),
                     new XElement("CertificateThumbprint", _certificateThumbprint),
-                    new XElement("SubscriptionId", _subscriptionId),
-                    new XElement("CloudFactoryTypeName", "Lokad.Cloud.EntryPoint.AutofacCloudFactory, Lokad.Cloud.Framework"));
+                    new XElement("SubscriptionId", _subscriptionId));
 
             string appConfigEtag;
             var appConfig = _storage.BlobStorage.GetBlob<byte[]>(ContainerName, AutofacConfigBlobName, out appConfigEtag);
@@ -83,7 +82,7 @@ namespace Lokad.Cloud
                 {
                     new CellDefinition("Cell",
                         new AssembliesHead(PackageEtagOfCombinedEtag(deployment.SolutionId)),
-                        "Lokad.Cloud.EntryPoint.ApplicationEntryPoint, Lokad.Cloud.Framework",
+                        "Lokad.Cloud.EntryPoint.AutofacApplicationEntryPoint, Lokad.Cloud.Framework",
                         settings.ToString())
                 });
         }
