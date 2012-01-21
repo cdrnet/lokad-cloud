@@ -1,11 +1,11 @@
-﻿#region Copyright (c) Lokad 2009-2011
+﻿#region Copyright (c) Lokad 2009-2012
 // This code is released under the terms of the new BSD licence.
 // URL: http://www.lokad.com/
 #endregion
 
 using System.Collections.Generic;
 
-namespace Lokad.Cloud.Application
+namespace Lokad.Cloud.Management.Application
 {
     public class CloudApplicationPackage
     {

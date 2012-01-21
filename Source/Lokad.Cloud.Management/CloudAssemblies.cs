@@ -1,4 +1,4 @@
-﻿#region Copyright (c) Lokad 2009-2010
+﻿#region Copyright (c) Lokad 2009-2012
 // This code is released under the terms of the new BSD licence.
 // URL: http://www.lokad.com/
 #endregion
@@ -6,7 +6,7 @@
 using System.IO;
 using System.Linq;
 using Ionic.Zip;
-using Lokad.Cloud.Application;
+using Lokad.Cloud.Management.Application;
 using Lokad.Cloud.Runtime;
 using Lokad.Cloud.Storage;
 

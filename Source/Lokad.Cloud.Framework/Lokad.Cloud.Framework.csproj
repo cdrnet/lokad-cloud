@@ -125,11 +125,6 @@
     <Compile Include="..\VersionAssemblyInfo.cs">
       <Link>Properties\VersionAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="Application\CloudApplicationAssemblyInfo.cs" />
-    <Compile Include="Application\CloudApplicationInspector.cs" />
-    <Compile Include="Application\CloudApplicationPackage.cs" />
-    <Compile Include="Application\CloudApplicationPackageReader.cs" />
-    <Compile Include="Application\CloudApplicationDefinition.cs" />
     <Compile Include="Diagnostics\CloudLogWriter.cs" />
     <Compile Include="Diagnostics\CloudLogReader.cs" />
     <Compile Include="Diagnostics\CloudStorageLogger.cs" />
@@ -161,12 +156,6 @@
     <Compile Include="ServiceFabric\ServiceExecutionFeedback.cs" />
     <Compile Include="ServiceFabric\SynchronizationLeaseState.cs" />
     <Compile Include="Diagnostics\DiagnosticsModule.cs" />
-    <Compile Include="Management\CloudAssemblies.cs" />
-    <Compile Include="Management\CloudConfiguration.cs" />
-    <Compile Include="Management\CloudServiceInfo.cs" />
-    <Compile Include="Management\CloudServices.cs" />
-    <Compile Include="Management\CloudServiceSchedulingInfo.cs" />
-    <Compile Include="Management\CloudServiceScheduling.cs" />
     <Compile Include="Mock\MockStorageModule.cs" />
     <Compile Include="Diagnostics\ILog.cs" />
     <Compile Include="Diagnostics\ILogExtensions.cs" />
@@ -185,7 +174,6 @@
   <ItemGroup>
     <Content Include="Diagnostics\ReadMe.txt" />
     <Content Include="Jobs\_ReadMe.txt" />
-    <Content Include="Management\ReadMe.txt" />
     <Content Include="ServiceFabric\ReadMe.txt" />
     <Content Include="Shared\_ReadMe.txt" />
   </ItemGroup>

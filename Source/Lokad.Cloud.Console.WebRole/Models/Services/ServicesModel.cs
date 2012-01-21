@@ -3,8 +3,8 @@
 // URL: http://www.lokad.com/
 #endregion
 
-using Lokad.Cloud.Management.Api10;
-using Lokad.Cloud.Application;
+using Lokad.Cloud.Management;
+using Lokad.Cloud.Management.Application;
 
 namespace Lokad.Cloud.Console.WebRole.Models.Services
 {

@@ -1,4 +1,4 @@
-﻿#region Copyright (c) Lokad 2009-2011
+﻿#region Copyright (c) Lokad 2009-2012
 // This code is released under the terms of the new BSD licence.
 // URL: http://www.lokad.com/
 #endregion
@@ -6,7 +6,7 @@
 using System;
 using System.Runtime.Serialization;
 
-namespace Lokad.Cloud.Application
+namespace Lokad.Cloud.Management.Application
 {
     [DataContract(Namespace = "http://schemas.lokad.com/lokad-cloud/application/1.1"), Serializable]
     public class CloudApplicationAssemblyInfo

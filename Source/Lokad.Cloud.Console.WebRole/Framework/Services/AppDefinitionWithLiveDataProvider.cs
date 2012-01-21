@@ -8,13 +8,11 @@ using System.Linq;
 using System.Text;
 using System.Web;
 using System.Xml;
-
-using Lokad.Cloud.Application;
 using Lokad.Cloud.Console.WebRole.Helpers;
 using Lokad.Cloud.Console.WebRole.Models.Queues;
 using Lokad.Cloud.Console.WebRole.Models.Services;
 using Lokad.Cloud.Management;
-using Lokad.Cloud.Management.Api10;
+using Lokad.Cloud.Management.Application;
 using Lokad.Cloud.Runtime;
 using Lokad.Cloud.Storage;
 using Lokad.Cloud.Storage.Shared;

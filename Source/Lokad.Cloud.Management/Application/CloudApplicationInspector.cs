@@ -1,4 +1,4 @@
-﻿#region Copyright (c) Lokad 2009-2011
+﻿#region Copyright (c) Lokad 2009-2012
 // This code is released under the terms of the new BSD licence.
 // URL: http://www.lokad.com/
 #endregion
@@ -7,13 +7,12 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Lokad.Cloud.Management;
 using Lokad.Cloud.Runtime;
 using Lokad.Cloud.ServiceFabric;
 using Lokad.Cloud.Storage;
 using Mono.Cecil;
 
-namespace Lokad.Cloud.Application
+namespace Lokad.Cloud.Management.Application
 {
     /// <summary>
     /// Utility to inspect a cloud application package and its services.
