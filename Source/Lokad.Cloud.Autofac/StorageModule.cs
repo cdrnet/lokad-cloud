@@ -8,11 +8,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using Autofac;
+using Lokad.Cloud.Storage;
 using Lokad.Cloud.Storage.Instrumentation;
 using Lokad.Cloud.Storage.Instrumentation.Events;
 using Microsoft.WindowsAzure;
 
-namespace Lokad.Cloud.Storage.Azure
+namespace Lokad.Cloud.Autofac
 {
     /// <summary>
     /// IoC module that registers <see cref="BlobStorageProvider"/>,

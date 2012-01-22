@@ -111,6 +111,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Source\Lokad.Cloud.Autofac\Lokad.Cloud.Autofac.csproj">
+      <Project>{406922F7-463F-48B9-B1E6-94824F98D25A}</Project>
+      <Name>Lokad.Cloud.Autofac</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Source\Lokad.Cloud.Framework\Lokad.Cloud.Framework.csproj">
       <Project>{BA84F8E7-F8B9-4912-BF93-9F4D0DDC5C29}</Project>
       <Name>Lokad.Cloud.Framework</Name>

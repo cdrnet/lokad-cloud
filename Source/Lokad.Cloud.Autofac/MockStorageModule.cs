@@ -8,7 +8,7 @@ using Lokad.Cloud.Diagnostics;
 using Lokad.Cloud.Storage;
 using Lokad.Cloud.Storage.InMemory;
 
-namespace Lokad.Cloud.Mock
+namespace Lokad.Cloud.Autofac
 {
     /// <remarks></remarks>
     public sealed class MockStorageModule : Module

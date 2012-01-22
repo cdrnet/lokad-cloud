@@ -8,12 +8,11 @@ using System.Collections.Generic;
 using System.Linq;
 using Autofac;
 using Lokad.Cloud.AppHost.Framework;
-using Lokad.Cloud.Diagnostics;
+using Lokad.Cloud.Autofac;
 using Lokad.Cloud.Mock;
 using Lokad.Cloud.Provisioning.Instrumentation;
 using Lokad.Cloud.Provisioning.Instrumentation.Events;
 using Lokad.Cloud.ServiceFabric;
-using Lokad.Cloud.Storage.Azure;
 using Microsoft.WindowsAzure;
 
 namespace Lokad.Cloud.Test

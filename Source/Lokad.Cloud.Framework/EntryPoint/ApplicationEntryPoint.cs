@@ -16,7 +16,9 @@ using Lokad.Cloud.Storage;
 
 namespace Lokad.Cloud.EntryPoint
 {
-    // NOTE: referred to by name in WorkerRole DeploymentReader
+    /// <summary>
+    /// Simple Entry Point, without any need for IoC.
+    /// </summary>
     public class ApplicationEntryPoint : IApplicationEntryPoint
     {
         protected IApplicationEnvironment Environment { get; private set; }

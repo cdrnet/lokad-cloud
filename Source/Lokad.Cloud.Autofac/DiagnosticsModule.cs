@@ -1,4 +1,4 @@
-﻿#region Copyright (c) Lokad 2009-2011
+﻿#region Copyright (c) Lokad 2009-2012
 // This code is released under the terms of the new BSD licence.
 // URL: http://www.lokad.com/
 #endregion
@@ -7,12 +7,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Autofac;
+using Lokad.Cloud.Diagnostics;
 using Lokad.Cloud.Instrumentation;
 using Lokad.Cloud.Instrumentation.Events;
 using Lokad.Cloud.Storage;
 using Microsoft.WindowsAzure;
 
-namespace Lokad.Cloud.Diagnostics
+namespace Lokad.Cloud.Autofac
 {
     /// <summary>Cloud Diagnostics IoC Module.</summary>
     public class DiagnosticsModule : Module

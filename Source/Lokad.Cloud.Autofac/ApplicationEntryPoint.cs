@@ -9,19 +9,17 @@ using System.IO;
 using System.Linq;
 using Autofac;
 using Autofac.Configuration;
-using Lokad.Cloud.Diagnostics;
 using Lokad.Cloud.Provisioning.Instrumentation;
 using Lokad.Cloud.Provisioning.Instrumentation.Events;
 using Lokad.Cloud.ServiceFabric;
-using Lokad.Cloud.Storage.Azure;
 using Microsoft.WindowsAzure;
 
-namespace Lokad.Cloud.EntryPoint
+namespace Lokad.Cloud.Autofac
 {
     /// <summary>
     /// Custom EntryPoint that allows service creation and extension using Autofac IoC
     /// </summary>
-    public class AutofacApplicationEntryPoint : ApplicationEntryPoint
+    public class ApplicationEntryPoint : EntryPoint.ApplicationEntryPoint
     {
         private byte[] _autofacConfig;
         private IDisposable _disposable;

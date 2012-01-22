@@ -6,8 +6,9 @@
 using Autofac;
 using Autofac.Core;
 using Autofac.Core.Registration;
+using Lokad.Cloud.Storage;
 
-namespace Lokad.Cloud.Storage
+namespace Lokad.Cloud.Autofac
 {
     /// <summary>
     /// Verifies that storage credentials are correct and allow access to blob and queue storage.
@@ -17,7 +18,7 @@ namespace Lokad.Cloud.Storage
         private readonly IBlobStorageProvider _storage;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="T:StorageCredentialsVerifier" /> class.
+        /// Initializes a new instance of the StorageCredentialsVerifier class.
         /// </summary>
         /// <param name="container">The IoC container.</param>
         public StorageCredentialsVerifier(IContainer container)

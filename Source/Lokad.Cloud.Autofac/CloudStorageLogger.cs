@@ -1,4 +1,4 @@
-﻿#region Copyright (c) Lokad 2011
+﻿#region Copyright (c) Lokad 2009-2012
 // This code is released under the terms of the new BSD licence.
 // URL: http://www.lokad.com/
 #endregion
@@ -6,13 +6,15 @@
 using System;
 using System.Collections.Generic;
 using System.Reactive.Linq;
+using Autofac;
+using Lokad.Cloud.Diagnostics;
 using Lokad.Cloud.Storage.Instrumentation.Events;
 
-namespace Lokad.Cloud.Diagnostics
+namespace Lokad.Cloud.Autofac
 {
     // TODO (ruegg, 2011-05-30): Temporary class to maintain logging via system events for now -> rework
 
-    internal class CloudStorageLogger : Autofac.IStartable, IDisposable
+    internal class CloudStorageLogger : IStartable, IDisposable
     {
         private readonly IObservable<ICloudStorageEvent> _observable;
         private readonly ILog _log;
@@ -26,7 +28,7 @@ namespace Lokad.Cloud.Diagnostics
             _subscriptions = new List<IDisposable>();
         }
 
-        void Autofac.IStartable.Start()
+        void IStartable.Start()
         {
             if (_log == null || _observable == null)
             {
