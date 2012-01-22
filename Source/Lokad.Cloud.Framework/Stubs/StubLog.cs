@@ -5,19 +5,20 @@
 
 using System;
 using System.Xml.Linq;
+using Lokad.Cloud.Diagnostics;
 
-namespace Lokad.Cloud.Diagnostics
+namespace Lokad.Cloud.Stubs
 {
     /// <summary> <see cref="ILog"/> that does not do anything.</summary>
     [Serializable]
-    public sealed class NullLog : ILog
+    public sealed class StubLog : ILog
     {
         /// <summary>
-        /// Singleton instance of the <see cref="NullLog"/>.
+        /// Singleton instance of the <see cref="StubLog"/>.
         /// </summary>
-        public static readonly ILog Instance = new NullLog();
+        public static readonly ILog Instance = new StubLog();
 
-        NullLog()
+        StubLog()
         {
         }
 

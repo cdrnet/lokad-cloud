@@ -21,7 +21,7 @@ namespace Lokad.Cloud.Test.Services
         {
             var storage = CloudStorage.ForInMemoryStorage().BuildStorageProviders();
 
-            var service = new SquareQueueService { Storage = storage, Environment = new StubEnvironment(), Log = NullLog.Instance };
+            var service = new SquareQueueService { Storage = storage, Environment = new StubEnvironment(), Log = StubLog.Instance };
 
             const string containerName = "mockcontainer";
 

@@ -143,7 +143,7 @@
     <Compile Include="Diagnostics\ILog.cs" />
     <Compile Include="Diagnostics\ILogExtensions.cs" />
     <Compile Include="Diagnostics\LogLevel.cs" />
-    <Compile Include="Diagnostics\NullLog.cs" />
+    <Compile Include="Stubs\StubLog.cs" />
     <Compile Include="Shared\Threading\WaitFor.cs" />
     <Compile Include="Storage\BlobCounter.cs" />
     <Compile Include="Storage\DelayedQueue.cs" />

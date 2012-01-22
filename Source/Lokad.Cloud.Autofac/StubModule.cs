@@ -21,7 +21,7 @@ namespace Lokad.Cloud.Autofac
         protected override void Load(ContainerBuilder builder)
         {
             builder.RegisterModule<StubStorageModule>();
-            builder.RegisterInstance(NullLog.Instance).As<ILog>();
+            builder.RegisterInstance(StubLog.Instance).As<ILog>();
 
             builder.RegisterType<CloudFormatter>().As<IDataSerializer>();
             builder.RegisterType<RuntimeFinalizer>().As<IRuntimeFinalizer>().SingleInstance();
