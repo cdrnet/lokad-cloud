@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Net;
 using System.Security.Cryptography.X509Certificates;
@@ -6,13 +6,13 @@ using Lokad.Cloud.AppHost.Framework;
 using Lokad.Cloud.AppHost.Framework.Definition;
 using Microsoft.WindowsAzure.ServiceRuntime;
 
-namespace Lokad.Cloud.Mock
+namespace Lokad.Cloud.Stubs
 {
-    public class MockEnvironment : IApplicationEnvironment
+    public class StubEnvironment : IApplicationEnvironment
     {
         private readonly string _instance = Guid.NewGuid().ToString("N");
 
-        public MockEnvironment()
+        public StubEnvironment()
         {
             Deployment = new SolutionHead("Solution");
             Host = new HostLifeIdentity("MockHost", "MockHost-" + _instance);

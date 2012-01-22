@@ -1,4 +1,4 @@
-﻿#region Copyright (c) Lokad 2009
+﻿#region Copyright (c) Lokad 2009-2012
 // This code is released under the terms of the new BSD licence.
 // URL: http://www.lokad.com/
 #endregion
@@ -8,7 +8,7 @@ using Autofac.Core;
 using Autofac.Core.Registration;
 using Lokad.Cloud.Storage;
 
-namespace Lokad.Cloud.Autofac
+namespace Lokad.Cloud.Autofac.Storage
 {
     /// <summary>
     /// Verifies that storage credentials are correct and allow access to blob and queue storage.

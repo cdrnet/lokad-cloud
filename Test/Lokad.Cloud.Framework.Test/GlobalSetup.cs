@@ -3,16 +3,10 @@
 // URL: http://www.lokad.com/
 #endregion
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Autofac;
 using Lokad.Cloud.AppHost.Framework;
 using Lokad.Cloud.Autofac;
-using Lokad.Cloud.Mock;
-using Lokad.Cloud.Provisioning.Instrumentation;
-using Lokad.Cloud.Provisioning.Instrumentation.Events;
-using Lokad.Cloud.ServiceFabric;
+using Lokad.Cloud.Stubs;
 using Microsoft.WindowsAzure;
 
 namespace Lokad.Cloud.Test
@@ -24,19 +18,9 @@ namespace Lokad.Cloud.Test
         static IContainer Setup()
         {
             var builder = new ContainerBuilder();
-
-            builder.RegisterModule(new StorageModule(CloudStorageAccount.DevelopmentStorageAccount));
-            builder.RegisterModule(new DiagnosticsModule());
-
-            builder.RegisterType<RuntimeFinalizer>().As<IRuntimeFinalizer>().InstancePerLifetimeScope();
-            builder.RegisterType<MockEnvironment>().As<IApplicationEnvironment>().InstancePerLifetimeScope();
-
-            builder.RegisterType<Jobs.JobManager>();
-
-            // Provisioning Observer Subject
-            builder.Register(c => new CloudProvisioningInstrumentationSubject(c.Resolve<IEnumerable<IObserver<ICloudProvisioningEvent>>>().ToArray()))
-                .As<ICloudProvisioningObserver, IObservable<ICloudProvisioningEvent>>()
-                .SingleInstance();
+            builder.RegisterModule<AzureModule>();
+            builder.RegisterInstance(CloudStorageAccount.DevelopmentStorageAccount);
+            builder.RegisterType<StubEnvironment>().As<IApplicationEnvironment>().InstancePerLifetimeScope();
 
             return builder.Build();
         }

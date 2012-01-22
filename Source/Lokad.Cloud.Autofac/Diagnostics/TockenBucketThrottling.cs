@@ -7,7 +7,7 @@ using System;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 
-namespace Lokad.Cloud.Autofac
+namespace Lokad.Cloud.Autofac.Diagnostics
 {
     internal static class TockenBucketThrottling
     {

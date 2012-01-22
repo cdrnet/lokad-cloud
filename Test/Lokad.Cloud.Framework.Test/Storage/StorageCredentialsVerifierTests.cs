@@ -3,8 +3,7 @@
 // URL: http://www.lokad.com/
 #endregion
 
-using Lokad.Cloud.Autofac;
-using Lokad.Cloud.Storage;
+using Lokad.Cloud.Autofac.Storage;
 using NUnit.Framework;
 
 namespace Lokad.Cloud.Test.Storage

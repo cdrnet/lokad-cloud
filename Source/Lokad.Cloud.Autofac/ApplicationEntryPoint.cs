@@ -9,8 +9,6 @@ using System.IO;
 using System.Linq;
 using Autofac;
 using Autofac.Configuration;
-using Lokad.Cloud.Provisioning.Instrumentation;
-using Lokad.Cloud.Provisioning.Instrumentation.Events;
 using Lokad.Cloud.ServiceFabric;
 using Microsoft.WindowsAzure;
 
@@ -36,23 +34,13 @@ namespace Lokad.Cloud.Autofac
 
         protected override List<CloudService> CreateServices(IRuntimeFinalizer finalizer)
         {
-            var applicationBuilder = new ContainerBuilder();
+            var builder = new ContainerBuilder();
+            builder.RegisterModule<AzureModule>();
+            builder.RegisterInstance(CloudStorageAccount.Parse(DataConnectionString));
+            builder.RegisterInstance(Environment);
+            builder.RegisterInstance(finalizer).As<IRuntimeFinalizer>();
 
-            applicationBuilder.RegisterInstance(Environment);
-            applicationBuilder.RegisterInstance(finalizer).As<IRuntimeFinalizer>();
-
-            applicationBuilder.RegisterModule(new StorageModule(CloudStorageAccount.Parse(DataConnectionString)));
-            applicationBuilder.RegisterModule(new DiagnosticsModule());
-
-            applicationBuilder.RegisterType<Jobs.JobManager>();
-            applicationBuilder.RegisterType<RuntimeFinalizer>().As<IRuntimeFinalizer>().InstancePerLifetimeScope();
-
-            // Provisioning Observer Subject
-            applicationBuilder.Register(c => new CloudProvisioningInstrumentationSubject(c.Resolve<IEnumerable<IObserver<ICloudProvisioningEvent>>>().ToArray()))
-                .As<ICloudProvisioningObserver, IObservable<ICloudProvisioningEvent>>()
-                .SingleInstance();
-
-            // Load Application IoC Configuration and apply it to the builder
+            // Load Application IoC Configuration and apply it to the builder (allows users to override and extend)
             if (_autofacConfig != null && _autofacConfig.Length > 0)
             {
                 // HACK: need to copy settings locally first
@@ -62,7 +50,7 @@ namespace Lokad.Cloud.Autofac
 
                 var pathToFile = Path.Combine(Environment.GetLocalResourcePath(resourceName), fileName);
                 File.WriteAllBytes(pathToFile, _autofacConfig);
-                applicationBuilder.RegisterModule(new ConfigurationSettingsReader("autofac", pathToFile));
+                builder.RegisterModule(new ConfigurationSettingsReader("autofac", pathToFile));
             }
 
             // Look for all cloud services currently loaded in the AppDomain
@@ -74,7 +62,7 @@ namespace Lokad.Cloud.Autofac
             // Register the cloud services in the IoC Builder so we can support dependencies
             foreach (var type in serviceTypes)
             {
-                applicationBuilder.RegisterType(type)
+                builder.RegisterType(type)
                     .OnActivating(e =>
                     {
                         e.Context.InjectUnsetProperties(e.Instance);
@@ -95,7 +83,7 @@ namespace Lokad.Cloud.Autofac
                 // e.g. RuntimeFinalizer
             }
 
-            var applicationContainer = applicationBuilder.Build();
+            var applicationContainer = builder.Build();
             _disposable = applicationContainer;
 
             // Instanciate and return all the cloud services

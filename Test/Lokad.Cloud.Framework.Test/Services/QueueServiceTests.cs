@@ -6,9 +6,9 @@
 using System;
 using System.Linq;
 using Lokad.Cloud.Diagnostics;
-using Lokad.Cloud.Mock;
 using Lokad.Cloud.ServiceFabric;
 using Lokad.Cloud.Storage;
+using Lokad.Cloud.Stubs;
 using NUnit.Framework;
 
 namespace Lokad.Cloud.Test.Services
@@ -21,7 +21,7 @@ namespace Lokad.Cloud.Test.Services
         {
             var storage = CloudStorage.ForInMemoryStorage().BuildStorageProviders();
 
-            var service = new SquareQueueService { Storage = storage, Environment = new MockEnvironment(), Log = NullLog.Instance };
+            var service = new SquareQueueService { Storage = storage, Environment = new StubEnvironment(), Log = NullLog.Instance };
 
             const string containerName = "mockcontainer";
 

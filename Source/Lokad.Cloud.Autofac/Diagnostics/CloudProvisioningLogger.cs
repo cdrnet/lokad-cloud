@@ -11,7 +11,7 @@ using Autofac;
 using Lokad.Cloud.Diagnostics;
 using Lokad.Cloud.Provisioning.Instrumentation.Events;
 
-namespace Lokad.Cloud.Autofac
+namespace Lokad.Cloud.Autofac.Diagnostics
 {
     // TODO (ruegg, 2011-05-30): Temporary class to maintain logging via system events for now -> rework
 

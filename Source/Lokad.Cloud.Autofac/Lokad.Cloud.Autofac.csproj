@@ -67,14 +67,19 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ApplicationEntryPoint.cs" />
-    <Compile Include="CloudProvisioningLogger.cs" />
-    <Compile Include="CloudStorageLogger.cs" />
-    <Compile Include="DiagnosticsModule.cs" />
-    <Compile Include="MockStorageModule.cs" />
+    <Compile Include="Diagnostics\NeutralLogStorage.cs" />
+    <Compile Include="Diagnostics\CloudProvisioningLogger.cs" />
+    <Compile Include="Diagnostics\CloudStorageLogger.cs" />
+    <Compile Include="AzureModule.cs" />
+    <Compile Include="Storage\StubStorageModule.cs" />
+    <Compile Include="StubModule.cs" />
+    <Compile Include="Diagnostics\DiagnosticsModule.cs" />
+    <Compile Include="MemoryModule.cs" />
+    <Compile Include="Storage\MemoryStorageModule.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="StorageCredentialsVerifier.cs" />
-    <Compile Include="StorageModule.cs" />
-    <Compile Include="TockenBucketThrottling.cs" />
+    <Compile Include="Storage\StorageCredentialsVerifier.cs" />
+    <Compile Include="Storage\AzureStorageModule.cs" />
+    <Compile Include="Diagnostics\TockenBucketThrottling.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

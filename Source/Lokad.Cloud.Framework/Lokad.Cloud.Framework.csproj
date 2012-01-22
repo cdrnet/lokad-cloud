@@ -130,7 +130,6 @@
     <Compile Include="Instrumentation\ICloudRuntimeObserver.cs" />
     <Compile Include="Jobs\Job.cs" />
     <Compile Include="Jobs\JobManager.cs" />
-    <Compile Include="Mock\MockEnvironment.cs" />
     <Compile Include="ServiceFabric\CloudService.cs" />
     <Compile Include="ServiceFabric\CloudServiceSettingsAttribute.cs" />
     <Compile Include="ServiceFabric\IInitializable.cs" />
@@ -148,6 +147,7 @@
     <Compile Include="Shared\Threading\WaitFor.cs" />
     <Compile Include="Storage\BlobCounter.cs" />
     <Compile Include="Storage\DelayedQueue.cs" />
+    <Compile Include="Stubs\StubEnvironment.cs" />
     <Compile Include="TypeMapperProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\ReviveMessagesService.cs" />
@@ -162,10 +162,7 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Runtime\" />
-    <Folder Include="Storage\Azure\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
