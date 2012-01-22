@@ -9,7 +9,6 @@ using System.Linq;
 using Lokad.Cloud.AppHost.Framework;
 using Lokad.Cloud.Diagnostics;
 using Lokad.Cloud.Jobs;
-using Lokad.Cloud.Shared.Threading;
 using Lokad.Cloud.Storage;
 
 namespace Lokad.Cloud.ServiceFabric

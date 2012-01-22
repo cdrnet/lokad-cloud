@@ -1,4 +1,4 @@
-﻿#region (c)2009-2011 Lokad - New BSD license
+#region (c)2009-2011 Lokad - New BSD license
 // Company: http://www.lokad.com
 // This code is released under the terms of the new BSD licence
 #endregion
@@ -7,7 +7,7 @@ using System;
 using System.Diagnostics;
 using System.Threading;
 
-namespace Lokad.Cloud.Shared.Threading
+namespace Lokad.Cloud.ServiceFabric
 {
     /// <summary>
     /// Helper class for invoking tasks with timeout.

@@ -143,8 +143,8 @@
     <Compile Include="Diagnostics\ILog.cs" />
     <Compile Include="Diagnostics\ILogExtensions.cs" />
     <Compile Include="Diagnostics\LogLevel.cs" />
+    <Compile Include="ServiceFabric\WaitFor.cs" />
     <Compile Include="Stubs\StubLog.cs" />
-    <Compile Include="Shared\Threading\WaitFor.cs" />
     <Compile Include="Storage\BlobCounter.cs" />
     <Compile Include="Storage\DelayedQueue.cs" />
     <Compile Include="Stubs\StubEnvironment.cs" />
@@ -154,10 +154,8 @@
     <Compile Include="Services\GarbageCollectorService.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Diagnostics\ReadMe.txt" />
     <Content Include="Jobs\_ReadMe.txt" />
     <Content Include="ServiceFabric\ReadMe.txt" />
-    <Content Include="Shared\_ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
