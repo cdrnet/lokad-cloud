@@ -79,22 +79,22 @@ namespace Lokad.Cloud
 
         public string GetSettingValue(string settingName)
         {
-            return _hostContext.GetSettingValue(settingName);
+            return _hostContext.GetSettingValue(_cellIdentity, settingName);
         }
 
         public X509Certificate2 GetCertificate(string thumbprint)
         {
-            return _hostContext.GetCertificate(thumbprint);
+            return _hostContext.GetCertificate(_cellIdentity, thumbprint);
         }
 
         public string GetLocalResourcePath(string resourceName)
         {
-            return _hostContext.GetLocalResourcePath(resourceName);
+            return _hostContext.GetLocalResourcePath(_cellIdentity, resourceName);
         }
 
         public IPEndPoint GetEndpoint(string endpointName)
         {
-            return _hostContext.GetEndpoint(endpointName);
+            return _hostContext.GetEndpoint(_cellIdentity, endpointName);
         }
 
         public void SendCommand(IHostCommand command)

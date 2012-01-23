@@ -6,8 +6,8 @@
 using System;
 using System.Linq;
 using System.Reactive.Linq;
-using Lokad.Cloud.AppHost.Framework;
-using Lokad.Cloud.AppHost.Framework.Events;
+using System.Xml.Linq;
+using Lokad.Cloud.AppHost.Framework.Instrumentation;
 using Lokad.Cloud.Provisioning.Instrumentation;
 using Lokad.Cloud.Provisioning.Instrumentation.Events;
 using Lokad.Cloud.Storage.Instrumentation;
@@ -17,33 +17,58 @@ namespace Lokad.Cloud.Diagnostics
 {
     internal static class Observers
     {
+        private static HostLogLevel EventLevelToLogLevel(int level)
+        {
+            switch (level)
+            {
+                case 1:
+                    return HostLogLevel.Debug;
+                case 2:
+                    return HostLogLevel.Info;
+                case 3:
+                    return HostLogLevel.Warn;
+                case 4:
+                    return HostLogLevel.Error;
+                case 5:
+                    return HostLogLevel.Fatal;
+                default:
+                    throw new NotSupportedException(level.ToString());
+            }
+        }
+
+        private static XElement ProcessMeta(Type eventType, XElement meta, out string exception)
+        {
+            var exceptionXml = meta.Element("Exception");
+            exception = exceptionXml != null && !String.IsNullOrWhiteSpace(exceptionXml.Value)
+                ? exceptionXml.Value.Trim()
+                : null;
+
+            meta.Add(new XElement("Event", new XAttribute("typeName", eventType.FullName)));
+            return meta;
+        }
+
         public static IHostObserver CreateHostObserver(HostLogWriter log)
         {
             var subject = new HostObserverSubject();
-            subject.OfType<HostStartedEvent>().Subscribe(e => TryLog(log, HostLogLevel.Debug, "AppHost started on {0}.", e.Host.WorkerName));
-            subject.OfType<HostStoppedEvent>().Subscribe(e => TryLog(log, HostLogLevel.Debug, "AppHost stopped on {0}.", e.Host.WorkerName));
-            subject.OfType<NewDeploymentDetectedEvent>().Subscribe(e => TryLog(log, HostLogLevel.Info, "New deployment {0} detected for solution {1} on {2}.", e.Deployment.SolutionId, e.Solution.SolutionName, e.Host.WorkerName));
-            subject.OfType<NewUnrelatedSolutionDetectedEvent>().Subscribe(e => TryLog(log, HostLogLevel.Info, "New unrelated solution {0} detected on {1}.", e.Solution.SolutionName, e.Host.WorkerName));
-            subject.OfType<CellStartedEvent>().Subscribe(e => TryLog(log, HostLogLevel.Debug, "Cell {0} of solution {1} started on {2}.", e.Cell.CellName, e.Cell.SolutionName, e.Cell.Host.WorkerName));
-            subject.OfType<CellStoppedEvent>().Subscribe(e => TryLog(log, HostLogLevel.Debug, "Cell {0} of solution {1} stopped on {2}.", e.Cell.CellName, e.Cell.SolutionName, e.Cell.Host.WorkerName));
-            subject.OfType<CellExceptionRestartedEvent>().Subscribe(e => TryLog(log, HostLogLevel.Error, "Cell {0} of solution {1} exception: {2}", e.Cell.CellName, e.Cell.SolutionName, e.Exception));
-            subject.OfType<CellFatalErrorRestartedEvent>().Subscribe(e => TryLog(log, HostLogLevel.Fatal, "Cell {0} of solution {1} fatal error: {2}", e.Cell.CellName, e.Cell.SolutionName, e.Exception));
-
+            subject.Subscribe(e => TryLog(log, e.GetType(), (int)e.Level, e.Describe(), e.DescribeMeta()));
             return subject;
         }
 
-        public static ICloudProvisioningObserver CreateProvisioningObserver(HostLogWriter log)
+        public static IProvisioningObserver CreateProvisioningObserver(HostLogWriter log)
         {
-            var subject = new CloudProvisioningInstrumentationSubject();
+            var subject = new ProvisioningObserverSubject();
             subject.OfType<ProvisioningOperationRetriedEvent>()
                 .Buffer(TimeSpan.FromMinutes(5))
                 .Subscribe(events =>
                     {
                         foreach (var group in events.GroupBy(e => e.Policy))
                         {
-                            TryLog(log, HostLogLevel.Debug, "Provisioning: {0} retries in 5 min for the {1} policy on {2}. {3}",
-                                group.Count(), group.Key, Environment.MachineName,
-                                string.Join(", ", group.Where(e => e.Exception != null).Select(e => e.Exception.GetType().Name).Distinct().ToArray()));
+                            var first = group.First();
+                            TryLog(log, typeof(ProvisioningOperationRetriedEvent), (int)first.Level,
+                                string.Format("Provisioning: {0} retries in 5 min for the {1} policy on {2}. {3}",
+                                    group.Count(), group.Key, Environment.MachineName,
+                                    string.Join(", ", group.Where(e => e.Exception != null).Select(e => e.Exception.GetType().Name).Distinct().ToArray())),
+                                first.DescribeMeta());
                         }
                     });
 
@@ -73,11 +98,29 @@ namespace Lokad.Cloud.Diagnostics
             return subject;
         }
 
+        private static void TryLog(HostLogWriter log, Type eventType, int level, string message, XElement meta)
+        {
+            try
+            {
+                string exception;
+                var processedMeta = ProcessMeta(eventType, meta, out exception);
+                log.Log(
+                    EventLevelToLogLevel(level),
+                    exception,
+                    message,
+                    processedMeta);
+            }
+            catch (Exception)
+            {
+                // If logging fails, ignore (we can't report)
+            }
+        }
+
         private static void TryLog(HostLogWriter log, HostLogLevel level, string message, params object[] args)
         {
             try
             {
-                log.Log(level, args == null ? message : string.Format(message, args));
+                log.Log(level, args == null ? message : string.Format(message, args), null, null);
             }
             catch (Exception)
             {
@@ -89,7 +132,7 @@ namespace Lokad.Cloud.Diagnostics
         {
             try
             {
-                log.Log(level, exception, args == null ? message : string.Format(message, args));
+                log.Log(level, args == null ? message : string.Format(message, args), exception!= null ? exception.ToString() : null, null);
             }
             catch (Exception)
             {

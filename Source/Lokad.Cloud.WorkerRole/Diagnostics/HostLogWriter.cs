@@ -47,16 +47,11 @@ namespace Lokad.Cloud.Diagnostics
             _blobStorage = blobStorage;
         }
 
-        public void Log(HostLogLevel level, object message, params XElement[] meta)
-        {
-            Log(level, null, message, meta);
-        }
-
-        public void Log(HostLogLevel level, Exception exception, object message, params XElement[] meta)
+        public void Log(HostLogLevel level, string message, string exception, XElement meta)
         {
             var now = DateTime.UtcNow;
 
-            var blobContent = FormatLogEntry(now, level, message.ToString(), exception, meta);
+            var blobContent = FormatLogEntry(now, level, message, exception, meta);
             var blobName = string.Format("{0}/{1}/", FormatDateTimeNamePrefix(now), level);
             var blobContainer = LevelToContainer(level);
 
@@ -72,21 +67,17 @@ namespace Lokad.Cloud.Diagnostics
             return ContainerNamePrefix + "-" + level.ToString().ToLower();
         }
 
-        private static string FormatLogEntry(DateTime dateTimeUtc, HostLogLevel level, string message, Exception exception, XElement[] meta)
+        private static string FormatLogEntry(DateTime dateTimeUtc, HostLogLevel level, string message, string exception, XElement meta)
         {
             var entry = new XElement("log",
                 new XElement("level", level),
                 new XElement("timestamp", dateTimeUtc.ToString("o", CultureInfo.InvariantCulture)),
-                new XElement("message", message));
+                new XElement("message", message),
+                meta ?? new XElement("Meta"));
 
             if (exception != null)
             {
-                entry.Add(new XElement("error", exception.ToString()));
-            }
-
-            if (meta != null && meta.Length > 0)
-            {
-                entry.Add(new XElement("meta", meta));
+                entry.Add(new XElement("error", exception));
             }
 
             return entry.ToString();

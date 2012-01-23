@@ -6,8 +6,8 @@
 using System;
 using System.Linq;
 using System.Reactive.Linq;
-using Lokad.Cloud.AppHost.Framework;
-using Lokad.Cloud.AppHost.Framework.Events;
+using Lokad.Cloud.AppHost.Framework.Instrumentation;
+using Lokad.Cloud.AppHost.Framework.Instrumentation.Events;
 using Lokad.Cloud.Diagnostics;
 using Lokad.Cloud.Instrumentation;
 using Lokad.Cloud.Provisioning.Instrumentation;
@@ -34,9 +34,9 @@ namespace Lokad.Cloud.EntryPoint
             return subject;
         }
 
-        public static ICloudProvisioningObserver CreateProvisioningObserver(ILog log)
+        public static IProvisioningObserver CreateProvisioningObserver(ILog log)
         {
-            var subject = new CloudProvisioningInstrumentationSubject();
+            var subject = new ProvisioningObserverSubject();
             subject.OfType<ProvisioningOperationRetriedEvent>()
                 .Buffer(TimeSpan.FromMinutes(5))
                 .Subscribe(events =>

@@ -11,6 +11,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Lokad.Cloud.AppHost.Framework;
 using Lokad.Cloud.AppHost.Framework.Definition;
+using Lokad.Cloud.AppHost.Framework.Instrumentation;
 using Lokad.Cloud.Diagnostics;
 using Lokad.Cloud.Provisioning;
 using Lokad.Cloud.Provisioning.Instrumentation;
@@ -27,7 +28,7 @@ namespace Lokad.Cloud
         private readonly AzureCurrentDeployment _currentDeployment;
         private readonly AzureProvisioning _provisioning;
 
-        public HostContext(IDeploymentReader deploymentReader, string certificateThumbprint, string subscriptionId, HostLogWriter log, IHostObserver observer, ICloudProvisioningObserver provisioningObserver)
+        public HostContext(IDeploymentReader deploymentReader, string certificateThumbprint, string subscriptionId, HostLogWriter log, IHostObserver observer, IProvisioningObserver provisioningObserver)
         {
             Observer = observer;
             DeploymentReader = deploymentReader;
@@ -39,7 +40,8 @@ namespace Lokad.Cloud
             // try get settings and certificate
             if (!IsAvailable)
             {
-                log.Log(HostLogLevel.Warn, string.Format("Provisioning: RoleEnvironment not available on worker {0}.", _identity.WorkerName));
+                // TODO: upgrade to proper instrumentation
+                log.Log(HostLogLevel.Warn, string.Format("Provisioning: RoleEnvironment not available on worker {0}.", _identity.WorkerName), null, null);
                 return;
             }
 
@@ -53,7 +55,8 @@ namespace Lokad.Cloud
             }
             catch (TypeInitializationException)
             {
-                log.Log(HostLogLevel.Warn, string.Format("Provisioning: RoleEnvironment not available on worker {0}.", _identity.WorkerName));
+                // TODO: upgrade to proper instrumentation
+                log.Log(HostLogLevel.Warn, string.Format("Provisioning: RoleEnvironment not available on worker {0}.", _identity.WorkerName), null, null);
                 return;
             }
 
@@ -61,20 +64,22 @@ namespace Lokad.Cloud
             X509Certificate2 certificate = null;
             if (!String.IsNullOrWhiteSpace(certificateThumbprint))
             {
-                certificate = GetCertificate(certificateThumbprint);
+                certificate = GetCertificate(null, certificateThumbprint);
             }
 
             // early evaluate management status for intrinsic fault states, to skip further processing
             if (currentDeploymentPrivateId == null || certificate == null || string.IsNullOrWhiteSpace(subscriptionId))
             {
-                log.Log(HostLogLevel.Debug, "Provisioning: Not available because either the certificate or the subscription was not provided correctly.");
+                // TODO: upgrade to proper instrumentation
+                log.Log(HostLogLevel.Debug, "Provisioning: Not available because either the certificate or the subscription was not provided correctly.", null, null);
                 return;
             }
 
             // detect dev fabric
             if (currentDeploymentPrivateId.StartsWith("deployment("))
             {
-                log.Log(HostLogLevel.Debug, "Provisioning: Not available in dev fabric instance.");
+                // TODO: upgrade to proper instrumentation
+                log.Log(HostLogLevel.Debug, "Provisioning: Not available in dev fabric instance.", null, null);
                 return;
             }
 
@@ -94,7 +99,7 @@ namespace Lokad.Cloud
             return new CellLifeIdentity(_identity, solutionName, cellName, Guid.NewGuid().ToString("N"));
         }
 
-        public string GetSettingValue(string settingName)
+        public string GetSettingValue(CellLifeIdentity cell, string settingName)
         {
             if (!IsAvailable)
             {
@@ -118,7 +123,7 @@ namespace Lokad.Cloud
             }
         }
 
-        public X509Certificate2 GetCertificate(string thumbprint)
+        public X509Certificate2 GetCertificate(CellLifeIdentity cell, string thumbprint)
         {
             var store = new X509Store(StoreName.My, StoreLocation.CurrentUser);
             try
@@ -138,7 +143,7 @@ namespace Lokad.Cloud
             }
         }
 
-        public string GetLocalResourcePath(string resourceName)
+        public string GetLocalResourcePath(CellLifeIdentity cell, string resourceName)
         {
             if (IsAvailable)
             {
@@ -150,7 +155,7 @@ namespace Lokad.Cloud
             return dir;
         }
 
-        public IPEndPoint GetEndpoint(string endpointName)
+        public IPEndPoint GetEndpoint(CellLifeIdentity cell, string endpointName)
         {
             if (!IsAvailable)
             {
@@ -203,11 +208,13 @@ namespace Lokad.Cloud
                     {
                         if (ProvisioningErrorHandling.IsTransientError(t.Exception))
                         {
-                            _log.Log(HostLogLevel.Debug, task.Exception.GetBaseException(), "Provisioning: Getting the current worker instance count failed with a transient error.");
+                            // TODO: upgrade to proper instrumentation
+                            _log.Log(HostLogLevel.Debug, "Provisioning: Getting the current worker instance count failed with a transient error.", task.Exception.GetBaseException().ToString(), null);
                         }
                         else
                         {
-                            _log.Log(HostLogLevel.Warn, task.Exception.GetBaseException(), "Provisioning: Getting the current worker instance count failed with a permanent error.");
+                            // TODO: upgrade to proper instrumentation
+                            _log.Log(HostLogLevel.Warn, "Provisioning: Getting the current worker instance count failed with a permanent error.", task.Exception.GetBaseException().ToString(), null);
                         }
                     }
                 }
@@ -231,7 +238,8 @@ namespace Lokad.Cloud
                 throw new ArgumentOutOfRangeException("count");
             }
 
-            _log.Log(HostLogLevel.Info, string.Format("Provisioning: Updating the worker instance count to {0}.", count));
+            // TODO: upgrade to proper instrumentation
+            _log.Log(HostLogLevel.Info, string.Format("Provisioning: Updating the worker instance count to {0}.", count), null, null);
 
             var task = _provisioning.UpdateCurrentLokadCloudWorkerCount(_currentDeployment, count, cancellationToken);
 
@@ -248,20 +256,24 @@ namespace Lokad.Cloud
                             switch (httpStatus)
                             {
                                 case HttpStatusCode.Conflict:
-                                    _log.Log(HostLogLevel.Debug, string.Format("Provisioning: Updating the worker instance count to {0} failed because another deployment update is already in progress.", count));
+                                    // TODO: upgrade to proper instrumentation
+                                    _log.Log(HostLogLevel.Debug, string.Format("Provisioning: Updating the worker instance count to {0} failed because another deployment update is already in progress.", count), null, null);
                                     break;
                                 default:
-                                    _log.Log(HostLogLevel.Debug, string.Format("Provisioning: Updating the worker instance count failed with HTTP Status {0} ({1}).", httpStatus));
+                                    // TODO: upgrade to proper instrumentation
+                                    _log.Log(HostLogLevel.Debug, string.Format("Provisioning: Updating the worker instance count failed with HTTP Status {0} ({1}).", httpStatus), null, null);
                                     break;
                             }
                         }
                         else if (ProvisioningErrorHandling.IsTransientError(t.Exception))
                         {
-                            _log.Log(HostLogLevel.Debug, task.Exception.GetBaseException(), "Provisioning: Updating the worker instance count failed with a transient error.");
+                            // TODO: upgrade to proper instrumentation
+                            _log.Log(HostLogLevel.Debug, "Provisioning: Updating the worker instance count failed with a transient error.", task.Exception.GetBaseException().ToString(), null);
                         }
                         else
                         {
-                            _log.Log(HostLogLevel.Warn, task.Exception.GetBaseException(), "Provisioning: Updating the worker instance count failed with a permanent error.");
+                            // TODO: upgrade to proper instrumentation
+                            _log.Log(HostLogLevel.Warn, "Provisioning: Updating the worker instance count failed with a permanent error.", task.Exception.GetBaseException().ToString(), null);
                         }
                     }
                 }

@@ -86,7 +86,7 @@ namespace Lokad.Cloud.Diagnostics
 
             if (meta != null && meta.Length > 0)
             {
-                entry.Add(new XElement("meta", meta));
+                entry.Add(new XElement("Meta", meta));
             }
 
             return entry.ToString();
