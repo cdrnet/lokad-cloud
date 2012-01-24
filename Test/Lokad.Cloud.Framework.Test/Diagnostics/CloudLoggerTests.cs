@@ -31,11 +31,8 @@ namespace Lokad.Cloud.Test.Diagnostics
         [Test]
         public void CanWriteToLog()
         {
-            _logWriter.Error(
-                new InvalidOperationException("CloudLoggerTests.Log"),
-                "My message with CloudLoggerTests.Log.");
-
-            _logWriter.Info(new InvalidOperationException("CloudLoggerTests.Log"), "Not a restart, just a test.");
+            Assert.IsTrue(_logWriter.TryError("My message with CloudLoggerTests.Log.", new InvalidOperationException("CloudLoggerTests.Log")));
+            Assert.IsTrue(_logWriter.TryInfo("Not a restart, just a test.", new InvalidOperationException("CloudLoggerTests.Log")));
 
             _logWriter.Warn().WithException(new Exception())
                 .WithMeta("JobId", "123").WithMeta(new XElement("abc", "def"))
@@ -49,12 +46,9 @@ namespace Lokad.Cloud.Test.Diagnostics
             var now = DateTime.UtcNow;
             Thread.Sleep(250);
 
-            _logWriter.Error(
-                new InvalidOperationException("CloudLoggerTests.Log"),
-                "My message with CloudLoggerTests.Log.");
-
-            _logWriter.Info(new InvalidOperationException("CloudLoggerTests.Log"), "Not a restart, just a test.");
-            _logWriter.Info(new InvalidOperationException("CloudLoggerTests.Log"), "Not a restart, just a test II.");
+            Assert.IsTrue(_logWriter.TryError("My message with CloudLoggerTests.Log.", new InvalidOperationException("CloudLoggerTests.Log")));
+            Assert.IsTrue(_logWriter.TryInfo("Not a restart, just a test.", new InvalidOperationException("CloudLoggerTests.Log")));
+            Assert.IsTrue(_logWriter.TryInfo("Not a restart, just a test II.", new InvalidOperationException("CloudLoggerTests.Log")));
 
             Assert.AreEqual(0, _logReader.GetLogsOfLevel(LogLevel.Fatal).Count(l => l.DateTimeUtc > now));
             Assert.AreEqual(1, _logReader.GetLogsOfLevel(LogLevel.Error).Count(l => l.DateTimeUtc > now));
@@ -70,12 +64,9 @@ namespace Lokad.Cloud.Test.Diagnostics
             var now = DateTime.UtcNow;
             Thread.Sleep(250);
 
-            _logWriter.Error(
-                new InvalidOperationException("CloudLoggerTests.Log"),
-                "My message with CloudLoggerTests.Log.");
-
-            _logWriter.Info(new InvalidOperationException("CloudLoggerTests.Log"), "Not a restart, just a test.");
-            _logWriter.Info(new InvalidOperationException("CloudLoggerTests.Log"), "Not a restart, just a test II.");
+            Assert.IsTrue(_logWriter.TryError("My message with CloudLoggerTests.Log.", new InvalidOperationException("CloudLoggerTests.Log")));
+            Assert.IsTrue(_logWriter.TryInfo("Not a restart, just a test.", new InvalidOperationException("CloudLoggerTests.Log")));
+            Assert.IsTrue(_logWriter.TryInfo("Not a restart, just a test II.", new InvalidOperationException("CloudLoggerTests.Log")));
 
             Assert.AreEqual(0, _logReader.GetLogsOfLevelOrHigher(LogLevel.Fatal).Count(l => l.DateTimeUtc > now));
             Assert.AreEqual(1, _logReader.GetLogsOfLevelOrHigher(LogLevel.Error).Count(l => l.DateTimeUtc > now));
@@ -94,11 +85,9 @@ namespace Lokad.Cloud.Test.Diagnostics
             // Add 30 log messages
             for (int i = 0; i < 10; i++)
             {
-                _logWriter.Error(
-                    new InvalidOperationException("CloudLoggerTests.Log"),
-                    "My message with CloudLoggerTests.Log.");
-                _logWriter.Warn("A test warning");
-                _logWriter.Info(new InvalidOperationException("CloudLoggerTests.Log"), "Not a restart, just a test.");
+                Assert.IsTrue(_logWriter.TryError("My message with CloudLoggerTests.Log.", new InvalidOperationException("CloudLoggerTests.Log")));
+                Assert.IsTrue(_logWriter.TryWarn("A test warning"));
+                Assert.IsTrue(_logWriter.TryInfo("Not a restart, just a test.", new InvalidOperationException("CloudLoggerTests.Log")));
             }
 
             Assert.AreEqual(10, _logReader.GetLogs().Take(10).Count());
@@ -116,11 +105,11 @@ namespace Lokad.Cloud.Test.Diagnostics
             Thread.Sleep(100);
             var before = DateTime.UtcNow;
             Thread.Sleep(100);
-            _logWriter.Error(new InvalidOperationException("CloudLoggerTests.Log"), "Not a restart, just a test.");
+            Assert.IsTrue(_logWriter.TryError("Not a restart, just a test.", new InvalidOperationException("CloudLoggerTests.Log")));
             Thread.Sleep(100);
-            _logWriter.Info(new InvalidOperationException("CloudLoggerTests.Log"), "Not a restart, just a test II.");
+            Assert.IsTrue(_logWriter.TryInfo("Not a restart, just a test II.", new InvalidOperationException("CloudLoggerTests.Log")));
             Thread.Sleep(100);
-            _logWriter.Warn(new InvalidOperationException("CloudLoggerTests.Log"), "Not a restart, just a test III.");
+            Assert.IsTrue(_logWriter.TryWarn("Not a restart, just a test III.", new InvalidOperationException("CloudLoggerTests.Log")));
             Thread.Sleep(100);
             var after = DateTime.UtcNow;
 
@@ -149,7 +138,7 @@ namespace Lokad.Cloud.Test.Diagnostics
 
             for (int i = 0; i < 10; i++)
             {
-                _logWriter.Info("Just a test message");
+                Assert.IsTrue(_logWriter.TryInfo("Just a test message"));
             }
 
             Assert.AreEqual(initialCount + 10, _logReader.GetLogs().Count());

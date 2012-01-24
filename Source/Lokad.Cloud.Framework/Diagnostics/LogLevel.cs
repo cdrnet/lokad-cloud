@@ -9,15 +9,15 @@ namespace Lokad.Cloud.Diagnostics
     public enum LogLevel
     {
         /// <summary> Message is intended for debugging </summary>
-        Debug,
+        Debug = 1,
         /// <summary> Informatory message </summary>
-        Info,
+        Info = 2,
         /// <summary> The message is about potential problem in the system </summary>
-        Warn,
+        Warn = 3,
         /// <summary> Some error has occured </summary>
-        Error,
+        Error = 4,
         /// <summary> Message is associated with the critical problem </summary>
-        Fatal,
+        Fatal = 5,
 
         /// <summary>
         /// Highest possible level

@@ -31,19 +31,19 @@ namespace Lokad.Cloud.Jobs
         public void Start(Job job)
         {
             // TODO: Implementation
-            _log.DebugFormat("Job {0} started", job.JobId);
+            _log.TryDebugFormat("Job {0} started", job.JobId);
         }
 
         public void Succeed(Job job)
         {
             // TODO: Implementation
-            _log.DebugFormat("Job {0} succeeded", job.JobId);
+            _log.TryDebugFormat("Job {0} succeeded", job.JobId);
         }
 
         public void Fail(Job job)
         {
             // TODO: Implementation
-            _log.DebugFormat("Job {0} failed", job.JobId);
+            _log.TryDebugFormat("Job {0} failed", job.JobId);
         }
     }
 }

@@ -47,7 +47,7 @@ namespace Lokad.Cloud.Diagnostics
             _blobStorage = blobStorage;
         }
 
-        public void Log(HostLogLevel level, string message, string exception, XElement meta)
+        public void Log(HostLogLevel level, string message, Exception exception = null, XElement meta = null)
         {
             var now = DateTime.UtcNow;
 
@@ -62,22 +62,47 @@ namespace Lokad.Cloud.Diagnostics
             }
         }
 
+        public bool TryLog(HostLogLevel level, string message, Exception exception = null, XElement meta = null)
+        {
+            try
+            {
+                Log(level, message, exception, meta);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
         private static string LevelToContainer(HostLogLevel level)
         {
             return ContainerNamePrefix + "-" + level.ToString().ToLower();
         }
 
-        private static string FormatLogEntry(DateTime dateTimeUtc, HostLogLevel level, string message, string exception, XElement meta)
+        private static string FormatLogEntry(DateTime dateTimeUtc, HostLogLevel level, string message, Exception exception, XElement meta)
         {
             var entry = new XElement("log",
                 new XElement("level", level),
                 new XElement("timestamp", dateTimeUtc.ToString("o", CultureInfo.InvariantCulture)),
-                new XElement("message", message),
-                meta ?? new XElement("Meta"));
+                new XElement("message", message));
 
             if (exception != null)
             {
-                entry.Add(new XElement("error", exception));
+                entry.Add(new XElement("error", exception.ToString()));
+            }
+
+            if (meta != null)
+            {
+                // Grab exception data from meta, if available (and not already provided)
+                XElement exceptionXml;
+                if (exception == null && (exceptionXml = meta.Element("Exception")) != null)
+                {
+                    entry.Add(new XElement("error", exceptionXml.Value));
+                }
+
+                // Patch xml if needed
+                entry.Add(meta.Name == "Meta" ? meta : new XElement("Meta", meta.Elements()));
             }
 
             return entry.ToString();

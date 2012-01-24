@@ -36,10 +36,10 @@ namespace Lokad.Cloud.Autofac.Diagnostics
                 return;
             }
 
-            _subscriptions.Add(_observable.OfType<BlobDeserializationFailedEvent>().Subscribe(e => TryLog(e, e.Exception, LogLevel.Error)));
-            _subscriptions.Add(_observable.OfType<MessageDeserializationFailedQuarantinedEvent>().Subscribe(e => TryLog(e, e.Exceptions)));
-            _subscriptions.Add(_observable.OfType<MessageProcessingFailedQuarantinedEvent>().Subscribe(e => TryLog(e)));
-            _subscriptions.Add(_observable.OfType<MessagesRevivedEvent>().Subscribe(e => TryLog(e)));
+            _subscriptions.Add(_observable.OfType<BlobDeserializationFailedEvent>().Subscribe(e => TryLog(e.Describe(), e.Exception, LogLevel.Error)));
+            _subscriptions.Add(_observable.OfType<MessageDeserializationFailedQuarantinedEvent>().Subscribe(e => TryLog(e.Describe(), e.Exceptions)));
+            _subscriptions.Add(_observable.OfType<MessageProcessingFailedQuarantinedEvent>().Subscribe(e => TryLog(e.Describe())));
+            _subscriptions.Add(_observable.OfType<MessagesRevivedEvent>().Subscribe(e => TryLog(e.Describe())));
 
             _subscriptions.Add(_observable.OfType<StorageOperationRetriedEvent>()
                 .Where(@event => @event.Policy != "OptimisticConcurrency")
@@ -56,13 +56,13 @@ namespace Lokad.Cloud.Autofac.Diagnostics
                     }));
         }
 
-        void TryLog(object message, Exception exception = null, LogLevel level = LogLevel.Warn)
+        void TryLog(string message, Exception exception = null, LogLevel level = LogLevel.Warn)
         {
             try
             {
                 if (exception != null)
                 {
-                    _log.Log(level, exception, message);
+                    _log.Log(level, message, exception);
                 }
                 else
                 {

@@ -41,7 +41,7 @@ namespace Lokad.Cloud.Services
                 var dm = Blobs.GetBlob(parsedName);
                 if (!dm.HasValue)
                 {
-                    Log.WarnFormat("Deserialization failed for delayed message {0}, message was dropped.", parsedName.Identifier);
+                    Log.TryWarnFormat("Deserialization failed for delayed message {0}, message was dropped.", parsedName.Identifier);
                     continue;
                 }
 

@@ -47,16 +47,11 @@ namespace Lokad.Cloud.Diagnostics
             _blobStorage = blobStorage;
         }
 
-        public void Log(LogLevel level, object message, params XElement[] meta)
-        {
-            Log(level, null, message, meta);
-        }
-
-        public void Log(LogLevel level, Exception exception, object message, params XElement[] meta)
+        public void Log(LogLevel level, string message, Exception exception = null, XElement meta = null)
         {
             var now = DateTime.UtcNow;
 
-            var blobContent = FormatLogEntry(now, level, message.ToString(), exception, meta);
+            var blobContent = FormatLogEntry(now, level, message, exception, meta);
             var blobName = string.Format("{0}/{1}/", FormatDateTimeNamePrefix(now), level);
             var blobContainer = LevelToContainer(level);
 
@@ -72,7 +67,7 @@ namespace Lokad.Cloud.Diagnostics
             return ContainerNamePrefix + "-" + level.ToString().ToLower();
         }
 
-        private static string FormatLogEntry(DateTime dateTimeUtc, LogLevel level, string message, Exception exception, XElement[] meta)
+        private static string FormatLogEntry(DateTime dateTimeUtc, LogLevel level, string message, Exception exception, XElement meta)
         {
             var entry = new XElement("log",
                 new XElement("level", level),
@@ -84,9 +79,17 @@ namespace Lokad.Cloud.Diagnostics
                 entry.Add(new XElement("error", exception.ToString()));
             }
 
-            if (meta != null && meta.Length > 0)
+            if (meta != null)
             {
-                entry.Add(new XElement("Meta", meta));
+                // Grab exception data from meta, if available (and not already provided)
+                XElement exceptionXml;
+                if (exception == null && (exceptionXml = meta.Element("Exception")) != null)
+                {
+                    entry.Add(new XElement("error", exceptionXml.Value));
+                }
+
+                // Patch xml if needed
+                entry.Add(meta.Name == "Meta" ? meta : new XElement("Meta", meta.Elements()));
             }
 
             return entry.ToString();

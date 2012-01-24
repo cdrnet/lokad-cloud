@@ -198,7 +198,7 @@ namespace Lokad.Cloud.ServiceFabric
                                 return Maybe<ScheduledServiceState>.Empty;
                             }
 
-                            Log.WarnFormat(
+                            Log.TryWarnFormat(
                                 "ScheduledService {0}: Expired lease owned by {1} was reset after blocking for {2} minutes.",
                                 Name, state.Lease.Owner, (int) (now - state.Lease.Acquired).TotalMinutes);
                         }

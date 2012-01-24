@@ -50,13 +50,13 @@ namespace Lokad.Cloud.Autofac.Diagnostics
                     }));
         }
 
-        void TryLog(object message, Exception exception = null, LogLevel level = LogLevel.Warn)
+        void TryLog(string message, Exception exception = null, LogLevel level = LogLevel.Warn)
         {
             try
             {
                 if (exception != null)
                 {
-                    _log.Log(level, exception, message);
+                    _log.Log(level, message, exception);
                 }
                 else
                 {

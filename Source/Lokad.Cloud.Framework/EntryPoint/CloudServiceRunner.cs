@@ -24,7 +24,7 @@ namespace Lokad.Cloud.EntryPoint
             var finalizer = new RuntimeFinalizer();
             try
             {
-                log.DebugFormat("Runtime: started on worker {0}.", environment.Host.WorkerName);
+                log.TryDebugFormat("Runtime: started on worker {0}.", environment.Host.WorkerName);
 
                 var services = createServices(finalizer);
 
@@ -32,50 +32,51 @@ namespace Lokad.Cloud.EntryPoint
                 _scheduler = new Scheduler(services, service => service.Start(), runtimeObserver);
                 _scheduler.RunSchedule(cancellationToken);
 
-                log.DebugFormat("Runtime: Runtime has stopped cleanly on worker {0}.", environment.Host.WorkerName);
+                log.TryDebugFormat("Runtime: Runtime has stopped cleanly on worker {0}.", environment.Host.WorkerName);
             }
             catch (TypeLoadException typeLoadException)
             {
-                log.ErrorFormat(typeLoadException, "Runtime: Type {0} could not be loaded. The Runtime will be restarted.",
+                log.TryErrorFormat(typeLoadException, "Runtime: Type {0} could not be loaded. The Runtime will be restarted.",
                     typeLoadException.TypeName);
             }
             catch (FileLoadException fileLoadException)
             {
                 // Tentatively: referenced assembly is missing
-                log.Fatal(fileLoadException, "Runtime: Could not load assembly probably due to a missing reference assembly. The Runtime will be restarted.");
+                log.TryFatal("Runtime: Could not load assembly probably due to a missing reference assembly. The Runtime will be restarted.",
+                    fileLoadException);
             }
             catch (SecurityException securityException)
             {
                 // Tentatively: assembly cannot be loaded due to security config
-                log.FatalFormat(securityException, "Runtime: Could not load assembly {0} probably due to security configuration. The Runtime will be restarted.",
+                log.TryFatalFormat(securityException, "Runtime: Could not load assembly {0} probably due to security configuration. The Runtime will be restarted.",
                     securityException.FailedAssemblyInfo);
             }
             catch (ThreadInterruptedException)
             {
-                log.WarnFormat("Runtime: execution was interrupted on worker {0} in service {1}. The Runtime will be restarted.",
+                log.TryWarnFormat("Runtime: execution was interrupted on worker {0} in service {1}. The Runtime will be restarted.",
                     environment.Host.WorkerName, GetNameOfServiceInExecution());
             }
             catch (ThreadAbortException)
             {
                 Thread.ResetAbort();
-                log.DebugFormat("Runtime: execution was aborted on worker {0} in service {1}. The Runtime is stopping.",
+                log.TryDebugFormat("Runtime: execution was aborted on worker {0} in service {1}. The Runtime is stopping.",
                     environment.Host.WorkerName, GetNameOfServiceInExecution());
             }
             catch (TimeoutException)
             {
-                log.WarnFormat("Runtime: execution timed out on worker {0} in service {1}. The Runtime will be restarted.",
+                log.TryWarnFormat("Runtime: execution timed out on worker {0} in service {1}. The Runtime will be restarted.",
                     environment.Host.WorkerName, GetNameOfServiceInExecution());
             }
             catch (Exception ex)
             {
-                log.ErrorFormat(ex, "Runtime: An unhandled {0} exception occurred on worker {1} in service {2}. The Runtime will be restarted.",
+                log.TryErrorFormat(ex, "Runtime: An unhandled {0} exception occurred on worker {1} in service {2}. The Runtime will be restarted.",
                     ex.GetType().Name, environment.Host.WorkerName, GetNameOfServiceInExecution());
             }
             finally
             {
                 finalizer.FinalizeRuntime();
 
-                log.DebugFormat("Runtime: stopped on worker {0}.", environment.Host.WorkerName);
+                log.TryDebugFormat("Runtime: stopped on worker {0}.", environment.Host.WorkerName);
 
                 if (disposeServices != null)
                 {

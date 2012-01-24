@@ -4,7 +4,6 @@
 #endregion
 
 using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.Xml.Linq;
 
@@ -14,14 +13,14 @@ namespace Lokad.Cloud.Diagnostics
     {
         private readonly ILog _log;
         private readonly LogLevel _level;
-        private readonly List<XElement> _meta;
+        private readonly XElement _meta;
         private Exception _exception;
 
         internal LogEntryBuilder(ILog log, LogLevel level)
         {
             _log = log;
             _level = level;
-            _meta = new List<XElement>();
+            _meta = new XElement("Meta");
         }
 
         public LogEntryBuilder WithException(Exception exception)
@@ -32,13 +31,21 @@ namespace Lokad.Cloud.Diagnostics
 
         public LogEntryBuilder WithMeta(XElement element)
         {
-            _meta.Add(element);
+            if (element.Name == "Meta")
+            {
+                _meta.Add(element.Elements());
+            }
+            else
+            {
+                _meta.Add(element);
+            }
+
             return this;
         }
 
         public LogEntryBuilder WithMeta(params XElement[] elements)
         {
-            _meta.AddRange(elements);
+            _meta.Add(elements);
             return this;
         }
 
@@ -48,14 +55,40 @@ namespace Lokad.Cloud.Diagnostics
             return this;
         }
 
-        public void Write(object message)
+        public void Write(string message)
         {
-            _log.Log(_level, _exception, message, _meta.ToArray());
+            _log.Log(_level, message, _exception, _meta);
+        }
+
+        public bool TryWrite(string message)
+        {
+            try
+            {
+                _log.Log(_level, message, _exception, _meta);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         public void WriteFormat(string format, params object[] args)
         {
-            _log.Log(_level, _exception, string.Format(CultureInfo.InvariantCulture, format, args), _meta.ToArray());
+            _log.Log(_level, string.Format(CultureInfo.InvariantCulture, format, args), _exception, _meta);
+        }
+
+        public bool TryWriteFormat(string format, params object[] args)
+        {
+            try
+            {
+                _log.Log(_level, string.Format(CultureInfo.InvariantCulture, format, args), _exception, _meta);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
     }
 }
