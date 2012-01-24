@@ -11,7 +11,7 @@ using Microsoft.WindowsAzure;
 
 namespace Lokad.Cloud.Test
 {
-    public sealed class GlobalSetup
+    public static class GlobalSetup
     {
         static IContainer _container;
 

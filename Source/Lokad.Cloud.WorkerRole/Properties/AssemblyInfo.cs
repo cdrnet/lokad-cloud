@@ -2,8 +2,8 @@
 // This code is released under the terms of the new BSD licence.
 // URL: http://www.lokad.com/
 #endregion
+
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 // General Information about an assembly is controlled through the following 

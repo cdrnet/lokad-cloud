@@ -85,7 +85,7 @@ namespace Lokad.Cloud.Diagnostics
 
         /// <summary>Time prefix with inversion in order to enumerate
         /// starting from the most recent.</summary>
-        /// <remarks>This method is the symmetric of <see cref="CloudLogReader.ParseDateTimeFromName"/>.</remarks>
+        /// <remarks>This method is the symmetric of CloudLogReader.ParseDateTimeFromName.</remarks>
         public static string FormatDateTimeNamePrefix(DateTime dateTimeUtc)
         {
             // yyyy/MM/dd/hh/mm/ss/fff

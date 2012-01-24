@@ -36,15 +36,12 @@ namespace Lokad.Cloud.Diagnostics
             }
         }
 
-        private static XElement ProcessMeta(Type eventType, XElement meta, out string exception)
+        private static string ExtractExceptionText(XElement meta)
         {
             var exceptionXml = meta.Element("Exception");
-            exception = exceptionXml != null && !String.IsNullOrWhiteSpace(exceptionXml.Value)
+            return exceptionXml != null && !String.IsNullOrWhiteSpace(exceptionXml.Value)
                 ? exceptionXml.Value.Trim()
                 : null;
-
-            meta.Add(new XElement("Event", new XAttribute("typeName", eventType.FullName)));
-            return meta;
         }
 
         public static IHostObserver CreateHostObserver(HostLogWriter log)
@@ -75,9 +72,9 @@ namespace Lokad.Cloud.Diagnostics
             return subject;
         }
 
-        public static ICloudStorageObserver CreateStorageObserver(HostLogWriter log)
+        public static IStorageObserver CreateStorageObserver(HostLogWriter log)
         {
-            var subject = new CloudStorageInstrumentationSubject();
+            var subject = new StorageObserverSubject();
             subject.OfType<BlobDeserializationFailedEvent>().Subscribe(e => TryLog(log, HostLogLevel.Error, e.Exception, e.ToString()));
             subject.OfType<MessageDeserializationFailedQuarantinedEvent>().Subscribe(e => TryLog(log, HostLogLevel.Warn, e.Exceptions, e.ToString()));
             subject.OfType<MessageProcessingFailedQuarantinedEvent>().Subscribe(e => TryLog(log, HostLogLevel.Warn, e.ToString()));
@@ -102,13 +99,7 @@ namespace Lokad.Cloud.Diagnostics
         {
             try
             {
-                string exception;
-                var processedMeta = ProcessMeta(eventType, meta, out exception);
-                log.Log(
-                    EventLevelToLogLevel(level),
-                    exception,
-                    message,
-                    processedMeta);
+                log.Log(EventLevelToLogLevel(level), ExtractExceptionText(meta), message, meta);
             }
             catch (Exception)
             {

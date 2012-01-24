@@ -52,9 +52,9 @@ namespace Lokad.Cloud.EntryPoint
             return subject;
         }
 
-        public static ICloudStorageObserver CreateStorageObserver(ILog log)
+        public static IStorageObserver CreateStorageObserver(ILog log)
         {
-            var subject = new CloudStorageInstrumentationSubject();
+            var subject = new StorageObserverSubject();
             subject.OfType<BlobDeserializationFailedEvent>().Subscribe(e => TryLog(log, LogLevel.Error, e.Exception, e.ToString()));
             subject.OfType<MessageDeserializationFailedQuarantinedEvent>().Subscribe(e => TryLog(log, LogLevel.Warn, e.Exceptions, e.ToString()));
             subject.OfType<MessageProcessingFailedQuarantinedEvent>().Subscribe(e => TryLog(log, LogLevel.Warn, e.ToString()));

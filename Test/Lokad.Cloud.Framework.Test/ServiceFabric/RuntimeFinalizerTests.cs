@@ -12,7 +12,7 @@ namespace Lokad.Cloud.Test.ServiceFabric
 {
     class MockDisposable : IDisposable
     {
-        public bool IsDisposed { get; set; }
+        public bool IsDisposed { get; private set; }
 
         public void Dispose()
         {

@@ -28,28 +28,28 @@ namespace Lokad.Cloud.Autofac.Storage
             builder.Register(c => CloudStorage
                 .ForAzureAccount(Patch(c.Resolve<CloudStorageAccount>()))
                 .WithDataSerializer(c.Resolve<IDataSerializer>())
-                .WithObserver(c.ResolveOptional<ICloudStorageObserver>())
+                .WithObserver(c.ResolveOptional<IStorageObserver>())
                 .WithRuntimeFinalizer(c.ResolveOptional<IRuntimeFinalizer>())
                 .BuildStorageProviders());
 
             builder.Register(c => CloudStorage
                 .ForAzureAccount(Patch(c.Resolve<CloudStorageAccount>()))
                 .WithDataSerializer(c.Resolve<IDataSerializer>())
-                .WithObserver(c.ResolveOptional<ICloudStorageObserver>())
+                .WithObserver(c.ResolveOptional<IStorageObserver>())
                 .WithRuntimeFinalizer(c.ResolveOptional<IRuntimeFinalizer>())
                 .BuildBlobStorage());
 
             builder.Register(c => CloudStorage
                 .ForAzureAccount(Patch(c.Resolve<CloudStorageAccount>()))
                 .WithDataSerializer(c.Resolve<IDataSerializer>())
-                .WithObserver(c.ResolveOptional<ICloudStorageObserver>())
+                .WithObserver(c.ResolveOptional<IStorageObserver>())
                 .WithRuntimeFinalizer(c.ResolveOptional<IRuntimeFinalizer>())
                 .BuildQueueStorage());
 
             builder.Register(c => CloudStorage
                 .ForAzureAccount(Patch(c.Resolve<CloudStorageAccount>()))
                 .WithDataSerializer(c.Resolve<IDataSerializer>())
-                .WithObserver(c.ResolveOptional<ICloudStorageObserver>())
+                .WithObserver(c.ResolveOptional<IStorageObserver>())
                 .WithRuntimeFinalizer(c.ResolveOptional<IRuntimeFinalizer>())
                 .BuildTableStorage());
 

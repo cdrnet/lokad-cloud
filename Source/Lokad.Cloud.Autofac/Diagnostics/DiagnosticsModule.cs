@@ -12,7 +12,6 @@ using Lokad.Cloud.Instrumentation;
 using Lokad.Cloud.Instrumentation.Events;
 using Lokad.Cloud.Provisioning.Instrumentation;
 using Lokad.Cloud.Storage.Instrumentation;
-using Lokad.Cloud.Storage.Instrumentation.Events;
 
 namespace Lokad.Cloud.Autofac.Diagnostics
 {
@@ -26,8 +25,8 @@ namespace Lokad.Cloud.Autofac.Diagnostics
             builder.Register(c => new CloudLogWriter(c.Resolve<NeutralLogStorage>().BlobStorage)).As<ILog>();
 
             // Storage Observer Subject
-            builder.Register(c => new CloudStorageInstrumentationSubject(c.ResolveOptional<IEnumerable<IObserver<ICloudStorageEvent>>>().ToArray()))
-                .As<ICloudStorageObserver, IObservable<ICloudStorageEvent>>()
+            builder.Register(c => new StorageObserverSubject(c.ResolveOptional<IEnumerable<IObserver<IStorageEvent>>>().ToArray()))
+                .As<IStorageObserver, IObservable<IStorageEvent>>()
                 .SingleInstance();
 
             // Runtime Observer Subject

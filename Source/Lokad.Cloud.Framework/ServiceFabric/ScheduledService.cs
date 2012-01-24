@@ -140,13 +140,13 @@ namespace Lokad.Cloud.ServiceFabric
 
             if (_scheduledPerWorker)
             {
-                var blobState = Blobs.GetBlob(stateReference, _runtimeFormatter);
+                var blobState = Blobs.GetBlob(stateReference, RuntimeFormatter);
                 if (!blobState.HasValue)
                 {
                     // even though we will never change it from here, a state blob 
                     // still needs to exist so it can be configured by the console
                     var newState = GetDefaultState();
-                    Blobs.PutBlob(stateReference, newState, _runtimeFormatter);
+                    Blobs.PutBlob(stateReference, newState, RuntimeFormatter);
                     blobState = newState;
                 }
 
@@ -208,7 +208,7 @@ namespace Lokad.Cloud.ServiceFabric
                         state.Lease = CreateLease(now);
                         return state;
                     },
-                _runtimeFormatter);
+                RuntimeFormatter);
 
             // 3. IF WE SHOULD NOT EXECUTE NOW, SKIP
 
@@ -259,7 +259,7 @@ namespace Lokad.Cloud.ServiceFabric
                         state.Lease = null;
                         return state;
                     },
-                _runtimeFormatter);
+                RuntimeFormatter);
         }
 
         /// <summary>Don't call this method. Disposing the scheduled service

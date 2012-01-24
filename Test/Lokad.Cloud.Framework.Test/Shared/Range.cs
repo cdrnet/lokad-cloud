@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Lokad.Cloud.Shared.Test
+namespace Lokad.Cloud.Test.Shared
 {
     /// <summary>
     /// Helper class with shortcut methods for managing enumerations.

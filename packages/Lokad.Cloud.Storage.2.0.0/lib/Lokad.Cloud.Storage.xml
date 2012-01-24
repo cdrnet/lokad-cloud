@@ -9,7 +9,7 @@
             Azure retry policies for corner-situation and server errors.
             </summary>
         </member>
-        <member name="M:Lokad.Cloud.Storage.Azure.RetryPolicies.#ctor(Lokad.Cloud.Storage.Instrumentation.ICloudStorageObserver)">
+        <member name="M:Lokad.Cloud.Storage.Azure.RetryPolicies.#ctor(Lokad.Cloud.Storage.Instrumentation.IStorageObserver)">
             <param name="observer">Can be <see langword="null"/>.</param>
         </member>
         <member name="M:Lokad.Cloud.Storage.Azure.RetryPolicies.OptimisticConcurrency">
@@ -363,7 +363,7 @@
             the integrity during the entire roundtrip, we need to apply a supplementary header
             used to perform the MD5 check.</remarks>
         </member>
-        <member name="M:Lokad.Cloud.Storage.Azure.BlobStorageProvider.#ctor(Microsoft.WindowsAzure.StorageClient.CloudBlobClient,Lokad.Cloud.Storage.IDataSerializer,Lokad.Cloud.Storage.Instrumentation.ICloudStorageObserver)">
+        <member name="M:Lokad.Cloud.Storage.Azure.BlobStorageProvider.#ctor(Microsoft.WindowsAzure.StorageClient.CloudBlobClient,Lokad.Cloud.Storage.IDataSerializer,Lokad.Cloud.Storage.Instrumentation.IStorageObserver)">
             <summary>IoC constructor.</summary>
             <param name="observer">Can be <see langword="null"/>.</param>
         </member>
@@ -755,7 +755,7 @@
         <member name="F:Lokad.Cloud.Storage.Azure.QueueStorageProvider._inProcessMessages">
             <summary>Mapping object --> Queue Message Id. Use to delete messages afterward.</summary>
         </member>
-        <member name="M:Lokad.Cloud.Storage.Azure.QueueStorageProvider.#ctor(Microsoft.WindowsAzure.StorageClient.CloudQueueClient,Lokad.Cloud.Storage.IBlobStorageProvider,Lokad.Cloud.Storage.IDataSerializer,Lokad.Cloud.Storage.Instrumentation.ICloudStorageObserver,Lokad.Cloud.IRuntimeFinalizer)">
+        <member name="M:Lokad.Cloud.Storage.Azure.QueueStorageProvider.#ctor(Microsoft.WindowsAzure.StorageClient.CloudQueueClient,Lokad.Cloud.Storage.IBlobStorageProvider,Lokad.Cloud.Storage.IDataSerializer,Lokad.Cloud.Storage.Instrumentation.IStorageObserver,Lokad.Cloud.IRuntimeFinalizer)">
             <summary>IoC constructor.</summary>
             <param name="blobStorage">Not null.</param>
             <param name="queueStorage">Not null.</param>
@@ -1109,7 +1109,7 @@
             </para>
             </remarks>
         </member>
-        <member name="M:Lokad.Cloud.Storage.Azure.TableStorageProvider.#ctor(Microsoft.WindowsAzure.StorageClient.CloudTableClient,Lokad.Cloud.Storage.IDataSerializer,Lokad.Cloud.Storage.Instrumentation.ICloudStorageObserver)">
+        <member name="M:Lokad.Cloud.Storage.Azure.TableStorageProvider.#ctor(Microsoft.WindowsAzure.StorageClient.CloudTableClient,Lokad.Cloud.Storage.IDataSerializer,Lokad.Cloud.Storage.Instrumentation.IStorageObserver)">
             <summary>IoC constructor.</summary>
             <param name="observer">Can be <see langword="null"/>.</param>
         </member>
@@ -1552,14 +1552,14 @@
             Replace the default data serializer with a custom implementation
             </summary>
         </member>
-        <member name="M:Lokad.Cloud.Storage.CloudStorage.CloudStorageBuilder.WithObserver(Lokad.Cloud.Storage.Instrumentation.ICloudStorageObserver)">
+        <member name="M:Lokad.Cloud.Storage.CloudStorage.CloudStorageBuilder.WithObserver(Lokad.Cloud.Storage.Instrumentation.IStorageObserver)">
             <summary>
-            Optionally provide a storage event observer, e.g. a <see cref="T:Lokad.Cloud.Storage.Instrumentation.CloudStorageInstrumentationSubject"/>.
+            Optionally provide a storage event observer, e.g. a <see cref="T:Lokad.Cloud.Storage.Instrumentation.StorageObserverSubject"/>.
             </summary>
         </member>
-        <member name="M:Lokad.Cloud.Storage.CloudStorage.CloudStorageBuilder.WithObservers(System.IObserver{Lokad.Cloud.Storage.Instrumentation.Events.ICloudStorageEvent}[])">
+        <member name="M:Lokad.Cloud.Storage.CloudStorage.CloudStorageBuilder.WithObservers(System.IObserver{Lokad.Cloud.Storage.Instrumentation.IStorageEvent}[])">
             <summary>
-            Optionally provide a set of observers, will use a <see cref="T:Lokad.Cloud.Storage.Instrumentation.CloudStorageInstrumentationSubject"/> internally.
+            Optionally provide a set of observers, will use a <see cref="T:Lokad.Cloud.Storage.Instrumentation.StorageObserverSubject"/> internally.
             </summary>
         </member>
         <member name="M:Lokad.Cloud.Storage.CloudStorage.CloudStorageBuilder.WithRuntimeFinalizer(Lokad.Cloud.IRuntimeFinalizer)">
@@ -1591,11 +1591,14 @@
         <member name="T:Lokad.Cloud.Storage.CloudStorageProviders">
             <summary>Storage providers and runtime providers.</summary>
         </member>
-        <member name="M:Lokad.Cloud.Storage.CloudStorageProviders.#ctor(Lokad.Cloud.Storage.IBlobStorageProvider,Lokad.Cloud.Storage.IQueueStorageProvider,Lokad.Cloud.Storage.ITableStorageProvider,Lokad.Cloud.Storage.IBlobStorageProvider,Lokad.Cloud.Storage.IQueueStorageProvider,Lokad.Cloud.Storage.ITableStorageProvider,Lokad.Cloud.Storage.IBlobStorageProvider,Lokad.Cloud.IRuntimeFinalizer)">
-            <summary>IoC constructor.</summary>
-        </member>
-        <member name="M:Lokad.Cloud.Storage.CloudStorageProviders.#ctor(Lokad.Cloud.Storage.CloudStorageProviders)">
-            <summary>Copy constructor.</summary>
+        <member name="M:Lokad.Cloud.Storage.CloudStorageProviders.#ctor(Lokad.Cloud.Storage.IBlobStorageProvider,Lokad.Cloud.Storage.IQueueStorageProvider,Lokad.Cloud.Storage.ITableStorageProvider,Lokad.Cloud.IRuntimeFinalizer)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Lokad.Cloud.Storage.CloudStorageProviders"/> class.
+            </summary>
+            <param name="blobStorage">The blob storage provider.</param>
+            <param name="queueStorage">The queue storage provider.</param>
+            <param name="tableStorage">The table storage provider.</param>
+            <param name="runtimeFinalizer">The runtime finalizer.</param>
         </member>
         <member name="P:Lokad.Cloud.Storage.CloudStorageProviders.BlobStorage">
             <summary>Blob Storage Abstraction.</summary>
@@ -1606,21 +1609,20 @@
         <member name="P:Lokad.Cloud.Storage.CloudStorageProviders.TableStorage">
             <summary>Table Storage Abstraction.</summary>
         </member>
-        <member name="P:Lokad.Cloud.Storage.CloudStorageProviders.NeutralBlobStorage">
-            <summary>Format-Neutral Blob Storage Abstraction.</summary>
-        </member>
-        <member name="P:Lokad.Cloud.Storage.CloudStorageProviders.NeutralQueueStorage">
-            <summary>Format-Neutral Queue Storage Abstraction.</summary>
-        </member>
-        <member name="P:Lokad.Cloud.Storage.CloudStorageProviders.NeutralTableStorage">
-            <summary>Format-Neutral Table Storage Abstraction.</summary>
-        </member>
-        <member name="P:Lokad.Cloud.Storage.CloudStorageProviders.RawBlobStorage">
-            <summary>Raw byte pass-through Blob Storage Abstraction, supporting only byte-array, string and XElement.</summary>
-        </member>
         <member name="P:Lokad.Cloud.Storage.CloudStorageProviders.RuntimeFinalizer">
             <summary>Abstracts the finalizer (used for fast resource release
             in case of runtime shutdown).</summary>
+        </member>
+        <member name="T:Lokad.Cloud.Storage.CompressedRawFormatter">
+            <summary>
+            Gzip byte pass-through formatter, supporting byte-array, Stream, string (UTF-8) and XElement (Root of UTF-8 XDocument) only.
+            </summary>
+        </member>
+        <member name="M:Lokad.Cloud.Storage.CompressedRawFormatter.Serialize(System.Object,System.IO.Stream,System.Type)">
+            <remarks>Supports byte[], XElement, Stream and string only</remarks>
+        </member>
+        <member name="M:Lokad.Cloud.Storage.CompressedRawFormatter.Deserialize(System.IO.Stream,System.Type)">
+            <remarks>Supports byte[], XElement, Stream and string only</remarks>
         </member>
         <member name="T:Lokad.Cloud.Storage.Instrumentation.Events.MessagesRevivedEvent">
             <summary>
@@ -1630,14 +1632,14 @@
         </member>
         <member name="T:Lokad.Cloud.Storage.RawFormatter">
             <summary>
-            Raw byte pass-through formatter, supporting byte-array, string (UTF-8) and XElement (Root of UTF-8 XDocument) only.
+            Raw byte pass-through formatter, supporting byte-array, Stream, string (UTF-8) and XElement (Root of UTF-8 XDocument) only.
             </summary>
         </member>
         <member name="M:Lokad.Cloud.Storage.RawFormatter.Serialize(System.Object,System.IO.Stream,System.Type)">
-            <remarks>Supports byte[] only</remarks>
+            <remarks>Supports byte[], XElement, Stream and string only</remarks>
         </member>
         <member name="M:Lokad.Cloud.Storage.RawFormatter.Deserialize(System.IO.Stream,System.Type)">
-            <remarks>Supports byte[] only</remarks>
+            <remarks>Supports byte[], XElement, Stream and string only</remarks>
         </member>
         <member name="T:Lokad.Cloud.Storage.Instrumentation.Events.BlobDeserializationFailedEvent">
             <summary>
@@ -1668,14 +1670,14 @@
             Useful for analyzing retry policy behavior.
             </summary>
         </member>
-        <member name="T:Lokad.Cloud.Storage.Instrumentation.CloudStorageInstrumentationSubject">
+        <member name="T:Lokad.Cloud.Storage.Instrumentation.StorageObserverSubject">
             <summary>
             Cloud storage observer that implements a hot Rx Observable, forwarding all events synchronously
             (similar to Rx's FastSubject). Use this class if you want an easy way to observe Lokad.Cloud.Storage
             using Rx. Alternatively you can implement your own storage observer instead, or not use any observers at all.
             </summary>
         </member>
-        <member name="M:Lokad.Cloud.Storage.Instrumentation.CloudStorageInstrumentationSubject.#ctor(System.IObserver{Lokad.Cloud.Storage.Instrumentation.Events.ICloudStorageEvent}[])">
+        <member name="M:Lokad.Cloud.Storage.Instrumentation.StorageObserverSubject.#ctor(System.IObserver{Lokad.Cloud.Storage.Instrumentation.IStorageEvent}[])">
             <param name="fixedObservers">Optional externally managed fixed observers, will neither be completed nor disposed by this class.</param>
         </member>
         <member name="T:Lokad.Cloud.Storage.InMemory.MemoryBlobStorageProvider">
@@ -2071,37 +2073,6 @@
         </member>
         <member name="M:Lokad.Cloud.Storage.QueueStorageExtensions.GetApproximateLatency``1(Lokad.Cloud.Storage.IQueueStorageProvider)">
             <summary>Gets the approximate age of the top message in a queue (derived from the message type T).</summary>
-        </member>
-        <member name="T:Lokad.Cloud.Storage.Shared.FormatUtil">
-            <summary>Pretty format utils.</summary>
-        </member>
-        <member name="M:Lokad.Cloud.Storage.Shared.FormatUtil.SizeInBytes(System.Int64)">
-            <summary>
-            Formats the size in bytes to a pretty string.
-            </summary>
-            <param name="sizeInBytes">The size in bytes.</param>
-            <returns></returns>
-        </member>
-        <member name="M:Lokad.Cloud.Storage.Shared.FormatUtil.TimeOffsetUtc(System.DateTime)">
-            <summary>
-            Displays time passed since (or remaining before) some event expressed in UTC, displaying it as '<em>5 days ago</em>'.
-            </summary>
-            <param name="dateInUtc">The date in UTC.</param>
-            <returns>formatted event</returns>
-        </member>
-        <member name="M:Lokad.Cloud.Storage.Shared.FormatUtil.TimeOffset(System.DateTime)">
-            <summary>
-            Displays time passed since some event expressed, displaying it as '<em>5 days ago</em>'.
-            </summary>
-            <param name="localTime">The local time.</param>
-            <returns></returns>
-        </member>
-        <member name="M:Lokad.Cloud.Storage.Shared.FormatUtil.TimeSpan(System.TimeSpan)">
-            <summary>
-            Formats time span nicely
-            </summary>
-            <param name="offset">The offset.</param>
-            <returns>formatted string</returns>
         </member>
         <member name="T:Lokad.Cloud.Storage.Maybe`1">
             <summary>

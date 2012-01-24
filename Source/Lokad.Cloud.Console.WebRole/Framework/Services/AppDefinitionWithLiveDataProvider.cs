@@ -1,4 +1,4 @@
-﻿#region Copyright (c) Lokad 2009-2011
+﻿#region Copyright (c) Lokad 2009-2012
 // This code is released under the terms of the new BSD licence.
 // URL: http://www.lokad.com/
 #endregion
@@ -14,7 +14,6 @@ using Lokad.Cloud.Console.WebRole.Models.Services;
 using Lokad.Cloud.Management;
 using Lokad.Cloud.Management.Application;
 using Lokad.Cloud.Storage;
-using Lokad.Cloud.Storage.Shared;
 
 namespace Lokad.Cloud.Console.WebRole.Framework.Services
 {

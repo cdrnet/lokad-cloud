@@ -7,7 +7,7 @@ using System.Threading;
 using Lokad.Cloud.ServiceFabric;
 using NUnit.Framework;
 
-namespace Lokad.Cloud.Storage.Shared.Threading.Tests
+namespace Lokad.Cloud.Test.Shared.Threading
 {
     [TestFixture]
     public sealed class WaitForTests

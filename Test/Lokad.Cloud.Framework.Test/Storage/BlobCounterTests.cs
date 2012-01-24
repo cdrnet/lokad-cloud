@@ -6,8 +6,8 @@
 using System;
 using System.Linq;
 using Autofac;
-using Lokad.Cloud.Shared.Test;
 using Lokad.Cloud.Storage;
+using Lokad.Cloud.Test.Shared;
 using NUnit.Framework;
 
 namespace Lokad.Cloud.Test.Storage

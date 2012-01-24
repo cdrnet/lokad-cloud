@@ -5,7 +5,6 @@
 
 using System;
 using System.Linq;
-using Lokad.Cloud.Diagnostics;
 using Lokad.Cloud.ServiceFabric;
 using Lokad.Cloud.Storage;
 using Lokad.Cloud.Stubs;

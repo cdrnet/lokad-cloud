@@ -10,10 +10,10 @@ using Lokad.Cloud.Storage;
 namespace Lokad.Cloud.Services
 {
     /// <summary>
-    /// Garbage collects temporary items stored in the <see cref="CloudService.TemporaryContainer"/>.
+    /// Garbage collects temporary items stored in the TemporaryContainer.
     /// </summary>
     /// <remarks>
-    /// The container <see cref="CloudService.TemporaryContainer"/> is handy to
+    /// The container TemporaryContainer is handy to
     /// store non-persistent data, typically state information concerning ongoing
     /// processing.
     /// </remarks>

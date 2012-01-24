@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Reactive.Linq;
 using Autofac;
 using Lokad.Cloud.Diagnostics;
+using Lokad.Cloud.Storage.Instrumentation;
 using Lokad.Cloud.Storage.Instrumentation.Events;
 
 namespace Lokad.Cloud.Autofac.Diagnostics
@@ -16,12 +17,12 @@ namespace Lokad.Cloud.Autofac.Diagnostics
 
     internal class CloudStorageLogger : IStartable, IDisposable
     {
-        private readonly IObservable<ICloudStorageEvent> _observable;
+        private readonly IObservable<IStorageEvent> _observable;
         private readonly ILog _log;
 
         private readonly List<IDisposable> _subscriptions;
 
-        public CloudStorageLogger(IObservable<ICloudStorageEvent> observable, ILog log)
+        public CloudStorageLogger(IObservable<IStorageEvent> observable, ILog log)
         {
             _observable = observable;
             _log = log;

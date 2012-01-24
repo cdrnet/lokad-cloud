@@ -1,70 +1,15 @@
-﻿#region Copyright (c) Lokad 2009-2012
-// This code is released under the terms of the new BSD licence.
-// URL: http://www.lokad.com/
-#endregion
-
 using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.Xml.Linq;
 
 namespace Lokad.Cloud.Diagnostics
 {
-    public sealed class LogEntryBuilder
-    {
-        private readonly ILog _log;
-        private readonly LogLevel _level;
-        private readonly List<XElement> _meta;
-        private Exception _exception;
-
-        internal LogEntryBuilder(ILog log, LogLevel level)
-        {
-            _log = log;
-            _level = level;
-            _meta = new List<XElement>();
-        }
-
-        public LogEntryBuilder WithException(Exception exception)
-        {
-            _exception = exception;
-            return this;
-        }
-
-        public LogEntryBuilder WithMeta(XElement element)
-        {
-            _meta.Add(element);
-            return this;
-        }
-
-        public LogEntryBuilder WithMeta(params XElement[] elements)
-        {
-            _meta.AddRange(elements);
-            return this;
-        }
-
-        public LogEntryBuilder WithMeta(string key, string value)
-        {
-            _meta.Add(new XElement(key, value));
-            return this;
-        }
-
-        public void Write(object message)
-        {
-            _log.Log(_level, _exception, message, _meta.ToArray());
-        }
-
-        public void WriteFormat(string format, params object[] args)
-        {
-            _log.Log(_level, _exception, string.Format(CultureInfo.InvariantCulture, format, args), _meta.ToArray());
-        }
-    }
-
     /// <summary>
     /// Helper extensions for any class that implements <see cref="ILog"/>
     /// </summary>
-    public static class ILogExtensions
+    public static class LogExtensions
     {
-        static readonly CultureInfo _culture = CultureInfo.InvariantCulture;
+        static readonly CultureInfo Culture = CultureInfo.InvariantCulture;
 
         /// <summary>
         /// Build a log entry incrementally with a builder
@@ -95,7 +40,7 @@ namespace Lokad.Cloud.Diagnostics
         /// <param name="args">Arguments</param>
         public static void DebugFormat(this ILog log, string format, params object[] args)
         {
-            log.Log(LogLevel.Debug, string.Format(_culture, format, args));
+            log.Log(LogLevel.Debug, string.Format(Culture, format, args));
         }
 
         /// <summary>
@@ -108,7 +53,7 @@ namespace Lokad.Cloud.Diagnostics
         /// <param name="meta">Optional semantic meta data</param>
         public static void DebugFormat(this ILog log, XElement[] meta, string format, params object[] args)
         {
-            log.Log(LogLevel.Debug, string.Format(_culture, format, args), meta);
+            log.Log(LogLevel.Debug, string.Format(Culture, format, args), meta);
         }
 
         /// <summary>
@@ -135,7 +80,7 @@ namespace Lokad.Cloud.Diagnostics
         /// <param name="args">Arguments</param>
         public static void DebugFormat(this ILog log, Exception ex, string format, params object[] args)
         {
-            log.Log(LogLevel.Debug, ex, string.Format(_culture, format, args));
+            log.Log(LogLevel.Debug, ex, string.Format(Culture, format, args));
         }
 
         /// <summary>
@@ -150,7 +95,7 @@ namespace Lokad.Cloud.Diagnostics
         /// <param name="meta">Optional semantic meta data</param>
         public static void DebugFormat(this ILog log, Exception ex, XElement[] meta, string format, params object[] args)
         {
-            log.Log(LogLevel.Debug, ex, string.Format(_culture, format, args), meta);
+            log.Log(LogLevel.Debug, ex, string.Format(Culture, format, args), meta);
         }
 
         /// <summary>
@@ -182,7 +127,7 @@ namespace Lokad.Cloud.Diagnostics
         /// <param name="args">Arguments</param>
         public static void InfoFormat(this ILog log, string format, params object[] args)
         {
-            log.Log(LogLevel.Info, string.Format(_culture, format, args));
+            log.Log(LogLevel.Info, string.Format(Culture, format, args));
         }
 
         /// <summary>
@@ -195,7 +140,7 @@ namespace Lokad.Cloud.Diagnostics
         /// <param name="meta">Optional semantic meta data</param>
         public static void InfoFormat(this ILog log, XElement[] meta, string format, params object[] args)
         {
-            log.Log(LogLevel.Info, string.Format(_culture, format, args), meta);
+            log.Log(LogLevel.Info, string.Format(Culture, format, args), meta);
         }
 
         /// <summary>
@@ -222,7 +167,7 @@ namespace Lokad.Cloud.Diagnostics
         /// <param name="args">Arguments</param>
         public static void InfoFormat(this ILog log, Exception ex, string format, params object[] args)
         {
-            log.Log(LogLevel.Info, ex, string.Format(_culture, format, args));
+            log.Log(LogLevel.Info, ex, string.Format(Culture, format, args));
         }
 
         /// <summary>
@@ -237,7 +182,7 @@ namespace Lokad.Cloud.Diagnostics
         /// <param name="meta">Optional semantic meta data</param>
         public static void InfoFormat(this ILog log, Exception ex, XElement[] meta, string format, params object[] args)
         {
-            log.Log(LogLevel.Info, ex, string.Format(_culture, format, args), meta);
+            log.Log(LogLevel.Info, ex, string.Format(Culture, format, args), meta);
         }
 
         /// <summary>
@@ -269,7 +214,7 @@ namespace Lokad.Cloud.Diagnostics
         /// <param name="args">Arguments</param>
         public static void WarnFormat(this ILog log, string format, params object[] args)
         {
-            log.Log(LogLevel.Warn, string.Format(_culture, format, args));
+            log.Log(LogLevel.Warn, string.Format(Culture, format, args));
         }
 
         /// <summary>
@@ -282,7 +227,7 @@ namespace Lokad.Cloud.Diagnostics
         /// <param name="meta">Optional semantic meta data</param>
         public static void WarnFormat(this ILog log, XElement[] meta, string format, params object[] args)
         {
-            log.Log(LogLevel.Warn, string.Format(_culture, format, args), meta);
+            log.Log(LogLevel.Warn, string.Format(Culture, format, args), meta);
         }
 
         /// <summary>
@@ -309,7 +254,7 @@ namespace Lokad.Cloud.Diagnostics
         /// <param name="args">Arguments</param>
         public static void WarnFormat(this ILog log, Exception ex, string format, params object[] args)
         {
-            log.Log(LogLevel.Warn, ex, string.Format(_culture, format, args));
+            log.Log(LogLevel.Warn, ex, string.Format(Culture, format, args));
         }
 
         /// <summary>
@@ -324,7 +269,7 @@ namespace Lokad.Cloud.Diagnostics
         /// <param name="meta">Optional semantic meta data</param>
         public static void WarnFormat(this ILog log, Exception ex, XElement[] meta, string format, params object[] args)
         {
-            log.Log(LogLevel.Warn, ex, string.Format(_culture, format, args), meta);
+            log.Log(LogLevel.Warn, ex, string.Format(Culture, format, args), meta);
         }
 
         /// <summary>
@@ -356,7 +301,7 @@ namespace Lokad.Cloud.Diagnostics
         /// <param name="args">Arguments</param>
         public static void ErrorFormat(this ILog log, string format, params object[] args)
         {
-            log.Log(LogLevel.Error, string.Format(_culture, format, args));
+            log.Log(LogLevel.Error, string.Format(Culture, format, args));
         }
 
         /// <summary>
@@ -369,7 +314,7 @@ namespace Lokad.Cloud.Diagnostics
         /// <param name="meta">Optional semantic meta data</param>
         public static void ErrorFormat(this ILog log, XElement[] meta, string format, params object[] args)
         {
-            log.Log(LogLevel.Error, string.Format(_culture, format, args), meta);
+            log.Log(LogLevel.Error, string.Format(Culture, format, args), meta);
         }
 
         /// <summary>
@@ -396,7 +341,7 @@ namespace Lokad.Cloud.Diagnostics
         /// <param name="args">Arguments</param>
         public static void ErrorFormat(this ILog log, Exception ex, string format, params object[] args)
         {
-            log.Log(LogLevel.Error, ex, string.Format(_culture, format, args));
+            log.Log(LogLevel.Error, ex, string.Format(Culture, format, args));
         }
 
         /// <summary>
@@ -411,7 +356,7 @@ namespace Lokad.Cloud.Diagnostics
         /// <param name="meta">Optional semantic meta data</param>
         public static void ErrorFormat(this ILog log, Exception ex, XElement[] meta, string format, params object[] args)
         {
-            log.Log(LogLevel.Error, ex, string.Format(_culture, format, args), meta);
+            log.Log(LogLevel.Error, ex, string.Format(Culture, format, args), meta);
         }
 
         /// <summary>
@@ -443,7 +388,7 @@ namespace Lokad.Cloud.Diagnostics
         /// <param name="args">Arguments</param>
         public static void FatalFormat(this ILog log, string format, params object[] args)
         {
-            log.Log(LogLevel.Fatal, string.Format(_culture, format, args));
+            log.Log(LogLevel.Fatal, string.Format(Culture, format, args));
         }
 
         /// <summary>
@@ -456,7 +401,7 @@ namespace Lokad.Cloud.Diagnostics
         /// <param name="meta">Optional semantic meta data</param>
         public static void FatalFormat(this ILog log, XElement[] meta, string format, params object[] args)
         {
-            log.Log(LogLevel.Fatal, string.Format(_culture, format, args), meta);
+            log.Log(LogLevel.Fatal, string.Format(Culture, format, args), meta);
         }
 
         /// <summary>
@@ -483,7 +428,7 @@ namespace Lokad.Cloud.Diagnostics
         /// <param name="args">Arguments</param>
         public static void FatalFormat(this ILog log, Exception ex, string format, params object[] args)
         {
-            log.Log(LogLevel.Fatal, ex, string.Format(_culture, format, args));
+            log.Log(LogLevel.Fatal, ex, string.Format(Culture, format, args));
         }
 
         /// <summary>
@@ -498,7 +443,7 @@ namespace Lokad.Cloud.Diagnostics
         /// <param name="meta">Optional semantic meta data</param>
         public static void FatalFormat(this ILog log, Exception ex, XElement[] meta, string format, params object[] args)
         {
-            log.Log(LogLevel.Fatal, ex, string.Format(_culture, format, args), meta);
+            log.Log(LogLevel.Fatal, ex, string.Format(Culture, format, args), meta);
         }
     }
 }

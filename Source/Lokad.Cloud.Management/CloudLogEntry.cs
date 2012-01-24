@@ -5,7 +5,6 @@
 
 using System;
 using System.Xml.Linq;
-using Lokad.Cloud.Diagnostics;
 
 namespace Lokad.Cloud.Management
 {

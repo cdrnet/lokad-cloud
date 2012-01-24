@@ -101,14 +101,14 @@ namespace Lokad.Cloud.ServiceFabric
         public IQueueStorageProvider Queues { get { return Storage.QueueStorage; } }
         public ITableStorageProvider Tables { get { return Storage.TableStorage; } }
 
-        protected internal readonly IDataSerializer _runtimeFormatter;
+        protected internal readonly IDataSerializer RuntimeFormatter;
 
         /// <summary>
         /// Default constructor
         /// </summary>
         protected CloudService()
         {
-            _runtimeFormatter = new CloudFormatter();
+            RuntimeFormatter = new CloudFormatter();
 
             // default setting
             _defaultState = CloudServiceState.Started;
@@ -156,13 +156,13 @@ namespace Lokad.Cloud.ServiceFabric
             {
                 var stateBlobName = new CloudServiceStateName(Name);
 
-                var state = Blobs.GetBlob(stateBlobName, _runtimeFormatter);
+                var state = Blobs.GetBlob(stateBlobName, RuntimeFormatter);
 
                 // no state can be retrieved, update blob storage
                 if(!state.HasValue)
                 {
                     state = _defaultState;
-                    Blobs.PutBlob(stateBlobName, state.Value, _runtimeFormatter);
+                    Blobs.PutBlob(stateBlobName, state.Value, RuntimeFormatter);
                 }
 
                 _state = state.Value;

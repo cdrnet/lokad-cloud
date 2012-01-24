@@ -66,21 +66,21 @@
     <Reference Include="Ionic.Zip.Reduced">
       <HintPath>..\..\packages\DotNetZip.Reduced.1.9.1.8\lib\net20\Ionic.Zip.Reduced.dll</HintPath>
     </Reference>
-    <Reference Include="Lokad.Cloud.AppHost, Version=0.8.1.11, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Lokad.Cloud.AppHost, Version=0.8.2.12, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Lokad.Cloud.AppHost.0.8.1\lib\Lokad.Cloud.AppHost.dll</HintPath>
+      <HintPath>..\..\packages\Lokad.Cloud.AppHost.0.8.2\lib\Lokad.Cloud.AppHost.dll</HintPath>
     </Reference>
-    <Reference Include="Lokad.Cloud.AppHost.Framework, Version=0.8.1.11, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Lokad.Cloud.AppHost.Framework, Version=0.8.2.12, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Lokad.Cloud.AppHost.Framework.0.8.1\lib\Lokad.Cloud.AppHost.Framework.dll</HintPath>
+      <HintPath>..\..\packages\Lokad.Cloud.AppHost.Framework.0.8.2\lib\Lokad.Cloud.AppHost.Framework.dll</HintPath>
     </Reference>
-    <Reference Include="Lokad.Cloud.Provisioning, Version=2.0.0.2, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Lokad.Cloud.Provisioning, Version=2.0.1.3, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Lokad.Cloud.Provisioning.2.0.0\lib\Lokad.Cloud.Provisioning.dll</HintPath>
+      <HintPath>..\..\packages\Lokad.Cloud.Provisioning.2.0.1\lib\Lokad.Cloud.Provisioning.dll</HintPath>
     </Reference>
-    <Reference Include="Lokad.Cloud.Storage, Version=1.6.2.4, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Lokad.Cloud.Storage, Version=2.0.0.5, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Lokad.Cloud.Storage.1.6.2\lib\Lokad.Cloud.Storage.dll</HintPath>
+      <HintPath>..\..\packages\Lokad.Cloud.Storage.2.0.0\lib\Lokad.Cloud.Storage.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Microsoft.Net.Http, Version=0.3.0.0, Culture=neutral, processorArchitecture=MSIL">
@@ -110,7 +110,6 @@
     <Compile Include="..\VersionAssemblyInfo.cs">
       <Link>Properties\VersionAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="ApplicationEnvironment.cs" />
     <Compile Include="Diagnostics\HostLogLevel.cs" />
     <Compile Include="Diagnostics\HostLogWriter.cs" />
     <Compile Include="DeploymentReader.cs" />
