@@ -10,7 +10,6 @@ using Autofac;
 using Lokad.Cloud.Diagnostics;
 using Lokad.Cloud.Instrumentation;
 using Lokad.Cloud.Instrumentation.Events;
-using Lokad.Cloud.Provisioning.Instrumentation;
 using Lokad.Cloud.Storage.Instrumentation;
 
 namespace Lokad.Cloud.Autofac.Diagnostics
@@ -34,14 +33,8 @@ namespace Lokad.Cloud.Autofac.Diagnostics
                 .As<ICloudRuntimeObserver, IObservable<ICloudRuntimeEvent>>()
                 .SingleInstance();
 
-            // Provisioning Observer Subject
-            builder.Register(c => new ProvisioningObserverSubject(c.ResolveOptional<IEnumerable<IObserver<IProvisioningEvent>>>().ToArray()))
-                .As<IProvisioningObserver, IObservable<IProvisioningEvent>>()
-                .SingleInstance();
-
             // TODO (ruegg, 2011-05-30): Observer that logs system events to the log: temporary! to keep old logging behavior for now
             builder.RegisterType<CloudStorageLogger>().As<IStartable>().SingleInstance();
-            builder.RegisterType<CloudProvisioningLogger>().As<IStartable>().SingleInstance();
         }
     }
 }
