@@ -20,7 +20,7 @@ namespace Lokad.Cloud.EntryPoint
     /// </summary>
     internal class Scheduler
     {
-        readonly ICloudRuntimeObserver _observer;
+        readonly IRuntimeObserver _observer;
 
         readonly List<CloudService> _services;
         readonly Func<CloudService, ServiceExecutionFeedback> _schedule;
@@ -38,7 +38,7 @@ namespace Lokad.Cloud.EntryPoint
         /// </summary>
         /// <param name="services">cloud services</param>
         /// <param name="schedule">Action to be invoked when a service is scheduled to run</param>
-        public Scheduler(List<CloudService> services, Func<CloudService, ServiceExecutionFeedback> schedule, ICloudRuntimeObserver observer = null)
+        public Scheduler(List<CloudService> services, Func<CloudService, ServiceExecutionFeedback> schedule, IRuntimeObserver observer = null)
         {
             _observer = observer;
             _services = services;

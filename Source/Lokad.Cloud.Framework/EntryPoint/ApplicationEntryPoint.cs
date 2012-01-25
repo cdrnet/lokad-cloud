@@ -65,7 +65,7 @@ namespace Lokad.Cloud.EntryPoint
             return new CloudLogWriter(CloudStorage.ForAzureConnectionString(DataConnectionString).BuildBlobStorage());
         }
 
-        protected virtual ICloudRuntimeObserver CreateRuntimeObserverOptional()
+        protected virtual IRuntimeObserver CreateRuntimeObserverOptional()
         {
             return Observers.CreateRuntimeObserver(Log);
         }

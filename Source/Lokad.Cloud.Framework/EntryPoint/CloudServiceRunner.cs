@@ -19,7 +19,7 @@ namespace Lokad.Cloud.EntryPoint
     {
         Scheduler _scheduler;
 
-        public void Run(IApplicationEnvironment environment, Func<IRuntimeFinalizer, List<CloudService>> createServices, Action disposeServices, ILog log, ICloudRuntimeObserver runtimeObserver, CancellationToken cancellationToken)
+        public void Run(IApplicationEnvironment environment, Func<IRuntimeFinalizer, List<CloudService>> createServices, Action disposeServices, ILog log, IRuntimeObserver runtimeObserver, CancellationToken cancellationToken)
         {
             var finalizer = new RuntimeFinalizer();
             try

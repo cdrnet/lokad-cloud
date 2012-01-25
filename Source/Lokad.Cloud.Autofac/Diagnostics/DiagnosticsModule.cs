@@ -9,7 +9,6 @@ using System.Linq;
 using Autofac;
 using Lokad.Cloud.Diagnostics;
 using Lokad.Cloud.Instrumentation;
-using Lokad.Cloud.Instrumentation.Events;
 using Lokad.Cloud.Storage.Instrumentation;
 
 namespace Lokad.Cloud.Autofac.Diagnostics
@@ -29,8 +28,8 @@ namespace Lokad.Cloud.Autofac.Diagnostics
                 .SingleInstance();
 
             // Runtime Observer Subject
-            builder.Register(c => new CloudRuntimeInstrumentationSubject(c.ResolveOptional<IEnumerable<IObserver<ICloudRuntimeEvent>>>().ToArray()))
-                .As<ICloudRuntimeObserver, IObservable<ICloudRuntimeEvent>>()
+            builder.Register(c => new RuntimeObserverSubject(c.ResolveOptional<IEnumerable<IObserver<IRuntimeEvent>>>().ToArray()))
+                .As<IRuntimeObserver, IObservable<IRuntimeEvent>>()
                 .SingleInstance();
 
             // TODO (ruegg, 2011-05-30): Observer that logs system events to the log: temporary! to keep old logging behavior for now

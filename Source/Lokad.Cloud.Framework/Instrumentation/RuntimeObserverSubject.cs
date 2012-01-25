@@ -1,10 +1,9 @@
-﻿#region Copyright (c) Lokad 2010-2011
+﻿#region Copyright (c) Lokad 2010-2012
 // This code is released under the terms of the new BSD licence.
 // URL: http://www.lokad.com/
 #endregion
 
 using System;
-using Lokad.Cloud.Instrumentation.Events;
 
 namespace Lokad.Cloud.Instrumentation
 {
@@ -13,27 +12,27 @@ namespace Lokad.Cloud.Instrumentation
     /// (similar to Rx's FastSubject). Use this class if you want an easy way to observe the runtime
     /// using Rx. Alternatively you can implement your own storage observer instead, or not use any observers at all.
     /// </summary>
-    public class CloudRuntimeInstrumentationSubject : IDisposable, ICloudRuntimeObserver, IObservable<ICloudRuntimeEvent>
+    public class RuntimeObserverSubject : IDisposable, IRuntimeObserver, IObservable<IRuntimeEvent>
     {
         readonly object _sync = new object();
         private bool _isDisposed;
 
-        readonly IObserver<ICloudRuntimeEvent>[] _fixedObservers;
-        IObserver<ICloudRuntimeEvent>[] _observers;
+        readonly IObserver<IRuntimeEvent>[] _fixedObservers;
+        IObserver<IRuntimeEvent>[] _observers;
 
         /// <param name="fixedObservers">Optional externally managed fixed observers, will neither be completed nor disposed by this class.</param>
-        public CloudRuntimeInstrumentationSubject(IObserver<ICloudRuntimeEvent>[] fixedObservers = null)
+        public RuntimeObserverSubject(IObserver<IRuntimeEvent>[] fixedObservers = null)
         {
-            _fixedObservers = fixedObservers ?? new IObserver<ICloudRuntimeEvent>[0];
-            _observers = new IObserver<ICloudRuntimeEvent>[0];
+            _fixedObservers = fixedObservers ?? new IObserver<IRuntimeEvent>[0];
+            _observers = new IObserver<IRuntimeEvent>[0];
         }
 
-        void ICloudRuntimeObserver.Notify(ICloudRuntimeEvent @event)
+        void IRuntimeObserver.Notify(IRuntimeEvent @event)
         {
             if (_isDisposed)
             {
                 // make lifetime issues visible
-                throw new ObjectDisposedException("CloudStorageInstrumentationSubject");
+                throw new ObjectDisposedException("RuntimeObserverSubject");
             }
 
             // Assuming event observers are light - else we may want to do this async
@@ -51,12 +50,12 @@ namespace Lokad.Cloud.Instrumentation
             }
         }
 
-        public IDisposable Subscribe(IObserver<ICloudRuntimeEvent> observer)
+        public IDisposable Subscribe(IObserver<IRuntimeEvent> observer)
         {
             if (_isDisposed)
             {
                 // make lifetime issues visible
-                throw new ObjectDisposedException("CloudStorageInstrumentationSubject");
+                throw new ObjectDisposedException("RuntimeObserverSubject");
             }
 
             if (observer == null)
@@ -66,7 +65,7 @@ namespace Lokad.Cloud.Instrumentation
 
             lock (_sync)
             {
-                var newObservers = new IObserver<ICloudRuntimeEvent>[_observers.Length + 1];
+                var newObservers = new IObserver<IRuntimeEvent>[_observers.Length + 1];
                 Array.Copy(_observers, newObservers, _observers.Length);
                 newObservers[_observers.Length] = observer;
                 _observers = newObservers;
@@ -86,10 +85,10 @@ namespace Lokad.Cloud.Instrumentation
 
         private class Subscription : IDisposable
         {
-            private readonly CloudRuntimeInstrumentationSubject _subject;
-            private IObserver<ICloudRuntimeEvent> _observer;
+            private readonly RuntimeObserverSubject _subject;
+            private IObserver<IRuntimeEvent> _observer;
 
-            public Subscription(CloudRuntimeInstrumentationSubject subject, IObserver<ICloudRuntimeEvent> observer)
+            public Subscription(RuntimeObserverSubject subject, IObserver<IRuntimeEvent> observer)
             {
                 _subject = subject;
                 _observer = observer;
@@ -106,7 +105,7 @@ namespace Lokad.Cloud.Instrumentation
                             int idx = Array.IndexOf(_subject._observers, _observer);
                             if (idx >= 0)
                             {
-                                var newObservers = new IObserver<ICloudRuntimeEvent>[_subject._observers.Length + 1];
+                                var newObservers = new IObserver<IRuntimeEvent>[_subject._observers.Length + 1];
                                 Array.Copy(_subject._observers, 0, newObservers, 0, idx);
                                 Array.Copy(_subject._observers, idx + 1, newObservers, idx, _subject._observers.Length - idx - 1);
                                 _subject._observers = newObservers;

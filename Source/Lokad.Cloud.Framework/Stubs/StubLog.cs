@@ -22,7 +22,7 @@ namespace Lokad.Cloud.Stubs
         {
         }
 
-        void ILog.Log(LogLevel level, string message, Exception exception = null, XElement meta = null)
+        void ILog.Log(LogLevel level, string message, Exception exception, XElement meta)
         {
         }
     }

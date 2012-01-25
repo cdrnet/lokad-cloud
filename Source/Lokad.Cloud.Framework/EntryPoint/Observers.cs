@@ -5,7 +5,6 @@
 
 using System;
 using System.Reactive.Linq;
-using Lokad.Cloud.AppHost.Framework.Instrumentation;
 using Lokad.Cloud.Diagnostics;
 using Lokad.Cloud.Instrumentation;
 using Lokad.Cloud.Storage.Instrumentation;
@@ -15,14 +14,6 @@ namespace Lokad.Cloud.EntryPoint
 {
     internal static class Observers
     {
-        public static IHostObserver CreateHostObserver(ILog log)
-        {
-            var subject = new HostObserverSubject();
-            subject.Subscribe(e => log.TryLog((LogLevel)(int)e.Level, e.Describe(), meta: e.DescribeMeta()));
-
-            return subject;
-        }
-
         public static IStorageObserver CreateStorageObserver(ILog log)
         {
             var subject = new StorageObserverSubject();
@@ -47,9 +38,9 @@ namespace Lokad.Cloud.EntryPoint
             return subject;
         }
 
-        public static ICloudRuntimeObserver CreateRuntimeObserver(ILog log)
+        public static IRuntimeObserver CreateRuntimeObserver(ILog log)
         {
-            var subject = new CloudRuntimeInstrumentationSubject();
+            var subject = new RuntimeObserverSubject();
 
             return subject;
         }
