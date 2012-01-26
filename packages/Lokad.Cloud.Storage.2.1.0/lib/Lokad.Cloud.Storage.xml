@@ -611,21 +611,21 @@
             </param>
             <returns>Enumeration of messages, possibly empty.</returns>
         </member>
-        <member name="M:Lokad.Cloud.Storage.IQueueStorageProvider.Put``1(System.String,``0,Lokad.Cloud.Storage.IDataSerializer)">
+        <member name="M:Lokad.Cloud.Storage.IQueueStorageProvider.Put``1(System.String,``0,System.TimeSpan,System.TimeSpan,Lokad.Cloud.Storage.IDataSerializer)">
             <summary>Put a message on a queue.</summary>
             <typeparam name="T">Type of the messages.</typeparam>
             <param name="queueName">Identifier of the queue where messages are put.</param>
             <param name="message">Message to be put.</param>
             <remarks>If the queue does not exist, it gets created.</remarks>
         </member>
-        <member name="M:Lokad.Cloud.Storage.IQueueStorageProvider.PutRange``1(System.String,System.Collections.Generic.IEnumerable{``0},Lokad.Cloud.Storage.IDataSerializer)">
+        <member name="M:Lokad.Cloud.Storage.IQueueStorageProvider.PutRange``1(System.String,System.Collections.Generic.IEnumerable{``0},System.TimeSpan,System.TimeSpan,Lokad.Cloud.Storage.IDataSerializer)">
             <summary>Put messages on a queue.</summary>
             <typeparam name="T">Type of the messages.</typeparam>
             <param name="queueName">Identifier of the queue where messages are put.</param>
             <param name="messages">Messages to be put.</param>
             <remarks>If the queue does not exist, it gets created.</remarks>
         </member>
-        <member name="M:Lokad.Cloud.Storage.IQueueStorageProvider.PutRangeParallel``1(System.String,System.Collections.Generic.IEnumerable{``0},Lokad.Cloud.Storage.IDataSerializer)">
+        <member name="M:Lokad.Cloud.Storage.IQueueStorageProvider.PutRangeParallel``1(System.String,System.Collections.Generic.IEnumerable{``0},System.TimeSpan,System.TimeSpan,Lokad.Cloud.Storage.IDataSerializer)">
             <summary>
             Puts messages on a queue. Uses Tasks to increase thouroughput dramatically.
             </summary>
@@ -641,7 +641,7 @@
             <summary>Keep the message alive for another period.</summary>
             <returns>The new visibility timeout</returns>
         </member>
-        <member name="M:Lokad.Cloud.Storage.IQueueStorageProvider.ReviveMessages">
+        <member name="M:Lokad.Cloud.Storage.IQueueStorageProvider.ReviveMessages(System.TimeSpan,System.TimeSpan)">
             <summary>Revive messages that are no longer kept alive.</summary>
         </member>
         <member name="M:Lokad.Cloud.Storage.IQueueStorageProvider.Delete``1(``0)">
@@ -656,7 +656,7 @@
             <returns>The number of messages actually deleted.</returns>
             <remarks>Messages must have first been retrieved through <see cref="M:Lokad.Cloud.Storage.IQueueStorageProvider.Get``1(System.String,System.Int32,System.TimeSpan,System.Int32,Lokad.Cloud.Storage.IDataSerializer)"/>.</remarks>
         </member>
-        <member name="M:Lokad.Cloud.Storage.IQueueStorageProvider.Abandon``1(``0)">
+        <member name="M:Lokad.Cloud.Storage.IQueueStorageProvider.Abandon``1(``0,System.TimeSpan,System.TimeSpan)">
             <summary>
             Abandon a message being processed and put it visibly back on the queue.
             </summary>
@@ -665,7 +665,7 @@
             <returns><c>True</c> if the original message has been deleted.</returns>
             <remarks>Message must have first been retrieved through <see cref="M:Lokad.Cloud.Storage.IQueueStorageProvider.Get``1(System.String,System.Int32,System.TimeSpan,System.Int32,Lokad.Cloud.Storage.IDataSerializer)"/>.</remarks>
         </member>
-        <member name="M:Lokad.Cloud.Storage.IQueueStorageProvider.AbandonRange``1(System.Collections.Generic.IEnumerable{``0})">
+        <member name="M:Lokad.Cloud.Storage.IQueueStorageProvider.AbandonRange``1(System.Collections.Generic.IEnumerable{``0},System.TimeSpan,System.TimeSpan)">
             <summary>
             Abandon a set of messages being processed and put them visibly back on the queue.
             </summary>
@@ -674,7 +674,7 @@
             <returns>The number of original messages actually deleted.</returns>
             <remarks>Messages must have first been retrieved through <see cref="M:Lokad.Cloud.Storage.IQueueStorageProvider.Get``1(System.String,System.Int32,System.TimeSpan,System.Int32,Lokad.Cloud.Storage.IDataSerializer)"/>.</remarks>
         </member>
-        <member name="M:Lokad.Cloud.Storage.IQueueStorageProvider.ResumeLater``1(``0)">
+        <member name="M:Lokad.Cloud.Storage.IQueueStorageProvider.ResumeLater``1(``0,System.TimeSpan,System.TimeSpan)">
             <summary>
             Resume a message being processed later and put it visibly back on the queue, without decreasing the poison detection dequeue count.
             </summary>
@@ -683,7 +683,7 @@
             <returns><c>True</c> if the original message has been deleted.</returns>
             <remarks>Message must have first been retrieved through <see cref="M:Lokad.Cloud.Storage.IQueueStorageProvider.Get``1(System.String,System.Int32,System.TimeSpan,System.Int32,Lokad.Cloud.Storage.IDataSerializer)"/>.</remarks>
         </member>
-        <member name="M:Lokad.Cloud.Storage.IQueueStorageProvider.ResumeLaterRange``1(System.Collections.Generic.IEnumerable{``0})">
+        <member name="M:Lokad.Cloud.Storage.IQueueStorageProvider.ResumeLaterRange``1(System.Collections.Generic.IEnumerable{``0},System.TimeSpan,System.TimeSpan)">
             <summary>
             Resume a set of messages being processed latern and put them visibly back on the queue, without decreasing the poison detection dequeue count.
             </summary>
@@ -730,7 +730,7 @@
             <param name="storeName">Name of the message persistence store.</param>
             <param name="key">Unique key of the persisted message as returned by ListPersisted.</param>
         </member>
-        <member name="M:Lokad.Cloud.Storage.IQueueStorageProvider.RestorePersisted(System.String,System.String)">
+        <member name="M:Lokad.Cloud.Storage.IQueueStorageProvider.RestorePersisted(System.String,System.String,System.TimeSpan,System.TimeSpan)">
             <summary>
             Put a persisted message back to the queue and delete it.
             </summary>
@@ -776,13 +776,13 @@
         <member name="M:Lokad.Cloud.Storage.Azure.QueueStorageProvider.Get``1(System.String,System.Int32,System.TimeSpan,System.Int32,Lokad.Cloud.Storage.IDataSerializer)">
             <remarks></remarks>
         </member>
-        <member name="M:Lokad.Cloud.Storage.Azure.QueueStorageProvider.Put``1(System.String,``0,Lokad.Cloud.Storage.IDataSerializer)">
+        <member name="M:Lokad.Cloud.Storage.Azure.QueueStorageProvider.Put``1(System.String,``0,System.TimeSpan,System.TimeSpan,Lokad.Cloud.Storage.IDataSerializer)">
             <remarks></remarks>
         </member>
-        <member name="M:Lokad.Cloud.Storage.Azure.QueueStorageProvider.PutRange``1(System.String,System.Collections.Generic.IEnumerable{``0},Lokad.Cloud.Storage.IDataSerializer)">
+        <member name="M:Lokad.Cloud.Storage.Azure.QueueStorageProvider.PutRange``1(System.String,System.Collections.Generic.IEnumerable{``0},System.TimeSpan,System.TimeSpan,Lokad.Cloud.Storage.IDataSerializer)">
             <remarks></remarks>
         </member>
-        <member name="M:Lokad.Cloud.Storage.Azure.QueueStorageProvider.PutRangeParallel``1(System.String,System.Collections.Generic.IEnumerable{``0},Lokad.Cloud.Storage.IDataSerializer)">
+        <member name="M:Lokad.Cloud.Storage.Azure.QueueStorageProvider.PutRangeParallel``1(System.String,System.Collections.Generic.IEnumerable{``0},System.TimeSpan,System.TimeSpan,Lokad.Cloud.Storage.IDataSerializer)">
             <remarks></remarks>
         </member>
         <member name="M:Lokad.Cloud.Storage.Azure.QueueStorageProvider.DeleteOverflowingMessages(System.String)">
@@ -797,16 +797,16 @@
         <member name="M:Lokad.Cloud.Storage.Azure.QueueStorageProvider.DeleteRange``1(System.Collections.Generic.IEnumerable{``0})">
             <remarks></remarks>
         </member>
-        <member name="M:Lokad.Cloud.Storage.Azure.QueueStorageProvider.Abandon``1(``0)">
+        <member name="M:Lokad.Cloud.Storage.Azure.QueueStorageProvider.Abandon``1(``0,System.TimeSpan,System.TimeSpan)">
             <remarks></remarks>
         </member>
-        <member name="M:Lokad.Cloud.Storage.Azure.QueueStorageProvider.AbandonRange``1(System.Collections.Generic.IEnumerable{``0})">
+        <member name="M:Lokad.Cloud.Storage.Azure.QueueStorageProvider.AbandonRange``1(System.Collections.Generic.IEnumerable{``0},System.TimeSpan,System.TimeSpan)">
             <remarks></remarks>
         </member>
-        <member name="M:Lokad.Cloud.Storage.Azure.QueueStorageProvider.ResumeLater``1(``0)">
+        <member name="M:Lokad.Cloud.Storage.Azure.QueueStorageProvider.ResumeLater``1(``0,System.TimeSpan,System.TimeSpan)">
             <remarks></remarks>
         </member>
-        <member name="M:Lokad.Cloud.Storage.Azure.QueueStorageProvider.ResumeLaterRange``1(System.Collections.Generic.IEnumerable{``0})">
+        <member name="M:Lokad.Cloud.Storage.Azure.QueueStorageProvider.ResumeLaterRange``1(System.Collections.Generic.IEnumerable{``0},System.TimeSpan,System.TimeSpan)">
             <remarks></remarks>
         </member>
         <member name="M:Lokad.Cloud.Storage.Azure.QueueStorageProvider.Persist``1(``0,System.String,System.String)">
@@ -824,7 +824,7 @@
         <member name="M:Lokad.Cloud.Storage.Azure.QueueStorageProvider.DeletePersisted(System.String,System.String,Lokad.Cloud.Storage.IDataSerializer)">
             <remarks></remarks>
         </member>
-        <member name="M:Lokad.Cloud.Storage.Azure.QueueStorageProvider.RestorePersisted(System.String,System.String)">
+        <member name="M:Lokad.Cloud.Storage.Azure.QueueStorageProvider.RestorePersisted(System.String,System.String,System.TimeSpan,System.TimeSpan)">
             <remarks></remarks>
         </member>
         <member name="M:Lokad.Cloud.Storage.Azure.QueueStorageProvider.DeleteQueue(System.String)">
@@ -1801,10 +1801,10 @@
         <member name="M:Lokad.Cloud.Storage.InMemory.MemoryQueueStorageProvider.Get``1(System.String,System.Int32,System.TimeSpan,System.Int32,Lokad.Cloud.Storage.IDataSerializer)">
             <remarks></remarks>
         </member>
-        <member name="M:Lokad.Cloud.Storage.InMemory.MemoryQueueStorageProvider.Put``1(System.String,``0,Lokad.Cloud.Storage.IDataSerializer)">
+        <member name="M:Lokad.Cloud.Storage.InMemory.MemoryQueueStorageProvider.Put``1(System.String,``0,System.TimeSpan,System.TimeSpan,Lokad.Cloud.Storage.IDataSerializer)">
             <remarks></remarks>
         </member>
-        <member name="M:Lokad.Cloud.Storage.InMemory.MemoryQueueStorageProvider.PutRange``1(System.String,System.Collections.Generic.IEnumerable{``0},Lokad.Cloud.Storage.IDataSerializer)">
+        <member name="M:Lokad.Cloud.Storage.InMemory.MemoryQueueStorageProvider.PutRange``1(System.String,System.Collections.Generic.IEnumerable{``0},System.TimeSpan,System.TimeSpan,Lokad.Cloud.Storage.IDataSerializer)">
             <remarks></remarks>
         </member>
         <member name="M:Lokad.Cloud.Storage.InMemory.MemoryQueueStorageProvider.Clear(System.String)">
@@ -1816,16 +1816,16 @@
         <member name="M:Lokad.Cloud.Storage.InMemory.MemoryQueueStorageProvider.DeleteRange``1(System.Collections.Generic.IEnumerable{``0})">
             <remarks></remarks>
         </member>
-        <member name="M:Lokad.Cloud.Storage.InMemory.MemoryQueueStorageProvider.Abandon``1(``0)">
+        <member name="M:Lokad.Cloud.Storage.InMemory.MemoryQueueStorageProvider.Abandon``1(``0,System.TimeSpan,System.TimeSpan)">
             <remarks></remarks>
         </member>
-        <member name="M:Lokad.Cloud.Storage.InMemory.MemoryQueueStorageProvider.AbandonRange``1(System.Collections.Generic.IEnumerable{``0})">
+        <member name="M:Lokad.Cloud.Storage.InMemory.MemoryQueueStorageProvider.AbandonRange``1(System.Collections.Generic.IEnumerable{``0},System.TimeSpan,System.TimeSpan)">
             <remarks></remarks>
         </member>
-        <member name="M:Lokad.Cloud.Storage.InMemory.MemoryQueueStorageProvider.ResumeLater``1(``0)">
+        <member name="M:Lokad.Cloud.Storage.InMemory.MemoryQueueStorageProvider.ResumeLater``1(``0,System.TimeSpan,System.TimeSpan)">
             <remarks></remarks>
         </member>
-        <member name="M:Lokad.Cloud.Storage.InMemory.MemoryQueueStorageProvider.ResumeLaterRange``1(System.Collections.Generic.IEnumerable{``0})">
+        <member name="M:Lokad.Cloud.Storage.InMemory.MemoryQueueStorageProvider.ResumeLaterRange``1(System.Collections.Generic.IEnumerable{``0},System.TimeSpan,System.TimeSpan)">
             <remarks></remarks>
         </member>
         <member name="M:Lokad.Cloud.Storage.InMemory.MemoryQueueStorageProvider.Persist``1(``0,System.String,System.String)">
@@ -1843,7 +1843,7 @@
         <member name="M:Lokad.Cloud.Storage.InMemory.MemoryQueueStorageProvider.DeletePersisted(System.String,System.String,Lokad.Cloud.Storage.IDataSerializer)">
             <remarks></remarks>
         </member>
-        <member name="M:Lokad.Cloud.Storage.InMemory.MemoryQueueStorageProvider.RestorePersisted(System.String,System.String)">
+        <member name="M:Lokad.Cloud.Storage.InMemory.MemoryQueueStorageProvider.RestorePersisted(System.String,System.String,System.TimeSpan,System.TimeSpan)">
             <remarks></remarks>
         </member>
         <member name="M:Lokad.Cloud.Storage.InMemory.MemoryQueueStorageProvider.DeleteQueue(System.String)">
@@ -2048,6 +2048,9 @@
         </member>
         <member name="M:Lokad.Cloud.Storage.QueueStorageExtensions.Put``1(Lokad.Cloud.Storage.IQueueStorageProvider,``0)">
             <summary>Put a message on a queue (derived from the message type T).</summary>
+        </member>
+        <member name="M:Lokad.Cloud.Storage.QueueStorageExtensions.PutWithDelay``1(Lokad.Cloud.Storage.IQueueStorageProvider,``0,System.TimeSpan)">
+            <summary>Put a message on a queue (derived from the message type T), but keep it invisible for a delay.</summary>
         </member>
         <member name="M:Lokad.Cloud.Storage.QueueStorageExtensions.PutRange``1(Lokad.Cloud.Storage.IQueueStorageProvider,System.Collections.Generic.IEnumerable{``0})">
             <summary>Put messages on a queue (derived from the message type T).</summary>

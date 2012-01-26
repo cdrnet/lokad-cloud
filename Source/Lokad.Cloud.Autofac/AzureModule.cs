@@ -5,9 +5,9 @@
 
 using Autofac;
 using Lokad.Cloud.Autofac.Diagnostics;
-using Lokad.Cloud.Autofac.Storage;
 using Lokad.Cloud.ServiceFabric;
 using Lokad.Cloud.Storage;
+using Lokad.Cloud.Storage.Autofac;
 
 namespace Lokad.Cloud.Autofac
 {

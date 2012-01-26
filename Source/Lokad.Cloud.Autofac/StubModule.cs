@@ -5,10 +5,10 @@
 
 using Autofac;
 using Lokad.Cloud.AppHost.Framework;
-using Lokad.Cloud.Autofac.Storage;
 using Lokad.Cloud.Diagnostics;
 using Lokad.Cloud.ServiceFabric;
 using Lokad.Cloud.Storage;
+using Lokad.Cloud.Storage.Autofac;
 using Lokad.Cloud.Stubs;
 
 namespace Lokad.Cloud.Autofac

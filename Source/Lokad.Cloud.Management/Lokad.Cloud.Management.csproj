@@ -34,9 +34,9 @@
     <Reference Include="Ionic.Zip.Reduced">
       <HintPath>..\..\packages\DotNetZip.Reduced.1.9.1.8\lib\net20\Ionic.Zip.Reduced.dll</HintPath>
     </Reference>
-    <Reference Include="Lokad.Cloud.Storage, Version=2.0.0.5, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Lokad.Cloud.Storage, Version=2.1.0.6, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Lokad.Cloud.Storage.2.0.0\lib\Lokad.Cloud.Storage.dll</HintPath>
+      <HintPath>..\..\packages\Lokad.Cloud.Storage.2.1.0\lib\Lokad.Cloud.Storage.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.WindowsAzure.StorageClient, Version=1.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\..\packages\WindowsAzure.Storage.1.6\lib\net35-full\Microsoft.WindowsAzure.StorageClient.dll</HintPath>
