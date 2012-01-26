@@ -16,6 +16,9 @@ namespace Lokad.Cloud.Autofac.Diagnostics
 {
     /// <summary>
     /// IoC Module for diagnostics and logging. Assumes that one of the storage modules has been registered as well.
+    /// 
+    /// Registers storage, runtime and application observers with default logging.
+    /// You can of course override these registrations if you don't want them.
     /// </summary>
     public class DiagnosticsModule : Module
     {
@@ -24,17 +27,19 @@ namespace Lokad.Cloud.Autofac.Diagnostics
             builder.Register(c => new CloudLogWriter(c.Resolve<NeutralLogStorage>().BlobStorage)).As<ILog>();
 
             // Storage Observer Subject
-            builder.Register(c => new StorageObserverSubject(c.ResolveOptional<IEnumerable<IObserver<IStorageEvent>>>().ToArray()))
+            builder.Register(c => SimpleLoggingObservers.CreateForStorage(c.Resolve<ILog>(), c.ResolveOptional<IEnumerable<IObserver<IStorageEvent>>>().ToArray()))
                 .As<IStorageObserver, IObservable<IStorageEvent>>()
                 .SingleInstance();
 
             // Runtime Observer Subject
-            builder.Register(c => new RuntimeObserverSubject(c.ResolveOptional<IEnumerable<IObserver<IRuntimeEvent>>>().ToArray()))
+            builder.Register(c => SimpleLoggingObservers.CreateForRuntime(c.Resolve<ILog>(), c.ResolveOptional<IEnumerable<IObserver<IRuntimeEvent>>>().ToArray()))
                 .As<IRuntimeObserver, IObservable<IRuntimeEvent>>()
                 .SingleInstance();
 
-            // TODO (ruegg, 2011-05-30): Observer that logs system events to the log: temporary! to keep old logging behavior for now
-            builder.RegisterType<CloudStorageLogger>().As<IStartable>().SingleInstance();
+            // Application Observer Subject
+            builder.Register(c => SimpleLoggingObservers.CreateForApplication(c.Resolve<ILog>(), c.ResolveOptional<IEnumerable<IObserver<IApplicationEvent>>>().ToArray()))
+                .As<IApplicationObserver, IObservable<IApplicationEvent>>()
+                .SingleInstance();
         }
     }
 }

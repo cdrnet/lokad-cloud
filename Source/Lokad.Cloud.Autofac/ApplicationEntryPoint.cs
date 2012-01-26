@@ -4,44 +4,50 @@
 #endregion
 
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
+using System.Xml.Linq;
 using Autofac;
 using Autofac.Configuration;
+using Lokad.Cloud.AppHost.Framework;
+using Lokad.Cloud.EntryPoint;
 using Lokad.Cloud.ServiceFabric;
 using Microsoft.WindowsAzure;
 
 namespace Lokad.Cloud.Autofac
 {
     /// <summary>
-    /// Custom EntryPoint that allows service creation and extension using Autofac IoC
+    /// Custom EntryPoint for service creation and extension using Autofac IoC
     /// </summary>
-    public class ApplicationEntryPoint : EntryPoint.ApplicationEntryPoint
+    public class ApplicationEntryPoint : IApplicationEntryPoint
     {
-        private byte[] _autofacConfig;
-        private IDisposable _disposable;
+        private IApplicationEnvironment Environment { get; set; }
+        private XElement Settings { get; set; }
 
-        protected override void Configure()
+        public void Run(XElement settings, IDeploymentReader deploymentReader, IApplicationEnvironment environment, CancellationToken cancellationToken)
         {
-            base.Configure();
+            if (cancellationToken.IsCancellationRequested)
+            {
+                return;
+            }
 
-            var autofacXml = Settings.Element("RawConfig");
-            _autofacConfig = autofacXml != null && !string.IsNullOrEmpty(autofacXml.Value)
-                ? Convert.FromBase64String(autofacXml.Value)
-                : null;
-        }
+            Environment = environment;
+            Settings = settings;
 
-        protected override List<CloudService> CreateServices(IRuntimeFinalizer finalizer)
-        {
             var builder = new ContainerBuilder();
             builder.RegisterModule<AzureModule>();
-            builder.RegisterInstance(CloudStorageAccount.Parse(DataConnectionString));
+            builder.RegisterInstance(CloudStorageAccount.Parse(Settings.Element("DataConnectionString").Value));
             builder.RegisterInstance(Environment);
-            builder.RegisterInstance(finalizer).As<IRuntimeFinalizer>();
+            builder.RegisterType<CloudServiceRunner>();
+            InjectRegistration(builder);
 
             // Load Application IoC Configuration and apply it to the builder (allows users to override and extend)
-            if (_autofacConfig != null && _autofacConfig.Length > 0)
+            var autofacXml = Settings.Element("RawConfig");
+            var autofacConfig = autofacXml != null && !string.IsNullOrEmpty(autofacXml.Value)
+                ? Convert.FromBase64String(autofacXml.Value)
+                : null;
+            if (autofacConfig != null && autofacConfig.Length > 0)
             {
                 // HACK: need to copy settings locally first
                 // HACK: hard-code string for local storage name
@@ -49,7 +55,7 @@ namespace Lokad.Cloud.Autofac
                 const string resourceName = "LokadCloudStorage";
 
                 var pathToFile = Path.Combine(Environment.GetLocalResourcePath(resourceName), fileName);
-                File.WriteAllBytes(pathToFile, _autofacConfig);
+                File.WriteAllBytes(pathToFile, autofacConfig);
                 builder.RegisterModule(new ConfigurationSettingsReader("autofac", pathToFile));
             }
 
@@ -67,8 +73,6 @@ namespace Lokad.Cloud.Autofac
                     {
                         e.Context.InjectUnsetProperties(e.Instance);
 
-                        Inject(e.Instance as CloudService);
-
                         var initializable = e.Instance as IInitializable;
                         if (initializable != null)
                         {
@@ -83,21 +87,28 @@ namespace Lokad.Cloud.Autofac
                 // e.g. RuntimeFinalizer
             }
 
-            var applicationContainer = builder.Build();
-            _disposable = applicationContainer;
+            using (var applicationContainer = builder.Build())
+            {
+                // Instanciate and return all the cloud services
+                var services = serviceTypes.Select(type => (CloudService)applicationContainer.Resolve(type)).ToList();
 
-            // Instanciate and return all the cloud services
-            return serviceTypes.Select(type => (CloudService)applicationContainer.Resolve(type)).ToList();
+                var runner = applicationContainer.Resolve<CloudServiceRunner>();
+
+                // Instanciate and return all the cloud services
+                runner.Run(environment, services, cancellationToken);
+            }
         }
 
-        protected override void DisposeServices()
+        public void OnSettingsChanged(XElement settings)
         {
-            var disposable = _disposable;
-            if (disposable != null)
-            {
-                disposable.Dispose();
-                _disposable = null;
-            }
+        }
+
+        /// <summary>
+        /// Override this method to register additional types or modules,
+        /// to be injected later into your services.
+        /// </summary>
+        protected virtual void InjectRegistration(ContainerBuilder builder)
+        {
         }
     }
 }

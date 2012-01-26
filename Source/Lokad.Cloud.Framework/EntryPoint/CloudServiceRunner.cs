@@ -17,71 +17,70 @@ namespace Lokad.Cloud.EntryPoint
 {
     public class CloudServiceRunner
     {
+        private readonly ILog _log;
+        private readonly IRuntimeObserver _runtimeObserver;
+
         Scheduler _scheduler;
 
-        public void Run(IApplicationEnvironment environment, Func<IRuntimeFinalizer, List<CloudService>> createServices, Action disposeServices, ILog log, IRuntimeObserver runtimeObserver, CancellationToken cancellationToken)
+        public CloudServiceRunner(ILog log, IRuntimeObserver runtimeObserver)
         {
-            var finalizer = new RuntimeFinalizer();
+            _log = log;
+            _runtimeObserver = runtimeObserver;
+        }
+
+        public void Run(IApplicationEnvironment environment, List<CloudService> services, CancellationToken cancellationToken)
+        {
             try
             {
-                log.TryDebugFormat("Runtime: started on worker {0}.", environment.Host.WorkerName);
-
-                var services = createServices(finalizer);
+                _log.TryDebugFormat("Runtime: started on worker {0}.", environment.Host.WorkerName);
 
                 // Execute
-                _scheduler = new Scheduler(services, service => service.Start(), runtimeObserver);
+                _scheduler = new Scheduler(services, service => service.Start(), _runtimeObserver);
                 _scheduler.RunSchedule(cancellationToken);
 
-                log.TryDebugFormat("Runtime: Runtime has stopped cleanly on worker {0}.", environment.Host.WorkerName);
+                _log.TryDebugFormat("Runtime: Runtime has stopped cleanly on worker {0}.", environment.Host.WorkerName);
             }
             catch (TypeLoadException typeLoadException)
             {
-                log.TryErrorFormat(typeLoadException, "Runtime: Type {0} could not be loaded. The Runtime will be restarted.",
+                _log.TryErrorFormat(typeLoadException, "Runtime: Type {0} could not be loaded. The Runtime will be restarted.",
                     typeLoadException.TypeName);
             }
             catch (FileLoadException fileLoadException)
             {
                 // Tentatively: referenced assembly is missing
-                log.TryFatal("Runtime: Could not load assembly probably due to a missing reference assembly. The Runtime will be restarted.",
+                _log.TryFatal("Runtime: Could not load assembly probably due to a missing reference assembly. The Runtime will be restarted.",
                     fileLoadException);
             }
             catch (SecurityException securityException)
             {
                 // Tentatively: assembly cannot be loaded due to security config
-                log.TryFatalFormat(securityException, "Runtime: Could not load assembly {0} probably due to security configuration. The Runtime will be restarted.",
+                _log.TryFatalFormat(securityException, "Runtime: Could not load assembly {0} probably due to security configuration. The Runtime will be restarted.",
                     securityException.FailedAssemblyInfo);
             }
             catch (ThreadInterruptedException)
             {
-                log.TryWarnFormat("Runtime: execution was interrupted on worker {0} in service {1}. The Runtime will be restarted.",
+                _log.TryWarnFormat("Runtime: execution was interrupted on worker {0} in service {1}. The Runtime will be restarted.",
                     environment.Host.WorkerName, GetNameOfServiceInExecution());
             }
             catch (ThreadAbortException)
             {
                 Thread.ResetAbort();
-                log.TryDebugFormat("Runtime: execution was aborted on worker {0} in service {1}. The Runtime is stopping.",
+                _log.TryDebugFormat("Runtime: execution was aborted on worker {0} in service {1}. The Runtime is stopping.",
                     environment.Host.WorkerName, GetNameOfServiceInExecution());
             }
             catch (TimeoutException)
             {
-                log.TryWarnFormat("Runtime: execution timed out on worker {0} in service {1}. The Runtime will be restarted.",
+                _log.TryWarnFormat("Runtime: execution timed out on worker {0} in service {1}. The Runtime will be restarted.",
                     environment.Host.WorkerName, GetNameOfServiceInExecution());
             }
             catch (Exception ex)
             {
-                log.TryErrorFormat(ex, "Runtime: An unhandled {0} exception occurred on worker {1} in service {2}. The Runtime will be restarted.",
+                _log.TryErrorFormat(ex, "Runtime: An unhandled {0} exception occurred on worker {1} in service {2}. The Runtime will be restarted.",
                     ex.GetType().Name, environment.Host.WorkerName, GetNameOfServiceInExecution());
             }
             finally
             {
-                finalizer.FinalizeRuntime();
-
-                log.TryDebugFormat("Runtime: stopped on worker {0}.", environment.Host.WorkerName);
-
-                if (disposeServices != null)
-                {
-                    disposeServices();
-                }
+                _log.TryDebugFormat("Runtime: stopped on worker {0}.", environment.Host.WorkerName);
             }
         }
 

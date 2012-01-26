@@ -5,18 +5,17 @@
 
 using System;
 using System.Reactive.Linq;
-using Lokad.Cloud.Diagnostics;
 using Lokad.Cloud.Instrumentation;
 using Lokad.Cloud.Storage.Instrumentation;
 using Lokad.Cloud.Storage.Instrumentation.Events;
 
-namespace Lokad.Cloud.EntryPoint
+namespace Lokad.Cloud.Diagnostics
 {
-    internal static class Observers
+    public static class SimpleLoggingObservers
     {
-        public static IStorageObserver CreateStorageObserver(ILog log)
+        public static IStorageObserver CreateForStorage(ILog log, IObserver<IStorageEvent>[] fixedObservers = null)
         {
-            var subject = new StorageObserverSubject();
+            var subject = new StorageObserverSubject(fixedObservers);
 
             subject.Where(e => !(e is StorageOperationRetriedEvent) && !(e is StorageOperationSucceededEvent))
                 .Subscribe(e => log.TryLog((LogLevel)(int)e.Level, e.Describe(), meta: e.DescribeMeta()));
@@ -38,9 +37,18 @@ namespace Lokad.Cloud.EntryPoint
             return subject;
         }
 
-        public static IRuntimeObserver CreateRuntimeObserver(ILog log)
+        public static IRuntimeObserver CreateForRuntime(ILog log, IObserver<IRuntimeEvent>[] fixedObservers = null)
         {
-            var subject = new RuntimeObserverSubject();
+            var subject = new RuntimeObserverSubject(fixedObservers);
+            subject.Subscribe(e => log.TryLog((LogLevel)(int)e.Level, e.Describe(), meta: e.DescribeMeta()));
+
+            return subject;
+        }
+
+        public static IApplicationObserver CreateForApplication(ILog log, IObserver<IApplicationEvent>[] fixedObservers = null)
+        {
+            var subject = new ApplicationObserverSubject(fixedObservers);
+            subject.Subscribe(e => log.TryLog((LogLevel)(int)e.Level, e.Describe(), meta: e.DescribeMeta()));
 
             return subject;
         }
