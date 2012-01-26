@@ -13,9 +13,9 @@ using Lokad.Cloud.Storage.Instrumentation.Events;
 
 namespace Lokad.Cloud.Diagnostics
 {
-    internal static class Observers
+    internal static class LoggingObservers
     {
-        public static IHostObserver CreateHostObserver(HostLogWriter log)
+        public static IHostObserver CreateForHost(HostLogWriter log)
         {
             var subject = new HostObserverSubject();
             subject.Subscribe(e => log.TryLog((HostLogLevel)(int)e.Level, e.Describe(), meta: e.DescribeMeta()));
@@ -23,7 +23,7 @@ namespace Lokad.Cloud.Diagnostics
             return subject;
         }
 
-        public static IProvisioningObserver CreateProvisioningObserver(HostLogWriter log)
+        public static IProvisioningObserver CreateForProvisioning(HostLogWriter log)
         {
             var subject = new ProvisioningObserverSubject();
 
@@ -46,7 +46,7 @@ namespace Lokad.Cloud.Diagnostics
             return subject;
         }
 
-        public static IStorageObserver CreateStorageObserver(HostLogWriter log)
+        public static IStorageObserver CreateForStorage(HostLogWriter log)
         {
             var subject = new StorageObserverSubject();
 

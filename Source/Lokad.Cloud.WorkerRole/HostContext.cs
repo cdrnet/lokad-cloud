@@ -30,7 +30,7 @@ namespace Lokad.Cloud
         public HostContext(IDeploymentReader deploymentReader, string certificateThumbprint, string subscriptionId, HostLogWriter log)
         {
             DeploymentReader = deploymentReader;
-            Observer = Observers.CreateHostObserver(log);
+            Observer = LoggingObservers.CreateForHost(log);
             _log = log;
 
             // TODO: Replace GUID with global blob counter
@@ -83,7 +83,7 @@ namespace Lokad.Cloud
             }
 
             // ok
-            var provisioningObserver = Observers.CreateProvisioningObserver(log);
+            var provisioningObserver = LoggingObservers.CreateForProvisioning(log);
             _provisioning = new AzureProvisioning(subscriptionId, certificate, provisioningObserver);
             _currentDeployment = new AzureCurrentDeployment(currentDeploymentPrivateId, subscriptionId, certificate, provisioningObserver);
         }

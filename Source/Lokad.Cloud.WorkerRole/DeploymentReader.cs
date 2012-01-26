@@ -34,7 +34,7 @@ namespace Lokad.Cloud
             _certificateThumbprint = certificateThumbprint;
 
             _log = new HostLogWriter(CloudStorage.ForAzureConnectionString(connectionString).BuildBlobStorage());
-            _storage = CloudStorage.ForAzureConnectionString(connectionString).WithObserver(Observers.CreateStorageObserver(_log)).BuildStorageProviders();
+            _storage = CloudStorage.ForAzureConnectionString(connectionString).WithObserver(LoggingObservers.CreateForStorage(_log)).BuildStorageProviders();
         }
 
         [NonSerialized]
@@ -47,7 +47,7 @@ namespace Lokad.Cloud
         private void OnDeserialized(StreamingContext context)
         {
             _log = new HostLogWriter(CloudStorage.ForAzureConnectionString(_connectionString).BuildBlobStorage());
-            _storage = CloudStorage.ForAzureConnectionString(_connectionString).WithObserver(Observers.CreateStorageObserver(_log)).BuildStorageProviders();
+            _storage = CloudStorage.ForAzureConnectionString(_connectionString).WithObserver(LoggingObservers.CreateForStorage(_log)).BuildStorageProviders();
         }
 
         public SolutionHead GetDeploymentIfModified(string knownETag, out string newETag)
