@@ -13,7 +13,7 @@ namespace Lokad.Cloud.Diagnostics
 {
     public static class SimpleLoggingObservers
     {
-        public static IStorageObserver CreateForStorage(ILog log, IObserver<IStorageEvent>[] fixedObservers = null)
+        public static StorageObserverSubject CreateForStorage(ILog log, IObserver<IStorageEvent>[] fixedObservers = null)
         {
             var subject = new StorageObserverSubject(fixedObservers);
 
@@ -37,7 +37,7 @@ namespace Lokad.Cloud.Diagnostics
             return subject;
         }
 
-        public static IRuntimeObserver CreateForRuntime(ILog log, IObserver<IRuntimeEvent>[] fixedObservers = null)
+        public static RuntimeObserverSubject CreateForRuntime(ILog log, IObserver<IRuntimeEvent>[] fixedObservers = null)
         {
             var subject = new RuntimeObserverSubject(fixedObservers);
             subject.Subscribe(e => log.TryLog((LogLevel)(int)e.Level, e.Describe(), meta: e.DescribeMeta()));
@@ -45,7 +45,7 @@ namespace Lokad.Cloud.Diagnostics
             return subject;
         }
 
-        public static IApplicationObserver CreateForApplication(ILog log, IObserver<IApplicationEvent>[] fixedObservers = null)
+        public static ApplicationObserverSubject CreateForApplication(ILog log, IObserver<IApplicationEvent>[] fixedObservers = null)
         {
             var subject = new ApplicationObserverSubject(fixedObservers);
             subject.Subscribe(e => log.TryLog((LogLevel)(int)e.Level, e.Describe(), meta: e.DescribeMeta()));
