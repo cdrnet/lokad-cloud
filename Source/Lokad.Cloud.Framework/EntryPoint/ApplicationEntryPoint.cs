@@ -9,6 +9,7 @@ using System.Threading;
 using System.Xml.Linq;
 using Lokad.Cloud.AppHost.Framework;
 using Lokad.Cloud.Diagnostics;
+using Lokad.Cloud.Jobs;
 using Lokad.Cloud.ServiceFabric;
 using Lokad.Cloud.Instrumentation;
 using Lokad.Cloud.Storage;
@@ -39,9 +40,10 @@ namespace Lokad.Cloud.EntryPoint
             DataConnectionString = Settings.Element("DataConnectionString").Value;
 
             Log = CreateLog();
-
             var applicationObserver = CreateOptionalApplicationObserver();
-            var jobs = new Jobs.JobManager(Log);
+            var runtimeObserver = CreateOptionalRuntimeObserver();
+
+            var jobs = new JobManager(runtimeObserver);
             var finalizer = new RuntimeFinalizer();
             var storage = CloudStorage
                 .ForAzureConnectionString(DataConnectionString)
@@ -70,7 +72,7 @@ namespace Lokad.Cloud.EntryPoint
                     })
                 .ToList();
 
-            var runner = new CloudServiceRunner(Log, CreateOptionalRuntimeObserver());
+            var runner = new CloudServiceRunner(Log, runtimeObserver);
             try
             {
                 runner.Run(environment, services, cancellationToken);

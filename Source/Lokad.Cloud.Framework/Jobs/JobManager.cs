@@ -1,16 +1,16 @@
 ﻿using System;
-using Lokad.Cloud.Diagnostics;
+using Lokad.Cloud.Instrumentation;
+using Lokad.Cloud.Instrumentation.Events;
 
 namespace Lokad.Cloud.Jobs
 {
-    /// <summary>NOT IMPLEMENTED YET.</summary>
     public class JobManager
     {
-        private readonly ILog _log;
+        private readonly IRuntimeObserver _observer;
 
-        public JobManager(ILog log)
+        public JobManager(IRuntimeObserver observer = null)
         {
-            _log = log;
+            _observer = observer;
         }
 
         public Job CreateNew()
@@ -30,20 +30,26 @@ namespace Lokad.Cloud.Jobs
 
         public void Start(Job job)
         {
-            // TODO: Implementation
-            _log.TryDebugFormat("Job {0} started", job.JobId);
+            if (_observer != null)
+            {
+                _observer.Notify(new JobStartedEvent(job, DateTimeOffset.UtcNow));
+            }
         }
 
         public void Succeed(Job job)
         {
-            // TODO: Implementation
-            _log.TryDebugFormat("Job {0} succeeded", job.JobId);
+            if (_observer != null)
+            {
+                _observer.Notify(new JobSucceededEvent(job, DateTimeOffset.UtcNow));
+            }
         }
 
         public void Fail(Job job)
         {
-            // TODO: Implementation
-            _log.TryDebugFormat("Job {0} failed", job.JobId);
+            if (_observer != null)
+            {
+                _observer.Notify(new JobFailedEvent(job, DateTimeOffset.UtcNow));
+            }
         }
     }
 }
