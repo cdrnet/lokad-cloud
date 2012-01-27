@@ -89,13 +89,18 @@ namespace Lokad.Cloud.Framework.Autofac
 
             using (var applicationContainer = builder.Build())
             {
-                // Instanciate and return all the cloud services
                 var services = serviceTypes.Select(type => (CloudService)applicationContainer.Resolve(type)).ToList();
-
                 var runner = applicationContainer.Resolve<CloudServiceRunner>();
+                var finalizer = applicationContainer.Resolve<IRuntimeFinalizer>();
 
-                // Instanciate and return all the cloud services
-                runner.Run(environment, services, cancellationToken);
+                try
+                {
+                    runner.Run(environment, services, cancellationToken);
+                }
+                finally
+                {
+                    finalizer.FinalizeRuntime();
+                }
             }
         }
 

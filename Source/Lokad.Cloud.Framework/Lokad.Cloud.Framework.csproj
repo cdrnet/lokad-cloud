@@ -102,6 +102,11 @@
     <Compile Include="EntryPoint\Scheduler.cs" />
     <Compile Include="Instrumentation\ApplicationObserverSubject.cs" />
     <Compile Include="Instrumentation\EventLevel.cs" />
+    <Compile Include="Instrumentation\Events\RuntimeInterruptedRestartedEvent.cs" />
+    <Compile Include="Instrumentation\Events\RuntimeTimeoutRestartedEvent.cs" />
+    <Compile Include="Instrumentation\Events\RuntimeExceptionRestartedEvent.cs" />
+    <Compile Include="Instrumentation\Events\RuntimeStoppedEvent.cs" />
+    <Compile Include="Instrumentation\Events\RuntimeStartedEvent.cs" />
     <Compile Include="Instrumentation\Events\ScheduledServiceLockResetAfterTimeoutEvent.cs" />
     <Compile Include="Instrumentation\Events\JobFailedEvent.cs" />
     <Compile Include="Instrumentation\Events\JobSucceededEvent.cs" />

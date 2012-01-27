@@ -5,89 +5,57 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Security;
 using System.Threading;
 using Lokad.Cloud.AppHost.Framework;
-using Lokad.Cloud.Diagnostics;
 using Lokad.Cloud.Instrumentation;
+using Lokad.Cloud.Instrumentation.Events;
 using Lokad.Cloud.ServiceFabric;
 
 namespace Lokad.Cloud.EntryPoint
 {
     public class CloudServiceRunner
     {
-        private readonly ILog _log;
         private readonly IRuntimeObserver _runtimeObserver;
 
-        Scheduler _scheduler;
-
-        public CloudServiceRunner(ILog log, IRuntimeObserver runtimeObserver)
+        public CloudServiceRunner(IRuntimeObserver runtimeObserver)
         {
-            _log = log;
             _runtimeObserver = runtimeObserver;
         }
 
         public void Run(IApplicationEnvironment environment, List<CloudService> services, CancellationToken cancellationToken)
         {
+            Notify(() => new RuntimeStartedEvent(environment.Cell));
+            var scheduler = new Scheduler(services, service => service.Start(), _runtimeObserver);
             try
             {
-                _log.TryDebugFormat("Runtime: started on worker {0}.", environment.Host.WorkerName);
-
-                // Execute
-                _scheduler = new Scheduler(services, service => service.Start(), _runtimeObserver);
-                _scheduler.RunSchedule(cancellationToken);
-
-                _log.TryDebugFormat("Runtime: Runtime has stopped cleanly on worker {0}.", environment.Host.WorkerName);
-            }
-            catch (TypeLoadException typeLoadException)
-            {
-                _log.TryErrorFormat(typeLoadException, "Runtime: Type {0} could not be loaded. The Runtime will be restarted.",
-                    typeLoadException.TypeName);
-            }
-            catch (FileLoadException fileLoadException)
-            {
-                // Tentatively: referenced assembly is missing
-                _log.TryFatal("Runtime: Could not load assembly probably due to a missing reference assembly. The Runtime will be restarted.",
-                    fileLoadException);
-            }
-            catch (SecurityException securityException)
-            {
-                // Tentatively: assembly cannot be loaded due to security config
-                _log.TryFatalFormat(securityException, "Runtime: Could not load assembly {0} probably due to security configuration. The Runtime will be restarted.",
-                    securityException.FailedAssemblyInfo);
+                scheduler.RunSchedule(cancellationToken);
             }
             catch (ThreadInterruptedException)
             {
-                _log.TryWarnFormat("Runtime: execution was interrupted on worker {0} in service {1}. The Runtime will be restarted.",
-                    environment.Host.WorkerName, GetNameOfServiceInExecution());
+                Notify(() => new RuntimeInterruptedRestartedEvent(environment.Cell, GetNameOfServiceInExecution(scheduler)));
             }
             catch (ThreadAbortException)
             {
                 Thread.ResetAbort();
-                _log.TryDebugFormat("Runtime: execution was aborted on worker {0} in service {1}. The Runtime is stopping.",
-                    environment.Host.WorkerName, GetNameOfServiceInExecution());
+                Notify(() => new RuntimeInterruptedRestartedEvent(environment.Cell, GetNameOfServiceInExecution(scheduler)));
             }
             catch (TimeoutException)
             {
-                _log.TryWarnFormat("Runtime: execution timed out on worker {0} in service {1}. The Runtime will be restarted.",
-                    environment.Host.WorkerName, GetNameOfServiceInExecution());
+                Notify(() => new RuntimeTimeoutRestartedEvent(environment.Cell, GetNameOfServiceInExecution(scheduler)));
             }
             catch (Exception ex)
             {
-                _log.TryErrorFormat(ex, "Runtime: An unhandled {0} exception occurred on worker {1} in service {2}. The Runtime will be restarted.",
-                    ex.GetType().Name, environment.Host.WorkerName, GetNameOfServiceInExecution());
+                Notify(() => new RuntimeExceptionRestartedEvent(environment.Cell, GetNameOfServiceInExecution(scheduler), ex));
             }
             finally
             {
-                _log.TryDebugFormat("Runtime: stopped on worker {0}.", environment.Host.WorkerName);
+                Notify(() => new RuntimeStoppedEvent(environment.Cell));
             }
         }
 
         /// <summary>The name of the service that is being executed, if any, <c>null</c> otherwise.</summary>
-        private string GetNameOfServiceInExecution()
+        private string GetNameOfServiceInExecution(Scheduler scheduler)
         {
-            var scheduler = _scheduler;
             CloudService service;
             if (scheduler == null || (service = scheduler.CurrentlyScheduledService) == null)
             {
@@ -95,6 +63,14 @@ namespace Lokad.Cloud.EntryPoint
             }
 
             return service.Name;
+        }
+
+        private void Notify(Func<IRuntimeEvent> buildEvent)
+        {
+            if (_runtimeObserver != null)
+            {
+                _runtimeObserver.Notify(buildEvent());
+            }
         }
     }
 }

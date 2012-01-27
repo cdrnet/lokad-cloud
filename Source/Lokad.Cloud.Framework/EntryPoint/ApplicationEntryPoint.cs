@@ -72,7 +72,7 @@ namespace Lokad.Cloud.EntryPoint
                     })
                 .ToList();
 
-            var runner = new CloudServiceRunner(Log, runtimeObserver);
+            var runner = new CloudServiceRunner(runtimeObserver);
             try
             {
                 runner.Run(environment, services, cancellationToken);
