@@ -102,7 +102,6 @@
     <Compile Include="Shared\Range.cs" />
     <Compile Include="Shared\Threading\WaitForTests.cs" />
     <Compile Include="Storage\BlobCounterTests.cs" />
-    <Compile Include="Storage\DelayedQueueTests.cs" />
     <Compile Include="Storage\StorageCredentialsVerifierTests.cs" />
     <Compile Include="TypeMapperProviderTests.cs" />
     <None Include="packages.config" />

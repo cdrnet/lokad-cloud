@@ -131,7 +131,6 @@
     <Compile Include="ServiceFabric\WaitFor.cs" />
     <Compile Include="Stubs\StubLog.cs" />
     <Compile Include="Storage\BlobCounter.cs" />
-    <Compile Include="Storage\DelayedQueue.cs" />
     <Compile Include="Stubs\StubEnvironment.cs" />
     <Compile Include="TypeMapperProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

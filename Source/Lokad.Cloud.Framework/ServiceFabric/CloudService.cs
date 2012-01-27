@@ -199,19 +199,19 @@ namespace Lokad.Cloud.ServiceFabric
         /// <summary>Put a message into the queue implicitly associated to the type <c>T</c>.</summary>
         protected void Put<T>(T message)
         {
-            PutRange(new[]{message});
+            Queues.Put(TypeMapper.GetStorageName(typeof(T)), message);
         }
 
         /// <summary>Put a message into the queue identified by <c>queueName</c>.</summary>
         protected void Put<T>(T message, string queueName)
         {
-            PutRange(new[] { message }, queueName);
+            Queues.Put(queueName, message);
         }
 
         /// <summary>Put messages into the queue implicitly associated to the type <c>T</c>.</summary>
         protected void PutRange<T>(IEnumerable<T> messages)
         {
-            PutRange(messages, TypeMapper.GetStorageName(typeof(T)));
+            Queues.PutRange(TypeMapper.GetStorageName(typeof(T)), messages);
         }
 
         /// <summary>Put messages into the queue identified by <c>queueName</c>.</summary>
@@ -224,21 +224,21 @@ namespace Lokad.Cloud.ServiceFabric
         /// time specified by the <c>triggerTime</c>.</summary>
         protected void PutWithDelay<T>(T message, DateTimeOffset triggerTime)
         {
-            new DelayedQueue(Blobs).PutWithDelay(message, triggerTime);
+            Queues.Put(TypeMapper.GetStorageName(typeof(T)), message, delay: triggerTime - DateTimeOffset.UtcNow);
         }
 
         /// <summary>Put a message into the queue identified by <c>queueName</c> at the
         /// time specified by the <c>triggerTime</c>.</summary>
         protected void PutWithDelay<T>(T message, DateTimeOffset triggerTime, string queueName)
         {
-            new DelayedQueue(Blobs).PutWithDelay(message, triggerTime, queueName);
+            Queues.Put(queueName, message, delay: triggerTime - DateTimeOffset.UtcNow);
         }
 
         /// <summary>Put messages into the queue implicitly associated to the type <c>T</c> at the
         /// time specified by the <c>triggerTime</c>.</summary>
         protected void PutRangeWithDelay<T>(IEnumerable<T> messages, DateTimeOffset triggerTime)
         {
-            new DelayedQueue(Blobs).PutRangeWithDelay(messages, triggerTime);
+            Queues.PutRange(TypeMapper.GetStorageName(typeof(T)), messages, delay: triggerTime - DateTimeOffset.UtcNow);
         }
 
         /// <summary>Put messages into the queue identified by <c>queueName</c> at the
@@ -247,7 +247,7 @@ namespace Lokad.Cloud.ServiceFabric
         /// before the <c>triggerTime</c> is reached.</remarks>
         protected void PutRangeWithDelay<T>(IEnumerable<T> messages, DateTimeOffset triggerTime, string queueName)
         {
-            new DelayedQueue(Blobs).PutRangeWithDelay(messages, triggerTime, queueName);
+            Queues.PutRange(queueName, messages, delay: triggerTime - DateTimeOffset.UtcNow);
         }
 
         protected bool TryNotify(IApplicationEvent @event)
