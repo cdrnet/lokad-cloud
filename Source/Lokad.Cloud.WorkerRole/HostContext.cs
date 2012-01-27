@@ -48,7 +48,6 @@ namespace Lokad.Cloud
             {
                 if (!RoleEnvironment.IsAvailable)
                 {
-
                     return;
                 }
             }

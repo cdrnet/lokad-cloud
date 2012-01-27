@@ -1,4 +1,4 @@
-﻿#region Copyright (c) Lokad 2009
+﻿#region Copyright (c) Lokad 2009-2012
 // This code is released under the terms of the new BSD licence.
 // URL: http://www.lokad.com/
 #endregion
@@ -6,13 +6,17 @@
 using System.Reflection;
 using System.Runtime.InteropServices;
 
-// General Information about an assembly is controlled through the following 
-// set of attributes. Change these attribute values to modify the information
-// associated with an assembly.
 [assembly: AssemblyTitle("Lokad.Cloud.WorkerRole")]
 [assembly: AssemblyDescription("")]
-[assembly: AssemblyCopyright("Copyright © Lokad 2009")]
+[assembly: AssemblyCopyright("Copyright © Lokad 2009-2012")]
 [assembly: AssemblyTrademark("")]
 
-// The following GUID is for the ID of the typelib if this project is exposed to COM
+[assembly: AssemblyCompany("Lokad")]
+[assembly: AssemblyProduct("Lokad.Cloud")]
+[assembly: AssemblyCulture("")]
+[assembly: ComVisible(false)]
+
+[assembly: AssemblyVersion("0.0.0.0")]
+[assembly: AssemblyFileVersion("0.0.0.0")]
+
 [assembly: Guid("6d6757ec-a849-4cb5-bdbb-17707b7129a5")]
