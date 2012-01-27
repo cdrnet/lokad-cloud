@@ -4,12 +4,12 @@
 #endregion
 
 using Autofac;
-using Lokad.Cloud.Autofac.Diagnostics;
+using Lokad.Cloud.Framework.Autofac.Diagnostics;
 using Lokad.Cloud.ServiceFabric;
 using Lokad.Cloud.Storage;
 using Lokad.Cloud.Storage.Autofac;
 
-namespace Lokad.Cloud.Autofac
+namespace Lokad.Cloud.Framework.Autofac
 {
     /// <summary>
     /// IoC Module for using Lokad.Cloud with in-memory storage

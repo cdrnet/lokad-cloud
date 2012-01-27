@@ -11,7 +11,7 @@ using Lokad.Cloud.Storage;
 using Lokad.Cloud.Storage.Autofac;
 using Lokad.Cloud.Stubs;
 
-namespace Lokad.Cloud.Autofac
+namespace Lokad.Cloud.Framework.Autofac
 {
     /// <summary>
     /// IoC Module for using Lokad.Cloud as stub only, e.g. for unit testing

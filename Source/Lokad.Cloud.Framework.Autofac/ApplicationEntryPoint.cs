@@ -15,7 +15,7 @@ using Lokad.Cloud.EntryPoint;
 using Lokad.Cloud.ServiceFabric;
 using Microsoft.WindowsAzure;
 
-namespace Lokad.Cloud.Autofac
+namespace Lokad.Cloud.Framework.Autofac
 {
     /// <summary>
     /// Custom EntryPoint for service creation and extension using Autofac IoC

@@ -35,7 +35,7 @@ Project("{CC5FD16D-436D-48AD-A40C-5A424C6E3E79}") = "Lokad.Cloud.DeployConsole",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lokad.Cloud.Management", "Source\Lokad.Cloud.Management\Lokad.Cloud.Management.csproj", "{CE66B408-AFC1-46A3-BFF5-4574F5EBFEC2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lokad.Cloud.Autofac", "Source\Lokad.Cloud.Autofac\Lokad.Cloud.Autofac.csproj", "{406922F7-463F-48B9-B1E6-94824F98D25A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lokad.Cloud.Framework.Autofac", "Source\Lokad.Cloud.Framework.Autofac\Lokad.Cloud.Framework.Autofac.csproj", "{406922F7-463F-48B9-B1E6-94824F98D25A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

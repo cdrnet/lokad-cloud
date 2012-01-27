@@ -8,8 +8,8 @@
     <ProjectGuid>{406922F7-463F-48B9-B1E6-94824F98D25A}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Lokad.Cloud.Autofac</RootNamespace>
-    <AssemblyName>Lokad.Cloud.Autofac</AssemblyName>
+    <RootNamespace>Lokad.Cloud.Framework.Autofac</RootNamespace>
+    <AssemblyName>Lokad.Cloud.Framework.Autofac</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>

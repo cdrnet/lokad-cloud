@@ -5,7 +5,7 @@
 
 using Autofac;
 using Lokad.Cloud.AppHost.Framework;
-using Lokad.Cloud.Autofac;
+using Lokad.Cloud.Framework.Autofac;
 using Lokad.Cloud.Stubs;
 using Microsoft.WindowsAzure;
 

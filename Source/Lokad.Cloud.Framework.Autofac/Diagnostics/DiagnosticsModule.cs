@@ -12,7 +12,7 @@ using Lokad.Cloud.Instrumentation;
 using Lokad.Cloud.Storage.Autofac;
 using Lokad.Cloud.Storage.Instrumentation;
 
-namespace Lokad.Cloud.Autofac.Diagnostics
+namespace Lokad.Cloud.Framework.Autofac.Diagnostics
 {
     /// <summary>
     /// IoC Module for diagnostics and logging. Assumes that one of the storage modules has been registered as well.
