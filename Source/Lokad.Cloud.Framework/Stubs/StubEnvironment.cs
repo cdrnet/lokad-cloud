@@ -4,7 +4,6 @@ using System.Net;
 using System.Security.Cryptography.X509Certificates;
 using Lokad.Cloud.AppHost.Framework;
 using Lokad.Cloud.AppHost.Framework.Definition;
-using Microsoft.WindowsAzure.ServiceRuntime;
 
 namespace Lokad.Cloud.Stubs
 {
@@ -48,7 +47,7 @@ namespace Lokad.Cloud.Stubs
 
         public string GetSettingValue(string settingName)
         {
-            return RoleEnvironment.GetConfigurationSettingValue(settingName);
+            return null;
         }
 
         public X509Certificate2 GetCertificate(string thumbprint)
