@@ -24,6 +24,11 @@ namespace Lokad.Cloud.EntryPoint
 
         public void Run(IApplicationEnvironment environment, List<CloudService> services, CancellationToken cancellationToken)
         {
+            if (cancellationToken.IsCancellationRequested)
+            {
+                return;
+            }
+
             Notify(() => new RuntimeStartedEvent(environment.Cell));
             var scheduler = new Scheduler(services, service => service.Start(), _runtimeObserver);
             try

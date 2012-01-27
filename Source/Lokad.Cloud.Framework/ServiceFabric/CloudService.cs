@@ -1,4 +1,4 @@
-﻿#region Copyright (c) Lokad 2009-2011
+﻿#region Copyright (c) Lokad 2009-2012
 // This code is released under the terms of the new BSD licence.
 // URL: http://www.lokad.com/
 #endregion
@@ -62,7 +62,6 @@ namespace Lokad.Cloud.ServiceFabric
     public abstract class CloudService : IInitializable
     {
         internal const string ServiceStateContainer = "lokad-cloud-services-state";
-        internal const string DelayedMessageContainer = "lokad-cloud-messages";
 
         /// <summary>Timeout set at 1h58.</summary>
         /// <remarks>The timeout provided by Windows Azure for message consumption
@@ -104,7 +103,7 @@ namespace Lokad.Cloud.ServiceFabric
         protected IQueueStorageProvider Queues { get { return Storage.QueueStorage; } }
         protected ITableStorageProvider Tables { get { return Storage.TableStorage; } }
 
-        protected internal readonly IDataSerializer RuntimeFormatter;
+        protected readonly IDataSerializer RuntimeFormatter;
 
         /// <summary>
         /// Default constructor
@@ -260,7 +259,17 @@ namespace Lokad.Cloud.ServiceFabric
             return Try(Observer, o => o.Notify(buildEvent()));
         }
 
-        protected internal bool Try<T>(T subject, Action<T> action) where T : class
+        protected bool TryNotify(IRuntimeEvent @event)
+        {
+            return Try(RuntimeObserver, o => o.Notify(@event));
+        }
+
+        protected bool TryNotify(Func<IRuntimeEvent> buildEvent)
+        {
+            return Try(RuntimeObserver, o => o.Notify(buildEvent()));
+        }
+
+        bool Try<T>(T subject, Action<T> action) where T : class
         {
             if (subject == null)
             {

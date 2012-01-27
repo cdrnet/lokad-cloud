@@ -61,7 +61,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ApplicationEntryPoint.cs" />
+    <Compile Include="AutofacApplicationEntryPoint.cs" />
     <Compile Include="AzureModule.cs" />
     <Compile Include="StubModule.cs" />
     <Compile Include="Diagnostics\DiagnosticsModule.cs" />

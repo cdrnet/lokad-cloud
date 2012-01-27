@@ -20,8 +20,10 @@ namespace Lokad.Cloud.EntryPoint
     /// <summary>
     /// Simple Entry Point, without any need for IoC.
     /// </summary>
-    public class ApplicationEntryPoint : IApplicationEntryPoint
+    public class SimpleApplicationEntryPoint : IApplicationEntryPoint
     {
+        private CancellationTokenSource _cancelledOrSettingsChangedCts;
+
         protected IApplicationEnvironment Environment { get; private set; }
         protected XElement Settings { get; private set; }
         protected string DataConnectionString { get; set; }
@@ -43,48 +45,62 @@ namespace Lokad.Cloud.EntryPoint
             var applicationObserver = CreateOptionalApplicationObserver();
             var runtimeObserver = CreateOptionalRuntimeObserver();
 
-            var jobs = new JobManager(runtimeObserver);
-            var finalizer = new RuntimeFinalizer();
-            var storage = CloudStorage
-                .ForAzureConnectionString(DataConnectionString)
-                .WithObserver(CreateOptionalStorageObserver())
-                .WithRuntimeFinalizer(finalizer)
-                .BuildStorageProviders();
-
-            var services = AppDomain.CurrentDomain.GetAssemblies()
-                .Select(a => a.GetExportedTypes()).SelectMany(x => x)
-                .Where(t => t.IsSubclassOf(typeof(CloudService)) && !t.IsAbstract && !t.IsGenericType)
-                .Select(t =>
-                    {
-                        var service = (CloudService)Activator.CreateInstance(t);
-
-                        service.Storage = storage;
-                        service.Environment = Environment;
-                        service.Log = Log;
-                        service.Observer = applicationObserver;
-                        service.Jobs = jobs;
-
-                        Inject(service);
-
-                        service.Initialize();
-
-                        return service;
-                    })
-                .ToList();
-
-            var runner = new CloudServiceRunner(runtimeObserver);
-            try
+            // We want to recycle if the settings change, but not actually unload the AppDomain.
+            // That's why we loop here instead of just return back to the caller.
+            // This is purely custom behavior, change in your EntryPoint as you see fit.
+            while (!cancellationToken.IsCancellationRequested)
             {
-                runner.Run(environment, services, cancellationToken);
-            }
-            finally
-            {
-                finalizer.FinalizeRuntime();
+                _cancelledOrSettingsChangedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+
+                var jobs = new JobManager(runtimeObserver);
+                var finalizer = new RuntimeFinalizer();
+                var storage = CloudStorage
+                    .ForAzureConnectionString(DataConnectionString)
+                    .WithObserver(CreateOptionalStorageObserver())
+                    .WithRuntimeFinalizer(finalizer)
+                    .BuildStorageProviders();
+
+                var services = AppDomain.CurrentDomain.GetAssemblies()
+                    .Select(a => a.GetExportedTypes()).SelectMany(x => x)
+                    .Where(t => t.IsSubclassOf(typeof(CloudService)) && !t.IsAbstract && !t.IsGenericType)
+                    .Select(t =>
+                        {
+                            var service = (CloudService)Activator.CreateInstance(t);
+
+                            service.Storage = storage;
+                            service.Environment = Environment;
+                            service.Log = Log;
+                            service.Observer = applicationObserver;
+                            service.RuntimeObserver = runtimeObserver;
+                            service.Jobs = jobs;
+
+                            Inject(service);
+
+                            service.Initialize();
+
+                            return service;
+                        })
+                    .ToList();
+
+                var runner = new CloudServiceRunner(runtimeObserver);
+                try
+                {
+                    runner.Run(environment, services, _cancelledOrSettingsChangedCts.Token);
+                }
+                finally
+                {
+                    finalizer.FinalizeRuntime();
+                }
             }
         }
 
         public void OnSettingsChanged(XElement settings)
         {
+            var cts = _cancelledOrSettingsChangedCts;
+            if (cts != null)
+            {
+                cts.Cancel();
+            }
         }
 
         protected virtual ILog CreateLog()
@@ -111,7 +127,6 @@ namespace Lokad.Cloud.EntryPoint
         /// Override this method to inject additional objects into your services,
         /// before they are initialized.
         /// </summary>
-        /// <param name="service"></param>
         protected virtual void Inject(CloudService service)
         {
         }

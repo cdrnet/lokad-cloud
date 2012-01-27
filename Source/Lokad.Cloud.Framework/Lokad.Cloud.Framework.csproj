@@ -96,7 +96,7 @@
     <Compile Include="Diagnostics\CloudLogWriter.cs" />
     <Compile Include="Diagnostics\LogExtensions.cs" />
     <Compile Include="Diagnostics\TockenBucketThrottling.cs" />
-    <Compile Include="EntryPoint\ApplicationEntryPoint.cs" />
+    <Compile Include="EntryPoint\SimpleApplicationEntryPoint.cs" />
     <Compile Include="EntryPoint\CloudServiceRunner.cs" />
     <Compile Include="Diagnostics\SimpleLoggingObservers.cs" />
     <Compile Include="EntryPoint\Scheduler.cs" />

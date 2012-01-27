@@ -199,8 +199,8 @@ namespace Lokad.Cloud.ServiceFabric
                                 return Maybe<ScheduledServiceState>.Empty;
                             }
 
-                            Try(RuntimeObserver, o => o.Notify(new ScheduledServiceLockResetAfterTimeoutEvent(
-                                Name, state.Lease.Owner, (now - state.Lease.Acquired))));
+                            TryNotify(() => new ScheduledServiceLockResetAfterTimeoutEvent(
+                                Name, state.Lease.Owner, (now - state.Lease.Acquired)));
                         }
 
                         // create lease and execute

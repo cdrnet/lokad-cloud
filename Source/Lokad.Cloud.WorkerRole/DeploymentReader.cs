@@ -109,7 +109,7 @@ namespace Lokad.Cloud
                 {
                     new CellDefinition("Cell",
                         new AssembliesHead(PackageEtagOfCombinedEtag(deployment.SolutionId)),
-                        entryPointTypeName ?? "Lokad.Cloud.Framework.Autofac.ApplicationEntryPoint, Lokad.Cloud.Framework.Autofac",
+                        entryPointTypeName ?? "Lokad.Cloud.Framework.Autofac.AutofacApplicationEntryPoint, Lokad.Cloud.Framework.Autofac",
                         settings.ToString())
                 });
         }
