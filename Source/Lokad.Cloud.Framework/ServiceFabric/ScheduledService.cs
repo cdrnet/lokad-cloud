@@ -7,6 +7,7 @@ using System;
 using System.Linq;
 using System.Runtime.Serialization;
 using Lokad.Cloud.Diagnostics;
+using Lokad.Cloud.Instrumentation.Events;
 using Lokad.Cloud.Storage;
 
 namespace Lokad.Cloud.ServiceFabric
@@ -198,9 +199,8 @@ namespace Lokad.Cloud.ServiceFabric
                                 return Maybe<ScheduledServiceState>.Empty;
                             }
 
-                            Log.TryWarnFormat(
-                                "ScheduledService {0}: Expired lease owned by {1} was reset after blocking for {2} minutes.",
-                                Name, state.Lease.Owner, (int) (now - state.Lease.Acquired).TotalMinutes);
+                            Try(RuntimeObserver, o => o.Notify(new ScheduledServiceLockResetAfterTimeoutEvent(
+                                Name, state.Lease.Owner, (now - state.Lease.Acquired))));
                         }
 
                         // create lease and execute

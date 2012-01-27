@@ -3,7 +3,6 @@
 // URL: http://www.lokad.com/
 #endregion
 
-using System;
 using System.Xml.Linq;
 using Lokad.Cloud.Jobs;
 
@@ -16,17 +15,15 @@ namespace Lokad.Cloud.Instrumentation.Events
     {
         public EventLevel Level { get { return EventLevel.Trace; } }
         public Job Job { get; private set; }
-        public DateTimeOffset Timestamp { get; private set; }
 
-        public JobStartedEvent(Job job, DateTimeOffset timestamp)
+        public JobStartedEvent(Job job)
         {
             Job = job;
-            Timestamp = timestamp;
         }
 
         public string Describe()
         {
-            return string.Format("Runtime: Job {0} was started at {1}.", Job.JobId, Timestamp);
+            return string.Format("Runtime: Job {0} was started.", Job.JobId);
         }
 
         public XElement DescribeMeta()

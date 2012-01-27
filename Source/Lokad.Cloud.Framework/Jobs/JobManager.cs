@@ -32,7 +32,7 @@ namespace Lokad.Cloud.Jobs
         {
             if (_observer != null)
             {
-                _observer.Notify(new JobStartedEvent(job, DateTimeOffset.UtcNow));
+                _observer.Notify(new JobStartedEvent(job));
             }
         }
 
@@ -40,7 +40,7 @@ namespace Lokad.Cloud.Jobs
         {
             if (_observer != null)
             {
-                _observer.Notify(new JobSucceededEvent(job, DateTimeOffset.UtcNow));
+                _observer.Notify(new JobSucceededEvent(job));
             }
         }
 
@@ -48,7 +48,7 @@ namespace Lokad.Cloud.Jobs
         {
             if (_observer != null)
             {
-                _observer.Notify(new JobFailedEvent(job, DateTimeOffset.UtcNow));
+                _observer.Notify(new JobFailedEvent(job));
             }
         }
     }

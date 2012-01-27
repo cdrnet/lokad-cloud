@@ -102,6 +102,7 @@
     <Compile Include="EntryPoint\Scheduler.cs" />
     <Compile Include="Instrumentation\ApplicationObserverSubject.cs" />
     <Compile Include="Instrumentation\EventLevel.cs" />
+    <Compile Include="Instrumentation\Events\ScheduledServiceLockResetAfterTimeoutEvent.cs" />
     <Compile Include="Instrumentation\Events\JobFailedEvent.cs" />
     <Compile Include="Instrumentation\Events\JobSucceededEvent.cs" />
     <Compile Include="Instrumentation\Events\JobStartedEvent.cs" />

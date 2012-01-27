@@ -95,13 +95,14 @@ namespace Lokad.Cloud.ServiceFabric
         public CloudStorageProviders Storage { get; set; }
         public IApplicationEnvironment Environment { get; set; }
         public IApplicationObserver Observer { get; set; }
+        public IRuntimeObserver RuntimeObserver { get; set; }
         public ILog Log { get; set; }
         public JobManager Jobs { get; set; }
 
         // Short-hands:
-        public IBlobStorageProvider Blobs { get { return Storage.BlobStorage; } }
-        public IQueueStorageProvider Queues { get { return Storage.QueueStorage; } }
-        public ITableStorageProvider Tables { get { return Storage.TableStorage; } }
+        protected IBlobStorageProvider Blobs { get { return Storage.BlobStorage; } }
+        protected IQueueStorageProvider Queues { get { return Storage.QueueStorage; } }
+        protected ITableStorageProvider Tables { get { return Storage.TableStorage; } }
 
         protected internal readonly IDataSerializer RuntimeFormatter;
 
@@ -251,32 +252,24 @@ namespace Lokad.Cloud.ServiceFabric
 
         protected bool TryNotify(IApplicationEvent @event)
         {
-            if (Observer == null)
-            {
-                return false;
-            }
-
-            try
-            {
-                Observer.Notify(@event);
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
+            return Try(Observer, o => o.Notify(@event));
         }
 
         protected bool TryNotify(Func<IApplicationEvent> buildEvent)
         {
-            if (Observer == null)
+            return Try(Observer, o => o.Notify(buildEvent()));
+        }
+
+        protected internal bool Try<T>(T subject, Action<T> action) where T : class
+        {
+            if (subject == null)
             {
                 return false;
             }
 
             try
             {
-                Observer.Notify(buildEvent());
+                action(subject);
                 return true;
             }
             catch
