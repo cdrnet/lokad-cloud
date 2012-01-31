@@ -102,16 +102,8 @@ namespace Lokad.Cloud.Framework.Autofac
                 {
                     var services = serviceTypes.Select(type => (CloudService)applicationContainer.Resolve(type)).ToList();
                     var runner = applicationContainer.Resolve<CloudServiceRunner>();
-                    var finalizer = applicationContainer.Resolve<IRuntimeFinalizer>();
 
-                    try
-                    {
-                        runner.Run(environment, services, _cancelledOrSettingsChangedCts.Token);
-                    }
-                    finally
-                    {
-                        finalizer.FinalizeRuntime();
-                    }
+                    runner.Run(environment, services, _cancelledOrSettingsChangedCts.Token);
                 }
             }
         }

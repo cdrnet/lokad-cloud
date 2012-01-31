@@ -5,7 +5,6 @@
 
 using Autofac;
 using Lokad.Cloud.Framework.Autofac.Diagnostics;
-using Lokad.Cloud.ServiceFabric;
 using Lokad.Cloud.Storage;
 using Lokad.Cloud.Storage.Autofac;
 
@@ -26,7 +25,6 @@ namespace Lokad.Cloud.Framework.Autofac
             builder.RegisterModule<DiagnosticsModule>();
 
             builder.RegisterType<CloudFormatter>().As<IDataSerializer>();
-            builder.RegisterType<RuntimeFinalizer>().As<IRuntimeFinalizer>().SingleInstance();
             builder.RegisterType<Jobs.JobManager>();
         }
     }

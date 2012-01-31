@@ -25,7 +25,6 @@ namespace Lokad.Cloud.Framework.Autofac
             builder.RegisterModule<DiagnosticsModule>();
 
             builder.RegisterType<CloudFormatter>().As<IDataSerializer>();
-            builder.RegisterType<RuntimeFinalizer>().As<IRuntimeFinalizer>().SingleInstance();
             builder.RegisterType<Jobs.JobManager>();
         }
     }

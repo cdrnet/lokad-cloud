@@ -53,11 +53,9 @@ namespace Lokad.Cloud.EntryPoint
                 _cancelledOrSettingsChangedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
 
                 var jobs = new JobManager(runtimeObserver);
-                var finalizer = new RuntimeFinalizer();
                 var storage = CloudStorage
                     .ForAzureConnectionString(DataConnectionString)
                     .WithObserver(CreateOptionalStorageObserver())
-                    .WithRuntimeFinalizer(finalizer)
                     .BuildStorageProviders();
 
                 var services = AppDomain.CurrentDomain.GetAssemblies()
@@ -89,7 +87,12 @@ namespace Lokad.Cloud.EntryPoint
                 }
                 finally
                 {
-                    finalizer.FinalizeRuntime();
+                    foreach(var disposable in services.OfType<IDisposable>())
+                    {
+                        disposable.Dispose();
+                    }
+
+                    storage.QueueStorage.AbandonAll();
                 }
             }
         }

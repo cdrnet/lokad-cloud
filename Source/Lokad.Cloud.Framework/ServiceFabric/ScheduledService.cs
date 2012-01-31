@@ -6,7 +6,6 @@
 using System;
 using System.Linq;
 using System.Runtime.Serialization;
-using Lokad.Cloud.Diagnostics;
 using Lokad.Cloud.Instrumentation.Events;
 using Lokad.Cloud.Storage;
 
@@ -120,16 +119,6 @@ namespace Lokad.Cloud.ServiceFabric
             base.Initialize();
 
             _workerKey = Environment.Host.WorkerName;
-
-            // Auto-register the service for finalization:
-            // 1) Registration should not be made within the constructor
-            //    because providers are not ready at this phase.
-            // 2) Hasty finalization is needed only for cloud-scoped scheduled
-            //    scheduled services (because they have a lease).
-            if (!_scheduledPerWorker)
-            {
-                Storage.RuntimeFinalizer.Register(this);
-            }
         }
 
         /// <seealso cref="CloudService.StartImpl"/>
@@ -262,9 +251,9 @@ namespace Lokad.Cloud.ServiceFabric
                 RuntimeFormatter);
         }
 
-        /// <summary>Don't call this method. Disposing the scheduled service
-        /// should only be done by the <see cref="IRuntimeFinalizer"/> when
-        /// the environment is being forcibly shut down.</summary>
+        /// <summary>
+        /// Should be called when the environment is being forcibly shut down.
+        /// </summary>
         public void Dispose()
         {
             if(_isLeaseOwner)

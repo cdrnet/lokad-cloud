@@ -674,6 +674,12 @@
             <returns>The number of original messages actually deleted.</returns>
             <remarks>Messages must have first been retrieved through <see cref="M:Lokad.Cloud.Storage.IQueueStorageProvider.Get``1(System.String,System.Int32,System.TimeSpan,System.Int32,Lokad.Cloud.Storage.IDataSerializer)"/>.</remarks>
         </member>
+        <member name="M:Lokad.Cloud.Storage.IQueueStorageProvider.AbandonAll">
+            <summary>
+            Abandon all messages still being processed. This is recommended to call e.g. when forcing a worker to shutting.
+            </summary>
+            <returns>The number of original messages actually deleted.</returns>
+        </member>
         <member name="M:Lokad.Cloud.Storage.IQueueStorageProvider.ResumeLater``1(``0,System.TimeSpan,System.TimeSpan)">
             <summary>
             Resume a message being processed later and put it visibly back on the queue, without decreasing the poison detection dequeue count.
@@ -755,20 +761,12 @@
         <member name="F:Lokad.Cloud.Storage.Azure.QueueStorageProvider._inProcessMessages">
             <summary>Mapping object --> Queue Message Id. Use to delete messages afterward.</summary>
         </member>
-        <member name="M:Lokad.Cloud.Storage.Azure.QueueStorageProvider.#ctor(Microsoft.WindowsAzure.StorageClient.CloudQueueClient,Lokad.Cloud.Storage.IBlobStorageProvider,Lokad.Cloud.Storage.IDataSerializer,Lokad.Cloud.Storage.Instrumentation.IStorageObserver,Lokad.Cloud.IRuntimeFinalizer)">
+        <member name="M:Lokad.Cloud.Storage.Azure.QueueStorageProvider.#ctor(Microsoft.WindowsAzure.StorageClient.CloudQueueClient,Lokad.Cloud.Storage.IBlobStorageProvider,Lokad.Cloud.Storage.IDataSerializer,Lokad.Cloud.Storage.Instrumentation.IStorageObserver)">
             <summary>IoC constructor.</summary>
             <param name="blobStorage">Not null.</param>
             <param name="queueStorage">Not null.</param>
             <param name="defaultSerializer">Not null.</param>
-            <param name="runtimeFinalizer">May be null (handy for strict O/C mapper scenario).</param>
             <param name="observer">Can be <see langword="null"/>.</param>
-        </member>
-        <member name="M:Lokad.Cloud.Storage.Azure.QueueStorageProvider.Dispose">
-            <summary>
-            Disposing the provider will cause an abandon on all currently messages currently
-            in-process. At the end of the life-cycle of the provider, normally there is no
-            message in-process.
-            </summary>
         </member>
         <member name="M:Lokad.Cloud.Storage.Azure.QueueStorageProvider.List(System.String)">
             <remarks></remarks>
@@ -1562,11 +1560,6 @@
             Optionally provide a set of observers, will use a <see cref="T:Lokad.Cloud.Storage.Instrumentation.StorageObserverSubject"/> internally.
             </summary>
         </member>
-        <member name="M:Lokad.Cloud.Storage.CloudStorage.CloudStorageBuilder.WithRuntimeFinalizer(Lokad.Cloud.IRuntimeFinalizer)">
-            <summary>
-            Optionally provide a runtime finalizer.
-            </summary>
-        </member>
         <member name="M:Lokad.Cloud.Storage.CloudStorage.CloudStorageBuilder.BuildBlobStorage">
             <remarks></remarks>
         </member>
@@ -1585,20 +1578,16 @@
         <member name="P:Lokad.Cloud.Storage.CloudStorage.CloudStorageBuilder.Observer">
             <remarks>Can be null if not needed</remarks>
         </member>
-        <member name="P:Lokad.Cloud.Storage.CloudStorage.CloudStorageBuilder.RuntimeFinalizer">
-            <remarks>Can be null if not needed</remarks>
-        </member>
         <member name="T:Lokad.Cloud.Storage.CloudStorageProviders">
             <summary>Storage providers and runtime providers.</summary>
         </member>
-        <member name="M:Lokad.Cloud.Storage.CloudStorageProviders.#ctor(Lokad.Cloud.Storage.IBlobStorageProvider,Lokad.Cloud.Storage.IQueueStorageProvider,Lokad.Cloud.Storage.ITableStorageProvider,Lokad.Cloud.IRuntimeFinalizer)">
+        <member name="M:Lokad.Cloud.Storage.CloudStorageProviders.#ctor(Lokad.Cloud.Storage.IBlobStorageProvider,Lokad.Cloud.Storage.IQueueStorageProvider,Lokad.Cloud.Storage.ITableStorageProvider)">
             <summary>
             Initializes a new instance of the <see cref="T:Lokad.Cloud.Storage.CloudStorageProviders"/> class.
             </summary>
             <param name="blobStorage">The blob storage provider.</param>
             <param name="queueStorage">The queue storage provider.</param>
             <param name="tableStorage">The table storage provider.</param>
-            <param name="runtimeFinalizer">The runtime finalizer.</param>
         </member>
         <member name="P:Lokad.Cloud.Storage.CloudStorageProviders.BlobStorage">
             <summary>Blob Storage Abstraction.</summary>
@@ -1608,10 +1597,6 @@
         </member>
         <member name="P:Lokad.Cloud.Storage.CloudStorageProviders.TableStorage">
             <summary>Table Storage Abstraction.</summary>
-        </member>
-        <member name="P:Lokad.Cloud.Storage.CloudStorageProviders.RuntimeFinalizer">
-            <summary>Abstracts the finalizer (used for fast resource release
-            in case of runtime shutdown).</summary>
         </member>
         <member name="T:Lokad.Cloud.Storage.CompressedRawFormatter">
             <summary>
@@ -1913,39 +1898,6 @@
         </member>
         <member name="P:Lokad.Cloud.Storage.InMemory.MemoryTableStorageProvider.DataSerializer">
             <summary>Formatter as requiered to handle FatEntities.</summary>
-        </member>
-        <member name="T:Lokad.Cloud.IRuntimeFinalizer">
-            <summary>Collects objects that absolutely need to be disposed
-            before the runtime gets shut down.</summary>
-            <remarks>
-            There is no garanty that registered objects will actually be disposed.
-            When a VM is shutdown, a small grace period (30s) is offered to clean-up
-            resources before the OS itself is aborted. The runtime finalizer
-            should be kept for very critical clean-ups to be performed during the
-            grace period.
-            
-            Typically, the runtime finalizer is used to abandon in-process queue
-            messages and lease on blobs. Any extra object that you register here
-            is likely to negatively impact more prioritary clean-ups. Use with care.
-            
-            Implementations must be thread-safe.
-            </remarks>
-        </member>
-        <member name="M:Lokad.Cloud.IRuntimeFinalizer.Register(System.IDisposable)">
-            <summary>Register a object for high priority finalization if runtime is terminating.</summary>
-            <remarks>The method is idempotent, once an object is registered,
-            registering the object again has no effect.</remarks>
-        </member>
-        <member name="M:Lokad.Cloud.IRuntimeFinalizer.Unregister(System.IDisposable)">
-            <summary>Unregister a object from high priority finalization.</summary>
-            <remarks>The method is idempotent, once an object is unregistered,
-            unregistering the object again has no effect.</remarks>
-        </member>
-        <member name="M:Lokad.Cloud.IRuntimeFinalizer.FinalizeRuntime">
-            <summary>
-            Finalize high-priority resources hold by the runtime. This method
-            should only be called ONCE upon runtime finalization.
-            </summary>
         </member>
         <member name="T:Lokad.Cloud.Storage.PersistedMessage">
             <summary>

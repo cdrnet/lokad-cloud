@@ -24,7 +24,6 @@ namespace Lokad.Cloud.Framework.Autofac
             builder.RegisterInstance(StubLog.Instance).As<ILog>();
 
             builder.RegisterType<CloudFormatter>().As<IDataSerializer>();
-            builder.RegisterType<RuntimeFinalizer>().As<IRuntimeFinalizer>().SingleInstance();
             builder.RegisterType<Jobs.JobManager>();
 
             builder.RegisterType<StubEnvironment>().As<IApplicationEnvironment>();
