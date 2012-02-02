@@ -41,13 +41,13 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\Lokad.Cloud.AppHost.Framework.0.8.2\lib\Lokad.Cloud.AppHost.Framework.dll</HintPath>
     </Reference>
-    <Reference Include="Lokad.Cloud.Storage, Version=2.2.0.11, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Lokad.Cloud.Storage, Version=2.3.0.12, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Lokad.Cloud.Storage.2.2.0\lib\Lokad.Cloud.Storage.dll</HintPath>
+      <HintPath>..\..\packages\Lokad.Cloud.Storage.2.3.0\lib\Lokad.Cloud.Storage.dll</HintPath>
     </Reference>
-    <Reference Include="Lokad.Cloud.Storage.Autofac, Version=2.2.0.11, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Lokad.Cloud.Storage.Autofac, Version=2.3.0.12, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Lokad.Cloud.Storage.Autofac.2.2.0\lib\Lokad.Cloud.Storage.Autofac.dll</HintPath>
+      <HintPath>..\..\packages\Lokad.Cloud.Storage.Autofac.2.3.0\lib\Lokad.Cloud.Storage.Autofac.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.WindowsAzure.StorageClient, Version=1.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\..\packages\WindowsAzure.Storage.1.6\lib\net35-full\Microsoft.WindowsAzure.StorageClient.dll</HintPath>
