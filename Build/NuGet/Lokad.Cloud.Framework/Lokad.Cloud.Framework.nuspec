@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>Lokad.Cloud.Framework</id>
+    <version>0.0.0</version>
+    <authors>Lokad.com</authors>
+    <owners>Lokad.com</owners>
+    <licenseUrl>http://www.opensource.org/licenses/bsd-license.php</licenseUrl>
+    <projectUrl>http://lokad.github.com/lokad-cloud/</projectUrl>
+    <iconUrl>http://lokad.github.com/images/lokad-cloud-logo-100-100.png</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Azure Compute Framework. Leverage Windows Azure without getting dragged down by low level technicalities.</description>
+    <language>en-US</language>
+    <tags>azure, compute, cloud</tags>
+    <dependencies>
+      <dependency id="Lokad.Cloud.Storage" version="2.3.0" />
+      <dependency id="Lokad.Cloud.AppHost.Framework" version="0.8.2" />
+    </dependencies>
+  </metadata>
+</package>

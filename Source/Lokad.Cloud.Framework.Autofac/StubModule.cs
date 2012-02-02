@@ -6,7 +6,6 @@
 using Autofac;
 using Lokad.Cloud.AppHost.Framework;
 using Lokad.Cloud.Diagnostics;
-using Lokad.Cloud.ServiceFabric;
 using Lokad.Cloud.Storage;
 using Lokad.Cloud.Storage.Autofac;
 using Lokad.Cloud.Stubs;

@@ -5,7 +5,6 @@
 
 using Autofac;
 using Lokad.Cloud.Framework.Autofac.Diagnostics;
-using Lokad.Cloud.ServiceFabric;
 using Lokad.Cloud.Storage;
 using Lokad.Cloud.Storage.Autofac;
 
