@@ -4,24 +4,23 @@
 #endregion
 
 using System.Xml.Linq;
-using Lokad.Cloud.AppHost.Framework;
 
 namespace Lokad.Cloud.Instrumentation.Events
 {
     public class RuntimeStoppedEvent : IRuntimeEvent
     {
         public EventLevel Level { get { return EventLevel.Trace; } }
-        public CellLifeIdentity Cell { get; private set; }
+        public HostInfo Host { get; private set; }
 
-        public RuntimeStoppedEvent(CellLifeIdentity cell)
+        public RuntimeStoppedEvent(HostInfo host)
         {
-            Cell = cell;
+            Host = host;
         }
 
         public string Describe()
         {
             return string.Format("Runtime stopped in cell {0} of solution {1} on {2}.",
-                Cell.CellName, Cell.SolutionName, Cell.Host.WorkerName);
+                Host.CellName, Host.SolutionName, Host.WorkerName);
         }
 
         public XElement DescribeMeta()
@@ -30,9 +29,9 @@ namespace Lokad.Cloud.Instrumentation.Events
                 new XElement("Component", "Lokad.Cloud.Framework"),
                 new XElement("Event", "RuntimeStoppedEvent"),
                 new XElement("AppHost",
-                    new XElement("Host", Cell.Host.WorkerName),
-                    new XElement("Solution", Cell.SolutionName),
-                    new XElement("Cell", Cell.CellName)));
+                    new XElement("Host", Host.WorkerName),
+                    new XElement("Solution", Host.SolutionName),
+                    new XElement("Cell", Host.CellName)));
         }
     }
 }

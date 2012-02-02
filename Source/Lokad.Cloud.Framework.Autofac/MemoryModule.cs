@@ -14,7 +14,7 @@ namespace Lokad.Cloud.Framework.Autofac
     /// IoC Module for using Lokad.Cloud with in-memory storage
     /// 
     /// Expected external registrations:
-    /// - Lokad.Cloud.AppHost.Framework.IApplicationEnvironment
+    /// - Lokad.Cloud.IEnvironment
     /// </summary>
     public class MemoryModule : Module
     {

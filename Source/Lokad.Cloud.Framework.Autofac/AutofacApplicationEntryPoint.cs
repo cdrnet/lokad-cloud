@@ -25,6 +25,7 @@ namespace Lokad.Cloud.Framework.Autofac
         private CancellationTokenSource _cancelledOrSettingsChangedCts;
 
         protected IApplicationEnvironment Environment { get; private set; }
+        protected IEnvironment CloudEnvironment { get; private set; }
         protected XElement Settings { get; private set; }
         protected string DataConnectionString { get; set; }
 
@@ -36,6 +37,7 @@ namespace Lokad.Cloud.Framework.Autofac
             }
             
             Environment = environment;
+            CloudEnvironment = new EnvironmentAdapter(environment);
             Settings = settings;
             DataConnectionString = Settings.Element("DataConnectionString").Value;
 
@@ -49,7 +51,7 @@ namespace Lokad.Cloud.Framework.Autofac
                 var builder = new ContainerBuilder();
                 builder.RegisterModule<AzureModule>();
                 builder.RegisterInstance(CloudStorageAccount.Parse(DataConnectionString));
-                builder.RegisterInstance(environment);
+                builder.RegisterInstance(CloudEnvironment);
                 builder.RegisterType<CloudServiceRunner>();
                 InjectRegistration(builder);
 
@@ -103,7 +105,7 @@ namespace Lokad.Cloud.Framework.Autofac
                     var services = serviceTypes.Select(type => (CloudService)applicationContainer.Resolve(type)).ToList();
                     var runner = applicationContainer.Resolve<CloudServiceRunner>();
 
-                    runner.Run(environment, services, _cancelledOrSettingsChangedCts.Token);
+                    runner.Run(CloudEnvironment, services, _cancelledOrSettingsChangedCts.Token);
                 }
             }
         }

@@ -4,7 +4,6 @@
 #endregion
 
 using Autofac;
-using Lokad.Cloud.AppHost.Framework;
 using Lokad.Cloud.Diagnostics;
 using Lokad.Cloud.Storage;
 using Lokad.Cloud.Storage.Autofac;
@@ -25,7 +24,7 @@ namespace Lokad.Cloud.Framework.Autofac
             builder.RegisterType<CloudFormatter>().As<IDataSerializer>();
             builder.RegisterType<Jobs.JobManager>();
 
-            builder.RegisterType<StubEnvironment>().As<IApplicationEnvironment>();
+            builder.RegisterType<StubEnvironment>().As<IEnvironment>();
         }
     }
 }

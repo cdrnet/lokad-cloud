@@ -6,7 +6,6 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
-using Lokad.Cloud.AppHost.Framework;
 using Lokad.Cloud.Instrumentation;
 using Lokad.Cloud.Instrumentation.Events;
 using Lokad.Cloud.ServiceFabric;
@@ -22,14 +21,14 @@ namespace Lokad.Cloud.EntryPoint
             _runtimeObserver = runtimeObserver;
         }
 
-        public void Run(IApplicationEnvironment environment, List<CloudService> services, CancellationToken cancellationToken)
+        public void Run(IEnvironment environment, List<CloudService> services, CancellationToken cancellationToken)
         {
             if (cancellationToken.IsCancellationRequested)
             {
                 return;
             }
 
-            Notify(() => new RuntimeStartedEvent(environment.Cell));
+            Notify(() => new RuntimeStartedEvent(environment.Host));
             var scheduler = new Scheduler(services, service => service.Start(), _runtimeObserver);
             try
             {
@@ -37,24 +36,24 @@ namespace Lokad.Cloud.EntryPoint
             }
             catch (ThreadInterruptedException)
             {
-                Notify(() => new RuntimeInterruptedRestartedEvent(environment.Cell, GetNameOfServiceInExecution(scheduler)));
+                Notify(() => new RuntimeInterruptedRestartedEvent(environment.Host, GetNameOfServiceInExecution(scheduler)));
             }
             catch (ThreadAbortException)
             {
                 Thread.ResetAbort();
-                Notify(() => new RuntimeInterruptedRestartedEvent(environment.Cell, GetNameOfServiceInExecution(scheduler)));
+                Notify(() => new RuntimeInterruptedRestartedEvent(environment.Host, GetNameOfServiceInExecution(scheduler)));
             }
             catch (TimeoutException)
             {
-                Notify(() => new RuntimeTimeoutRestartedEvent(environment.Cell, GetNameOfServiceInExecution(scheduler)));
+                Notify(() => new RuntimeTimeoutRestartedEvent(environment.Host, GetNameOfServiceInExecution(scheduler)));
             }
             catch (Exception ex)
             {
-                Notify(() => new RuntimeExceptionRestartedEvent(environment.Cell, GetNameOfServiceInExecution(scheduler), ex));
+                Notify(() => new RuntimeExceptionRestartedEvent(environment.Host, GetNameOfServiceInExecution(scheduler), ex));
             }
             finally
             {
-                Notify(() => new RuntimeStoppedEvent(environment.Cell));
+                Notify(() => new RuntimeStoppedEvent(environment.Host));
             }
         }
 

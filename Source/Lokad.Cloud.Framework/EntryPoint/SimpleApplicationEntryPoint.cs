@@ -25,6 +25,7 @@ namespace Lokad.Cloud.EntryPoint
         private CancellationTokenSource _cancelledOrSettingsChangedCts;
 
         protected IApplicationEnvironment Environment { get; private set; }
+        protected IEnvironment CloudEnvironment { get; private set; }
         protected XElement Settings { get; private set; }
         protected string DataConnectionString { get; set; }
 
@@ -38,6 +39,7 @@ namespace Lokad.Cloud.EntryPoint
             }
 
             Environment = environment;
+            CloudEnvironment = new EnvironmentAdapter(environment);
             Settings = settings;
             DataConnectionString = Settings.Element("DataConnectionString").Value;
 
@@ -66,7 +68,7 @@ namespace Lokad.Cloud.EntryPoint
                             var service = (CloudService)Activator.CreateInstance(t);
 
                             service.Storage = storage;
-                            service.Environment = Environment;
+                            service.Environment = CloudEnvironment;
                             service.Log = Log;
                             service.Observer = applicationObserver;
                             service.RuntimeObserver = runtimeObserver;
@@ -83,7 +85,7 @@ namespace Lokad.Cloud.EntryPoint
                 var runner = new CloudServiceRunner(runtimeObserver);
                 try
                 {
-                    runner.Run(environment, services, _cancelledOrSettingsChangedCts.Token);
+                    runner.Run(CloudEnvironment, services, _cancelledOrSettingsChangedCts.Token);
                 }
                 finally
                 {

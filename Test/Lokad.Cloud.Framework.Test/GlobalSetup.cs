@@ -4,7 +4,6 @@
 #endregion
 
 using Autofac;
-using Lokad.Cloud.AppHost.Framework;
 using Lokad.Cloud.Framework.Autofac;
 using Lokad.Cloud.Stubs;
 using Microsoft.WindowsAzure;
@@ -20,7 +19,7 @@ namespace Lokad.Cloud.Test
             var builder = new ContainerBuilder();
             builder.RegisterModule<AzureModule>();
             builder.RegisterInstance(CloudStorageAccount.DevelopmentStorageAccount);
-            builder.RegisterType<StubEnvironment>().As<IApplicationEnvironment>().InstancePerLifetimeScope();
+            builder.RegisterType<StubEnvironment>().As<IEnvironment>().InstancePerLifetimeScope();
 
             return builder.Build();
         }

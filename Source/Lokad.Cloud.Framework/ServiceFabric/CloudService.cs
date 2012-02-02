@@ -6,7 +6,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Lokad.Cloud.AppHost.Framework;
 using Lokad.Cloud.Diagnostics;
 using Lokad.Cloud.Instrumentation;
 using Lokad.Cloud.Jobs;
@@ -92,7 +91,7 @@ namespace Lokad.Cloud.ServiceFabric
 
         // IoC Injected Services:
         public CloudStorageProviders Storage { get; set; }
-        public IApplicationEnvironment Environment { get; set; }
+        public IEnvironment Environment { get; set; }
         public IApplicationObserver Observer { get; set; }
         public IRuntimeObserver RuntimeObserver { get; set; }
         public ILog Log { get; set; }

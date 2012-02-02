@@ -90,10 +90,12 @@
     <Compile Include="Diagnostics\CloudLogWriter.cs" />
     <Compile Include="Diagnostics\LogExtensions.cs" />
     <Compile Include="Diagnostics\TockenBucketThrottling.cs" />
+    <Compile Include="EntryPoint\EnvironmentAdapter.cs" />
     <Compile Include="EntryPoint\SimpleApplicationEntryPoint.cs" />
     <Compile Include="EntryPoint\CloudServiceRunner.cs" />
     <Compile Include="Diagnostics\SimpleLoggingObservers.cs" />
     <Compile Include="EntryPoint\Scheduler.cs" />
+    <Compile Include="IEnvironment.cs" />
     <Compile Include="Instrumentation\ApplicationObserverSubject.cs" />
     <Compile Include="Instrumentation\EventLevel.cs" />
     <Compile Include="Instrumentation\Events\RuntimeInterruptedRestartedEvent.cs" />

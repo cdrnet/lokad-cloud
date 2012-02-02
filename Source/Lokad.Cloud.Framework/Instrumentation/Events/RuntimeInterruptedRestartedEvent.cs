@@ -4,26 +4,25 @@
 #endregion
 
 using System.Xml.Linq;
-using Lokad.Cloud.AppHost.Framework;
 
 namespace Lokad.Cloud.Instrumentation.Events
 {
     public class RuntimeInterruptedRestartedEvent : IRuntimeEvent
     {
         public EventLevel Level { get { return EventLevel.Trace; } }
-        public CellLifeIdentity Cell { get; private set; }
+        public HostInfo Host { get; private set; }
         public string ServiceName { get; set; }
 
-        public RuntimeInterruptedRestartedEvent(CellLifeIdentity cell, string serviceName)
+        public RuntimeInterruptedRestartedEvent(HostInfo host, string serviceName)
         {
-            Cell = cell;
+            Host = host;
             ServiceName = serviceName;
         }
 
         public string Describe()
         {
             return string.Format("Runtime execution was forcibly interrupted in service {0} on cell {1} of solution {2} on {3}. The Runtime will be restarted.",
-                ServiceName, Cell.CellName, Cell.SolutionName, Cell.Host.WorkerName);
+                ServiceName, Host.CellName, Host.SolutionName, Host.WorkerName);
         }
 
         public XElement DescribeMeta()
@@ -32,9 +31,9 @@ namespace Lokad.Cloud.Instrumentation.Events
                 new XElement("Component", "Lokad.Cloud.Framework"),
                 new XElement("Event", "RuntimeInterruptedRestartedEvent"),
                 new XElement("AppHost",
-                    new XElement("Host", Cell.Host.WorkerName),
-                    new XElement("Solution", Cell.SolutionName),
-                    new XElement("Cell", Cell.CellName)),
+                    new XElement("Host", Host.WorkerName),
+                    new XElement("Solution", Host.SolutionName),
+                    new XElement("Cell", Host.CellName)),
                 new XElement("Service", ServiceName));
         }
     }

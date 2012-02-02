@@ -5,20 +5,19 @@
 
 using System;
 using System.Xml.Linq;
-using Lokad.Cloud.AppHost.Framework;
 
 namespace Lokad.Cloud.Instrumentation.Events
 {
     public class RuntimeExceptionRestartedEvent : IRuntimeEvent
     {
         public EventLevel Level { get { return EventLevel.Trace; } }
-        public CellLifeIdentity Cell { get; private set; }
+        public HostInfo Host { get; private set; }
         public string ServiceName { get; set; }
         public Exception Exception { get; set; }
 
-        public RuntimeExceptionRestartedEvent(CellLifeIdentity cell, string serviceName, Exception exception)
+        public RuntimeExceptionRestartedEvent(HostInfo host, string serviceName, Exception exception)
         {
-            Cell = cell;
+            Host = host;
             ServiceName = serviceName;
             Exception = exception;
         }
@@ -26,7 +25,7 @@ namespace Lokad.Cloud.Instrumentation.Events
         public string Describe()
         {
             return string.Format("Runtime: an unhandled {0} occured in service {1} on cell {2} of solution {3} on {4}. The Runtime will be restarted.",
-                Exception.GetType().Name, ServiceName, Cell.CellName, Cell.SolutionName, Cell.Host.WorkerName);
+                Exception.GetType().Name, ServiceName, Host.CellName, Host.SolutionName, Host.WorkerName);
         }
 
         public XElement DescribeMeta()
@@ -35,9 +34,9 @@ namespace Lokad.Cloud.Instrumentation.Events
                 new XElement("Component", "Lokad.Cloud.Framework"),
                 new XElement("Event", "RuntimeExceptionRestartedEvent"),
                 new XElement("AppHost",
-                    new XElement("Host", Cell.Host.WorkerName),
-                    new XElement("Solution", Cell.SolutionName),
-                    new XElement("Cell", Cell.CellName)),
+                    new XElement("Host", Host.WorkerName),
+                    new XElement("Solution", Host.SolutionName),
+                    new XElement("Cell", Host.CellName)),
                 new XElement("Service", ServiceName));
 
             if (Exception != null)

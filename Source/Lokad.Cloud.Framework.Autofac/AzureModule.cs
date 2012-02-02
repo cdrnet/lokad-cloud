@@ -15,7 +15,7 @@ namespace Lokad.Cloud.Framework.Autofac
     /// 
     /// Expected external registrations:
     /// - Microsoft.WindowsAzure.CloudStorageAccount
-    /// - Lokad.Cloud.AppHost.Framework.IApplicationEnvironment
+    /// - Lokad.Cloud.IEnvironment
     /// </summary>
     public class AzureModule : Module
     {
