@@ -11,8 +11,8 @@ using System.Xml.Linq;
 using Autofac;
 using Autofac.Configuration;
 using Lokad.Cloud.AppHost.Framework;
-using Lokad.Cloud.EntryPoint;
 using Lokad.Cloud.ServiceFabric;
+using Lokad.Cloud.Services.EntryPoint;
 using Microsoft.WindowsAzure;
 
 namespace Lokad.Cloud.Framework.Autofac

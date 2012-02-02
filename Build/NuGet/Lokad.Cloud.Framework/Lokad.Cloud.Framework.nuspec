@@ -14,7 +14,6 @@
     <tags>azure, compute, cloud</tags>
     <dependencies>
       <dependency id="Lokad.Cloud.Storage" version="2.3.0" />
-      <dependency id="Lokad.Cloud.AppHost.Framework" version="0.8.2" />
     </dependencies>
   </metadata>
 </package>

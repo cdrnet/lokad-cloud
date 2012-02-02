@@ -7,7 +7,7 @@ using System.Net;
 using System.Security.Cryptography.X509Certificates;
 using Lokad.Cloud.AppHost.Framework;
 
-namespace Lokad.Cloud.EntryPoint
+namespace Lokad.Cloud.Services.EntryPoint
 {
     public class EnvironmentAdapter : IEnvironment
     {

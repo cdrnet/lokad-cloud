@@ -31,7 +31,7 @@ namespace Lokad.Cloud
         public string WorkerName { get; private set; }
         public string CellName { get; private set; }
 
-        internal HostInfo(string worker, string cell, string solution)
+        public HostInfo(string worker, string cell, string solution)
         {
             WorkerName = worker;
             CellName = cell;

@@ -64,10 +64,6 @@
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Lokad.Cloud.AppHost.Framework, Version=0.8.2.12, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Lokad.Cloud.AppHost.Framework.0.8.2\lib\Lokad.Cloud.AppHost.Framework.dll</HintPath>
-    </Reference>
     <Reference Include="Lokad.Cloud.Storage, Version=2.3.0.12, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\Lokad.Cloud.Storage.2.3.0\lib\Lokad.Cloud.Storage.dll</HintPath>
@@ -90,11 +86,7 @@
     <Compile Include="Diagnostics\CloudLogWriter.cs" />
     <Compile Include="Diagnostics\LogExtensions.cs" />
     <Compile Include="Diagnostics\TockenBucketThrottling.cs" />
-    <Compile Include="EntryPoint\EnvironmentAdapter.cs" />
-    <Compile Include="EntryPoint\SimpleApplicationEntryPoint.cs" />
-    <Compile Include="EntryPoint\CloudServiceRunner.cs" />
     <Compile Include="Diagnostics\SimpleLoggingObservers.cs" />
-    <Compile Include="EntryPoint\Scheduler.cs" />
     <Compile Include="IEnvironment.cs" />
     <Compile Include="Instrumentation\ApplicationObserverSubject.cs" />
     <Compile Include="Instrumentation\EventLevel.cs" />

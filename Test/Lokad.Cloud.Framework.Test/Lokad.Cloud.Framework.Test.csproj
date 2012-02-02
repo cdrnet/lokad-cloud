@@ -119,6 +119,10 @@
       <Project>{CE66B408-AFC1-46A3-BFF5-4574F5EBFEC2}</Project>
       <Name>Lokad.Cloud.Management</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Source\Lokad.Cloud.Services.EntryPoint\Lokad.Cloud.Services.EntryPoint.csproj">
+      <Project>{D286F227-43AB-483D-8198-C2EA959BA7AE}</Project>
+      <Name>Lokad.Cloud.Services.EntryPoint</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Content Include="Shared\_ReadMe.txt" />

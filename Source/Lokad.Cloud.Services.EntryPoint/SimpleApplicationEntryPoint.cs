@@ -15,7 +15,7 @@ using Lokad.Cloud.Instrumentation;
 using Lokad.Cloud.Storage;
 using Lokad.Cloud.Storage.Instrumentation;
 
-namespace Lokad.Cloud.EntryPoint
+namespace Lokad.Cloud.Services.EntryPoint
 {
     /// <summary>
     /// Simple Entry Point, without any need for IoC.
