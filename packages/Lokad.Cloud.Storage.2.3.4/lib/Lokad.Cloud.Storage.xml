@@ -1210,6 +1210,14 @@
             <para>This method is sideeffect-free, except for infrastructure effects like thread pool usage.</para>
             </remarks>
         </member>
+        <member name="M:Lokad.Cloud.Storage.BlobStorageExtensions.ListBlobNames``1(Lokad.Cloud.Storage.IBlobStorageProvider,Lokad.Cloud.Storage.IBlobLocation)">
+            <summary>
+            List the blob names of all blobs matching the provided blob name prefix.
+            </summary>
+            <remarks>
+            <para>This method is sideeffect-free, except for infrastructure effects like thread pool usage.</para>
+            </remarks>
+        </member>
         <member name="M:Lokad.Cloud.Storage.BlobStorageExtensions.ListBlobLocations(Lokad.Cloud.Storage.IBlobStorageProvider,System.String,System.String)">
             <summary>
             List the blob locations of all blobs matching the provided blob name prefix.
@@ -1707,6 +1715,11 @@
         <member name="M:Lokad.Cloud.Storage.CompressedRawFormatter.Deserialize(System.IO.Stream,System.Type)">
             <remarks>Supports byte[], XElement, Stream and string only</remarks>
         </member>
+        <member name="T:Lokad.Cloud.Storage.Documents.CompressedBinaryDocumentSet`2">
+            <summary>
+            Base class for a set of documents to be serialized using a BinaryWriter
+            </summary>
+        </member>
         <member name="T:Lokad.Cloud.Storage.Documents.DocumentSet`2">
             <summary>
             Represents a set of documents and how they are persisted.
@@ -1749,6 +1762,29 @@
             If the document does not exist yet, insert a new document with the provided insert function.
             </summary>
         </member>
+        <member name="M:Lokad.Cloud.Storage.Documents.IDocumentSet`2.ListAllKeys">
+            <summary>
+            List the keys of all documents. Not all document sets will support this,
+            those that do not will throw a NotSupportedException.
+            </summary>
+            <exception cref="T:System.NotSupportedException"/>
+        </member>
+        <member name="M:Lokad.Cloud.Storage.Documents.IDocumentSet`2.GetAll">
+            <summary>
+            Read all documents matching the provided prefix.
+            Not all document sets will support this, those that
+            do not will throw a NotSupportedException.
+            </summary>
+            <exception cref="T:System.NotSupportedException"/>
+        </member>
+        <member name="M:Lokad.Cloud.Storage.Documents.IDocumentSet`2.DeleteAll">
+            <summary>
+            Delete all document matching the provided prefix.
+            Not all document sets will support this, those that
+            do not will throw a NotSupportedException.
+            </summary>
+            <exception cref="T:System.NotSupportedException"/>
+        </member>
         <member name="M:Lokad.Cloud.Storage.Documents.DocumentSet`2.TryGet(`1,`0@)">
             <summary>
             Try to read the document, if it exists.
@@ -1781,40 +1817,45 @@
             If the document does not exist yet, insert a new document with the provided insert function.
             </summary>
         </member>
-        <member name="M:Lokad.Cloud.Storage.Documents.IEnumerableDocumentSet`3.ListAllKeys(`2)">
+        <member name="M:Lokad.Cloud.Storage.Documents.DocumentSet`2.ListAllKeys">
             <summary>
-            List the keys of all documents matching the provided prefix.
-            Not all document sets will support this, those that do not will
-            throw a NotSupportedException.
+            List the keys of all documents. Not all document sets will support this,
+            those that do not will throw a NotSupportedException.
             </summary>
             <exception cref="T:System.NotSupportedException"/>
         </member>
-        <member name="M:Lokad.Cloud.Storage.Documents.IEnumerableDocumentSet`3.GetAll(`2)">
+        <member name="M:Lokad.Cloud.Storage.Documents.DocumentSet`2.GetAll">
             <summary>
             Read all documents matching the provided prefix.
-            </summary>
-        </member>
-        <member name="M:Lokad.Cloud.Storage.Documents.IEnumerableDocumentSet`3.DeleteAll(`2)">
-            <summary>
-            Delete all document matching the provided prefix.
-            </summary>
-        </member>
-        <member name="M:Lokad.Cloud.Storage.Documents.EnumerableDocumentSet`3.ListAllKeys(`2)">
-            <summary>
-            List the keys of all documents matching the provided prefix.
-            Not all document sets will support this, those that do not will
-            throw a NotSupportedException.
+            Not all document sets will support this, those that
+            do not will throw a NotSupportedException.
             </summary>
             <exception cref="T:System.NotSupportedException"/>
         </member>
-        <member name="M:Lokad.Cloud.Storage.Documents.EnumerableDocumentSet`3.GetAll(`2)">
-            <summary>
-            Read all documents matching the provided prefix.
-            </summary>
-        </member>
-        <member name="M:Lokad.Cloud.Storage.Documents.EnumerableDocumentSet`3.DeleteAll(`2)">
+        <member name="M:Lokad.Cloud.Storage.Documents.DocumentSet`2.DeleteAll">
             <summary>
             Delete all document matching the provided prefix.
+            Not all document sets will support this, those that
+            do not will throw a NotSupportedException.
+            </summary>
+            <exception cref="T:System.NotSupportedException"/>
+        </member>
+        <member name="M:Lokad.Cloud.Storage.Documents.DocumentSet`2.TryGetCache(Lokad.Cloud.Storage.IBlobLocation,`0@)">
+            <summary>
+            Override this method to plug in your cache provider, if needed.
+            By default, no caching is performed.
+            </summary>
+        </member>
+        <member name="M:Lokad.Cloud.Storage.Documents.DocumentSet`2.SetCache(Lokad.Cloud.Storage.IBlobLocation,`0)">
+            <summary>
+            Override this method to plug in your cache provider, if needed.
+            By default, no caching is performed.
+            </summary>
+        </member>
+        <member name="M:Lokad.Cloud.Storage.Documents.DocumentSet`2.RemoveCache(Lokad.Cloud.Storage.IBlobLocation)">
+            <summary>
+            Override this method to plug in your cache provider, if needed.
+            By default, no caching is performed.
             </summary>
         </member>
         <member name="T:Lokad.Cloud.Storage.Instrumentation.Events.MessagesRevivedEvent">

@@ -11,9 +11,12 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Azure Compute Framework. Leverage Windows Azure without getting dragged down by low level technicalities.</description>
     <language>en-US</language>
-    <tags>azure, compute, cloud</tags>
+    <tags>azure, compute, services, cloud</tags>
     <dependencies>
-      <dependency id="Lokad.Cloud.Storage" version="2.3.0" />
+      <dependency id="Lokad.Cloud.Storage" version="2.3.4" />
     </dependencies>
+    <frameworkAssemblies>
+      <frameworkAssembly assemblyName="System.Runtime.Serialization" />
+    </frameworkAssemblies>
   </metadata>
 </package>

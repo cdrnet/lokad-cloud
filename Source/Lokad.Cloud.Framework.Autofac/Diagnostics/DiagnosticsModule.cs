@@ -9,6 +9,7 @@ using System.Linq;
 using Autofac;
 using Lokad.Cloud.Diagnostics;
 using Lokad.Cloud.Instrumentation;
+using Lokad.Cloud.Services.EntryPoint.Diagnostics;
 using Lokad.Cloud.Storage.Autofac;
 using Lokad.Cloud.Storage.Instrumentation;
 

@@ -37,12 +37,10 @@ namespace Lokad.Cloud.Services.EntryPoint
         /// Creates a new instance of the Scheduler class.
         /// </summary>
         /// <param name="services">cloud services</param>
-        /// <param name="schedule">Action to be invoked when a service is scheduled to run</param>
-        public Scheduler(List<CloudService> services, Func<CloudService, ServiceExecutionFeedback> schedule, IRuntimeObserver observer = null)
+        public Scheduler(List<CloudService> services, IRuntimeObserver observer = null)
         {
             _observer = observer;
             _services = services;
-            _schedule = schedule;
         }
 
         public CloudService CurrentlyScheduledService
@@ -78,7 +76,7 @@ namespace Lokad.Cloud.Services.EntryPoint
                 using(cancellationToken.Register(currentThread.Abort))
                 while (DateTimeOffset.UtcNow.Subtract(start) < _moreOfTheSame && !cancellationToken.IsCancellationRequested && DemandsImmediateStart(result))
                 {
-                    result = _schedule(_currentService);
+                    result = _currentService.Start();
                     isRunOnce |= WasSuccessfullyExecuted(result);
                 }
 

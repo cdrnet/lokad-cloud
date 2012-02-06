@@ -5,11 +5,12 @@
 
 using System;
 using System.Reactive.Linq;
+using Lokad.Cloud.Diagnostics;
 using Lokad.Cloud.Instrumentation;
 using Lokad.Cloud.Storage.Instrumentation;
 using Lokad.Cloud.Storage.Instrumentation.Events;
 
-namespace Lokad.Cloud.Diagnostics
+namespace Lokad.Cloud.Services.EntryPoint.Diagnostics
 {
     public static class SimpleLoggingObservers
     {
