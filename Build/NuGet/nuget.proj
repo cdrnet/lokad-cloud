@@ -7,17 +7,24 @@
 		<OutNuGetPackages>$(MSBuildProjectDirectory)/out</OutNuGetPackages>
 		<FrameworkOut>$(MSBuildProjectDirectory)/../../Source/Lokad.Cloud.Framework/bin/Release</FrameworkOut>
 		<FrameworkPack>$(MSBuildProjectDirectory)/Lokad.Cloud.Framework</FrameworkPack>
+		<EntryPointOut>$(MSBuildProjectDirectory)/../../Source/Lokad.Cloud.Services.EntryPoint/bin/Release</EntryPointOut>
+		<EntryPointPack>$(MSBuildProjectDirectory)/Lokad.Cloud.Services.EntryPoint</EntryPointPack>
 		<NuGetExe>$(MSBuildProjectDirectory)/../../Tools/nuget.exe</NuGetExe>
 	</PropertyGroup>
 	
 	<ItemGroup>
 		<FrameworkNet40 Include="$(FrameworkOut)/Lokad.Cloud.Framework.dll;$(FrameworkOut)/Lokad.Cloud.Framework.pdb" />
+		<EntryPointNet40 Include="$(EntryPointOut)/Lokad.Cloud.Services.EntryPoint.dll;$(EntryPointOut)/Lokad.Cloud.Services.EntryPoint.pdb" />
 	</ItemGroup>
 	
 	<Target Name="CopyContentFiles">
 		<RemoveDir Directories="$(FrameworkPack)/content" />
 		<RemoveDir Directories="$(FrameworkPack)/lib" />
 		<Copy SourceFiles="@(FrameworkNet40)" DestinationFolder="$(FrameworkPack)/lib" />
+		
+		<RemoveDir Directories="$(EntryPointPack)/content" />
+		<RemoveDir Directories="$(EntryPointPack)/lib" />
+		<Copy SourceFiles="@(EntryPointNet40)" DestinationFolder="$(EntryPointPack)/lib" />
 	</Target>
 
 	<Target Name="UpdateNuspec" DependsOnTargets="CopyContentFiles">
@@ -26,15 +33,20 @@
 		<GetAssemblyIdentity AssemblyFiles="$(FrameworkPack)/lib/Lokad.Cloud.Framework.dll">
 			<Output TaskParameter="Assemblies" ItemName="FrameworkAssemblyInfo"/>
 		</GetAssemblyIdentity>
+		<GetAssemblyIdentity AssemblyFiles="$(EntryPointPack)/lib/Lokad.Cloud.Services.EntryPoint.dll">
+			<Output TaskParameter="Assemblies" ItemName="EntryPointAssemblyInfo"/>
+		</GetAssemblyIdentity>
 		
 		<!-- Extract Assembly Versions -->
 		<PropertyGroup>
 			<FrameworkAssemblyVersion>%(FrameworkAssemblyInfo.Version)</FrameworkAssemblyVersion>
+			<EntryPointAssemblyVersion>%(EntryPointAssemblyInfo.Version)</EntryPointAssemblyVersion>
 		</PropertyGroup>
 		
 		<!-- Package Versions (skip 4th part/build number, for semvar compliance) -->
 		<PropertyGroup>
 			<FrameworkPackVersion>$(FrameworkAssemblyVersion.Substring(0, $(FrameworkAssemblyVersion.LastIndexOf('.'))))</FrameworkPackVersion>
+			<EntryPointVersion>$(EntryPointAssemblyVersion.Substring(0, $(EntryPointAssemblyVersion.LastIndexOf('.'))))</EntryPointVersion>
 		</PropertyGroup>
 		
 		<XmlUpdate
@@ -42,12 +54,24 @@
 			XmlFileName="$(FrameworkPack)/Lokad.Cloud.Framework.nuspec"
 			XPath="//n:package/n:metadata/n:version"
 			Value="$(FrameworkPackVersion)"/>
+		
+		<XmlUpdate
+			Prefix="n" Namespace="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd"
+			XmlFileName="$(EntryPointPack)/Lokad.Cloud.Services.EntryPoint.nuspec"
+			XPath="//n:package/n:metadata/n:version"
+			Value="$(EntryPointVersion)"/>
+		<XmlUpdate
+			Prefix="n" Namespace="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd"
+			XmlFileName="$(EntryPointPack)/Lokad.Cloud.Services.EntryPoint.nuspec"
+			XPath="//n:package/n:metadata/n:dependencies/n:dependency[@id='Lokad.Cloud.Framework']/@version"
+			Value="$(FrameworkPackVersion)"/>
 	</Target>
 
 	<Target Name="BuildPackages" DependsOnTargets="UpdateNuspec">
 		<RemoveDir Directories="$(OutNuGetPackages)" />
 		<MakeDir Directories="$(OutNuGetPackages)" />
 		<Exec Command="$(NuGetExe) pack $(FrameworkPack)/Lokad.Cloud.Framework.nuspec /Verbose /OutputDirectory $(OutNuGetPackages)" />
+		<Exec Command="$(NuGetExe) pack $(EntryPointPack)/Lokad.Cloud.Services.EntryPoint.nuspec /Verbose /OutputDirectory $(OutNuGetPackages)" />
 	</Target>
 
 </Project>
