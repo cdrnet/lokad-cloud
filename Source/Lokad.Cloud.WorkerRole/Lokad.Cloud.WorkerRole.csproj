@@ -66,13 +66,13 @@
     <Reference Include="Ionic.Zip.Reduced">
       <HintPath>..\..\packages\DotNetZip.Reduced.1.9.1.8\lib\net20\Ionic.Zip.Reduced.dll</HintPath>
     </Reference>
-    <Reference Include="Lokad.Cloud.AppHost, Version=0.8.2.12, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Lokad.Cloud.AppHost, Version=0.8.3.13, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Lokad.Cloud.AppHost.0.8.2\lib\Lokad.Cloud.AppHost.dll</HintPath>
+      <HintPath>..\..\packages\Lokad.Cloud.AppHost.0.8.3\lib\Lokad.Cloud.AppHost.dll</HintPath>
     </Reference>
-    <Reference Include="Lokad.Cloud.AppHost.Framework, Version=0.8.2.12, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Lokad.Cloud.AppHost.Framework, Version=0.8.3.13, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Lokad.Cloud.AppHost.Framework.0.8.2\lib\Lokad.Cloud.AppHost.Framework.dll</HintPath>
+      <HintPath>..\..\packages\Lokad.Cloud.AppHost.Framework.0.8.3\lib\Lokad.Cloud.AppHost.Framework.dll</HintPath>
     </Reference>
     <Reference Include="Lokad.Cloud.Provisioning, Version=2.0.2.4, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
