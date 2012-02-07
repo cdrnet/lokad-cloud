@@ -175,7 +175,13 @@ namespace Lokad.Cloud
 
         public void ProvisionWorkerInstances(int numberOfInstances)
         {
-            SetWorkerInstanceCount(numberOfInstances, CancellationToken.None);
+            GetWorkerInstanceCount(CancellationToken.None).ContinueWith(task =>
+                {
+                    if (task.Result != numberOfInstances)
+                    {
+                        SetWorkerInstanceCount(numberOfInstances, CancellationToken.None);
+                    }
+                });
         }
 
         public void ProvisionWorkerInstancesAtLeast(int minNumberOfInstances)
