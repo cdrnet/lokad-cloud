@@ -7,6 +7,7 @@ using System;
 using System.Reactive.Linq;
 using Lokad.Cloud.Diagnostics;
 using Lokad.Cloud.Instrumentation;
+using Lokad.Cloud.Instrumentation.Events;
 using Lokad.Cloud.Storage.Instrumentation;
 using Lokad.Cloud.Storage.Instrumentation.Events;
 
@@ -41,7 +42,9 @@ namespace Lokad.Cloud.Services.EntryPoint.Diagnostics
         public static RuntimeObserverSubject CreateForRuntime(ILog log, IObserver<IRuntimeEvent>[] fixedObservers = null)
         {
             var subject = new RuntimeObserverSubject(fixedObservers);
-            subject.Subscribe(e => log.TryLog((LogLevel)(int)e.Level, e.Describe(), meta: e.DescribeMeta()));
+            subject
+                .Where(e => !(e is SchedulerIdleEvent) && !(e is SchedulerBusyEvent))
+                .Subscribe(e => log.TryLog((LogLevel)(int)e.Level, e.Describe(), meta: e.DescribeMeta()));
 
             return subject;
         }
