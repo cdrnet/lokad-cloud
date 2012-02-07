@@ -9,7 +9,7 @@ namespace Lokad.Cloud.Instrumentation.Events
 {
     public class RuntimeTimeoutRestartedEvent : IRuntimeEvent
     {
-        public EventLevel Level { get { return EventLevel.Trace; } }
+        public EventLevel Level { get { return EventLevel.Warning; } }
         public HostInfo Host { get; private set; }
         public string ServiceName { get; set; }
 

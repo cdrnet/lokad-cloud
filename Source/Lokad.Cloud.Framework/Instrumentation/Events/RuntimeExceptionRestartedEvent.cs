@@ -10,7 +10,7 @@ namespace Lokad.Cloud.Instrumentation.Events
 {
     public class RuntimeExceptionRestartedEvent : IRuntimeEvent
     {
-        public EventLevel Level { get { return EventLevel.Trace; } }
+        public EventLevel Level { get { return EventLevel.Error; } }
         public HostInfo Host { get; private set; }
         public string ServiceName { get; set; }
         public Exception Exception { get; set; }
