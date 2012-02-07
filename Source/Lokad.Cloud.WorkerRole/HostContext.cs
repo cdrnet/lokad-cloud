@@ -5,6 +5,7 @@
 
 using System;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading;
@@ -58,22 +59,27 @@ namespace Lokad.Cloud
                 return;
             }
 
-            var currentDeploymentPrivateId = RoleEnvironment.DeploymentId;
+            if (string.IsNullOrWhiteSpace(subscriptionId))
+            {
+                // TODO: upgrade to proper instrumentation
+                log.TryLog(HostLogLevel.Debug, "Provisioning: Not available because no subscription id was provided.");
+                return;
+            }
+
             X509Certificate2 certificate = null;
             if (!String.IsNullOrWhiteSpace(certificateThumbprint))
             {
                 certificate = GetCertificate(null, certificateThumbprint);
             }
-
-            // early evaluate management status for intrinsic fault states, to skip further processing
-            if (currentDeploymentPrivateId == null || certificate == null || string.IsNullOrWhiteSpace(subscriptionId))
+            if (certificate == null)
             {
                 // TODO: upgrade to proper instrumentation
-                log.TryLog(HostLogLevel.Debug, "Provisioning: Not available because either the certificate or the subscription was not provided correctly.");
+                log.TryLog(HostLogLevel.Debug, string.Format("Provisioning: Not available because the certificate with thumbprint '{0}' was not found.", certificateThumbprint));
                 return;
             }
 
             // detect dev fabric
+            var currentDeploymentPrivateId = RoleEnvironment.DeploymentId;
             if (currentDeploymentPrivateId.StartsWith("deployment("))
             {
                 // TODO: upgrade to proper instrumentation
@@ -128,13 +134,10 @@ namespace Lokad.Cloud
             try
             {
                 store.Open(OpenFlags.ReadOnly);
-                var certs = store.Certificates.Find(X509FindType.FindByThumbprint, thumbprint, false);
-                if (certs.Count != 1)
-                {
-                    return null;
-                }
-
-                return certs[0];
+                return store.Certificates
+                    .Find(X509FindType.FindByThumbprint, thumbprint, false)
+                    .OfType<X509Certificate2>()
+                    .FirstOrDefault();
             }
             finally
             {
