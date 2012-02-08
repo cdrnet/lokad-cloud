@@ -6,6 +6,7 @@
 using System;
 using System.Reactive.Linq;
 using Lokad.Cloud.AppHost.Framework.Instrumentation;
+using Lokad.Cloud.AppHost.Framework.Instrumentation.Events;
 using Lokad.Cloud.Provisioning.Instrumentation;
 using Lokad.Cloud.Provisioning.Instrumentation.Events;
 using Lokad.Cloud.Storage.Instrumentation;
@@ -18,7 +19,21 @@ namespace Lokad.Cloud.Diagnostics
         public static IHostObserver CreateForHost(HostLogWriter log)
         {
             var subject = new HostObserverSubject();
-            subject.Subscribe(e => log.TryLog((HostLogLevel)(int)e.Level, e.Describe(), meta: e.DescribeMeta()));
+
+            subject.OfType<CellExceptionRestartedEvent>()
+                .Subscribe(e => log.TryLog(HostLogLevel.Error, e.Describe(), meta: e.DescribeMeta()));
+            subject.OfType<CellFatalErrorRestartedEvent>()
+                .Subscribe(e => log.TryLog(HostLogLevel.Fatal, e.Describe(), meta: e.DescribeMeta()));
+
+            subject.OfType<CellAbortedEvent>()
+                .Subscribe(e => log.TryLog((HostLogLevel)(int)e.Level, e.Describe(), meta: e.DescribeMeta()));
+
+            // Skip start/stop logging since the Lokad.Cloud runtime logs start/stop anyway
+            // Downgrade new deployment/solution levels to debug:
+            subject.OfType<NewDeploymentOfSolutionDetectedEvent>()
+                .Subscribe(e => log.TryLog(HostLogLevel.Debug, e.Describe(), meta: e.DescribeMeta()));
+            subject.OfType<NewUnrelatedSolutionDetectedEvent>()
+                .Subscribe(e => log.TryLog(HostLogLevel.Debug, e.Describe(), meta: e.DescribeMeta()));
 
             return subject;
         }

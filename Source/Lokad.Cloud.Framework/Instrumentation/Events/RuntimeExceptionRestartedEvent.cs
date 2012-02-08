@@ -24,7 +24,7 @@ namespace Lokad.Cloud.Instrumentation.Events
 
         public string Describe()
         {
-            return string.Format("Runtime: an unhandled {0} occured in service {1} on cell {2} of solution {3} on {4}. The Runtime will be restarted.",
+            return string.Format("Runtime: an unhandled {0} occured in service {1} on {2} cell of {3} solution on {4}. The Runtime will be restarted.",
                 Exception.GetType().Name, ServiceName, Host.CellName, Host.SolutionName, Host.WorkerName);
         }
 

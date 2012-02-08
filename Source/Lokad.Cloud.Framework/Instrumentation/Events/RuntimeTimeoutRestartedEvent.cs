@@ -21,7 +21,7 @@ namespace Lokad.Cloud.Instrumentation.Events
 
         public string Describe()
         {
-            return string.Format("Runtime: a timeout was raised in service {0} on cell {1} of solution {2} on {3}. The Runtime will be restarted.",
+            return string.Format("Runtime: a timeout was raised in service {0} on {1} cell of {2} solution on {3}. The Runtime will be restarted.",
                 ServiceName, Host.CellName, Host.SolutionName, Host.WorkerName);
         }
 

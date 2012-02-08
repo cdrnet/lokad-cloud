@@ -14,7 +14,7 @@
     <tags>azure, compute, services, cloud</tags>
     <dependencies>
       <dependency id="Lokad.Cloud.Framework" version="0.0.0" />
-      <dependency id="Lokad.Cloud.AppHost.Framework" version="0.9.0" />
+      <dependency id="Lokad.Cloud.AppHost.Framework" version="0.9.1" />
       <dependency id="Rx-Main" version="1.0.11226" />
     </dependencies>
   </metadata>

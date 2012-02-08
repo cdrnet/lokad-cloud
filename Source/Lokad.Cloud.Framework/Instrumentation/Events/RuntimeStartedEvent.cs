@@ -19,7 +19,7 @@ namespace Lokad.Cloud.Instrumentation.Events
 
         public string Describe()
         {
-            return string.Format("Runtime started in cell {0} of solution {1} on {2}.",
+            return string.Format("Runtime: started in {0} cell of {1} solution on {2}.",
                 Host.CellName, Host.SolutionName, Host.WorkerName);
         }
 
