@@ -71,7 +71,9 @@ namespace Lokad.Cloud
                     new XElement("CertificateThumbprint", _certificateThumbprint),
                     new XElement("SubscriptionId", _subscriptionId));
 
-            string entryPointTypeName = null;
+            var entryPointTypeName = "Lokad.Cloud.Framework.Autofac.AutofacApplicationEntryPoint, Lokad.Cloud.Framework.Autofac";
+            var solutionName = "Lokad.Cloud";
+
             string configEtag;
             var appConfig = _storage.BlobStorage.GetBlob<byte[]>(ContainerName, ConfigBlobName, out configEtag);
             if (appConfig.HasValue && configEtag == ConfigEtagOfCombinedEtag(deployment.SolutionId))
@@ -96,6 +98,13 @@ namespace Lokad.Cloud
                             {
                                 entryPointTypeName = typeNameXml.Value.Trim();
                             }
+
+                            // if root contains "Solution" element, use its value as solution name
+                            var solutionXml = configDoc.Root.Element("Solution");
+                            if (solutionXml != null && !String.IsNullOrWhiteSpace(solutionXml.Value))
+                            {
+                                solutionName = solutionXml.Value.Trim();
+                            }
                         }
                     }
                 }
@@ -105,11 +114,11 @@ namespace Lokad.Cloud
                 }
             }
 
-            return new SolutionDefinition("Solution", new[]
+            return new SolutionDefinition(solutionName, new[]
                 {
-                    new CellDefinition("Cell",
+                    new CellDefinition("Primary",
                         new AssembliesHead(PackageEtagOfCombinedEtag(deployment.SolutionId)),
-                        entryPointTypeName ?? "Lokad.Cloud.Framework.Autofac.AutofacApplicationEntryPoint, Lokad.Cloud.Framework.Autofac",
+                        entryPointTypeName,
                         settings.ToString())
                 });
         }

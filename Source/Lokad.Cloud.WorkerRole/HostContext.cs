@@ -62,7 +62,7 @@ namespace Lokad.Cloud
             if (string.IsNullOrWhiteSpace(subscriptionId))
             {
                 // TODO: upgrade to proper instrumentation
-                log.TryLog(HostLogLevel.Debug, "Provisioning: Not available because no subscription id was provided.");
+                log.TryLog(HostLogLevel.Warn, "Provisioning: Not available because no subscription id was provided.");
                 return;
             }
 
@@ -74,7 +74,7 @@ namespace Lokad.Cloud
             if (certificate == null)
             {
                 // TODO: upgrade to proper instrumentation
-                log.TryLog(HostLogLevel.Debug, string.Format("Provisioning: Not available because the certificate with thumbprint '{0}' was not found.", certificateThumbprint));
+                log.TryLog(HostLogLevel.Warn, string.Format("Provisioning: Not available because the certificate with thumbprint '{0}' was not found.", certificateThumbprint));
                 return;
             }
 
