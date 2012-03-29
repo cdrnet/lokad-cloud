@@ -6,7 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using ICSharpCode.SharpZipLib.Zip;
+using Ionic.Zip;
 using Mono.Cecil;
 
 namespace Lokad.Cloud.Application
@@ -27,28 +27,27 @@ namespace Lokad.Cloud.Application
             var assemblyBytes = new Dictionary<string, byte[]>();
             var symbolBytes = new Dictionary<string, byte[]>();
 
-            using (var zipStream = new ZipInputStream(stream))
+            using (var zip = ZipFile.Read(stream))
+            foreach (var entry in zip)
             {
-                ZipEntry entry;
-                while ((entry = zipStream.GetNextEntry()) != null)
+                if (entry.IsDirectory || entry.IsText || entry.UncompressedSize == 0)
                 {
-                    if (!entry.IsFile || entry.Size == 0)
-                    {
-                        continue;
-                    }
+                    continue;
+                }
 
-                    var extension = Path.GetExtension(entry.Name).ToLowerInvariant();
-                    if (extension != ".dll" && extension != ".pdb")
-                    {
-                        continue;
-                    }
+                var extension = Path.GetExtension(entry.FileName).ToLowerInvariant();
+                if (extension != ".dll" && extension != ".pdb")
+                {
+                    continue;
+                }
 
-                    var isValid = true;
-                    var name = Path.GetFileNameWithoutExtension(entry.Name);
-                    var data = new byte[entry.Size];
+                var isValid = true;
+                var name = Path.GetFileNameWithoutExtension(entry.FileName);
+                using (var fileStream = new MemoryStream())
+                {
                     try
                     {
-                        zipStream.Read(data, 0, data.Length);
+                        entry.Extract(fileStream);
                     }
                     catch (Exception)
                     {
@@ -58,18 +57,18 @@ namespace Lokad.Cloud.Application
                     switch (extension)
                     {
                         case ".dll":
-                            assemblyBytes.Add(name.ToLowerInvariant(), data);
+                            assemblyBytes.Add(name.ToLowerInvariant(), fileStream.ToArray());
                             assemblyInfos.Add(new CloudApplicationAssemblyInfo
                                 {
                                     AssemblyName = name,
-                                    DateTime = entry.DateTime,
-                                    SizeBytes = entry.Size,
+                                    DateTime = entry.LastModified,
+                                    SizeBytes = entry.UncompressedSize,
                                     IsValid = isValid,
                                     Version = new Version()
                                 });
                             break;
                         case ".pdb":
-                            symbolBytes.Add(name.ToLowerInvariant(), data);
+                            symbolBytes.Add(name.ToLowerInvariant(), fileStream.ToArray());
                             break;
                     }
                 }

@@ -4,7 +4,8 @@
 #endregion
 
 using System.IO;
-using ICSharpCode.SharpZipLib.Zip;
+using System.Linq;
+using Ionic.Zip;
 using Lokad.Cloud.Application;
 using Lokad.Cloud.ServiceFabric.Runtime;
 using Lokad.Cloud.Storage;
@@ -35,16 +36,12 @@ namespace Lokad.Cloud.Management
         /// </summary>
         public void UploadApplicationSingleDll(byte[] data, string fileName)
         {
-            using (var tempStream = new MemoryStream())
+            using (var stream = new MemoryStream())
+            using (var zip = new ZipFile())
             {
-                using (var zip = new ZipOutputStream(tempStream))
-                {
-                    zip.PutNextEntry(new ZipEntry(fileName));
-                    zip.Write(data, 0, data.Length);
-                    zip.CloseEntry();
-                }
-
-                UploadApplicationZipContainer(tempStream.ToArray());
+                zip.AddEntry(fileName, data);
+                zip.Save(stream);
+                UploadApplicationZipContainer(stream.ToArray());
             }
         }
 
@@ -69,14 +66,12 @@ namespace Lokad.Cloud.Management
             try
             {
                 using (var dataStream = new MemoryStream(data))
-                using (var zipStream = new ZipInputStream(dataStream))
+                using (var zip = ZipFile.Read(dataStream))
+                using (var readStream = new MemoryStream())
+                foreach (var entry in zip.Where(e => !e.IsDirectory && !e.IsText && e.CompressedSize > 0))
                 {
-                    ZipEntry entry;
-                    while ((entry = zipStream.GetNextEntry()) != null)
-                    {
-                        var buffer = new byte[entry.Size];
-                        zipStream.Read(buffer, 0, buffer.Length);
-                    }
+                    readStream.Position = 0;
+                    entry.Extract(readStream);
                 }
 
                 return true;
