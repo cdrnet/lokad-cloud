@@ -21,7 +21,6 @@ namespace Lokad.Cloud.Runtime
                 providers.BlobStorage,
                 providers.QueueStorage,
                 providers.TableStorage,
-                providers.RuntimeFinalizer,
                 log);
         }
     }

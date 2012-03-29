@@ -12,7 +12,6 @@ using Lokad.Cloud.Diagnostics;
 using Lokad.Cloud.Management;
 using Lokad.Cloud.Runtime;
 using Lokad.Cloud.Storage.Instrumentation;
-using Lokad.Cloud.Storage.Instrumentation.Events;
 using Microsoft.WindowsAzure;
 
 namespace Lokad.Cloud.Storage.Azure
@@ -28,16 +27,16 @@ namespace Lokad.Cloud.Storage.Azure
             builder.RegisterType<CloudFormatter>().As<IDataSerializer>();
 
             builder.Register(BlobStorageProvider);
-            builder.Register(QueueStorageProvider);
+            builder.Register(QueueStorageProvider).OnRelease(queues => queues.AbandonAll());
             builder.Register(TableStorageProvider);
 
-            builder.Register(RuntimeProviders);
-            builder.Register(CloudStorageProviders);
+            builder.Register(RuntimeProviders).OnRelease(storage => storage.QueueStorage.AbandonAll());
+            builder.Register(CloudStorageProviders).OnRelease(storage => storage.QueueStorage.AbandonAll());
             builder.Register(CloudInfrastructureProviders);
 
             // Storage Observer Subject
             builder.Register(StorageObserver)
-                .As<ICloudStorageObserver, IObservable<ICloudStorageEvent>>()
+                .As<IStorageObserver, IObservable<IStorageEvent>>()
                 .SingleInstance();
         }
 
@@ -61,8 +60,7 @@ namespace Lokad.Cloud.Storage.Azure
         {
             return CloudStorage
                 .ForAzureAccount(c.Resolve<CloudStorageAccount>())
-                .WithObserver(c.Resolve<ICloudStorageObserver>())
-                .WithRuntimeFinalizer(c.ResolveOptional<IRuntimeFinalizer>())
+                .WithObserver(c.Resolve<IStorageObserver>())
                 .BuildRuntimeProviders(c.ResolveOptional<ILog>());
         }
 
@@ -79,8 +77,7 @@ namespace Lokad.Cloud.Storage.Azure
             return CloudStorage
                 .ForAzureAccount(c.Resolve<CloudStorageAccount>())
                 .WithDataSerializer(c.Resolve<IDataSerializer>())
-                .WithObserver(c.Resolve<ICloudStorageObserver>())
-                .WithRuntimeFinalizer(c.ResolveOptional<IRuntimeFinalizer>())
+                .WithObserver(c.Resolve<IStorageObserver>())
                 .BuildStorageProviders();
         }
 
@@ -89,8 +86,7 @@ namespace Lokad.Cloud.Storage.Azure
             return CloudStorage
                 .ForAzureAccount(c.Resolve<CloudStorageAccount>())
                 .WithDataSerializer(c.Resolve<IDataSerializer>())
-                .WithObserver(c.Resolve<ICloudStorageObserver>())
-                .WithRuntimeFinalizer(c.ResolveOptional<IRuntimeFinalizer>())
+                .WithObserver(c.Resolve<IStorageObserver>())
                 .BuildTableStorage();
         }
 
@@ -99,8 +95,7 @@ namespace Lokad.Cloud.Storage.Azure
             return CloudStorage
                 .ForAzureAccount(c.Resolve<CloudStorageAccount>())
                 .WithDataSerializer(c.Resolve<IDataSerializer>())
-                .WithObserver(c.Resolve<ICloudStorageObserver>())
-                .WithRuntimeFinalizer(c.ResolveOptional<IRuntimeFinalizer>())
+                .WithObserver(c.Resolve<IStorageObserver>())
                 .BuildQueueStorage();
         }
 
@@ -109,15 +104,14 @@ namespace Lokad.Cloud.Storage.Azure
             return CloudStorage
                 .ForAzureAccount(c.Resolve<CloudStorageAccount>())
                 .WithDataSerializer(c.Resolve<IDataSerializer>())
-                .WithObserver(c.Resolve<ICloudStorageObserver>())
-                .WithRuntimeFinalizer(c.ResolveOptional<IRuntimeFinalizer>())
+                .WithObserver(c.Resolve<IStorageObserver>())
                 .BuildBlobStorage();
         }
 
-        static CloudStorageInstrumentationSubject StorageObserver(IComponentContext c)
+        static StorageObserverSubject StorageObserver(IComponentContext c)
         {
             // will include any registered storage event observers, if there are any, as fixed subscriptions
-            return new CloudStorageInstrumentationSubject(c.Resolve<IEnumerable<IObserver<ICloudStorageEvent>>>().ToArray());
+            return new StorageObserverSubject(c.Resolve<IEnumerable<IObserver<IStorageEvent>>>().ToArray());
         }
     }
 }

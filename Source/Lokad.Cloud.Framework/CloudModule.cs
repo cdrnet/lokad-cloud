@@ -28,7 +28,6 @@ namespace Lokad.Cloud
             builder.RegisterModule(new Management.ManagementModule());
 
             builder.RegisterType<Jobs.JobManager>();
-            builder.RegisterType<ServiceFabric.RuntimeFinalizer>().As<IRuntimeFinalizer>().InstancePerLifetimeScope();
         }
     }
 }

@@ -27,10 +27,6 @@ namespace Lokad.Cloud.Runtime
         /// <summary>Abstracts the Table Storage.</summary>
         public ITableStorageProvider TableStorage { get; private set; }
 
-        /// <summary>Abstracts the finalizer (used for fast resource release
-        /// in case of runtime shutdown).</summary>
-        public IRuntimeFinalizer RuntimeFinalizer { get; private set; }
-
         public ILog Log { get; private set; }
 
         /// <summary>IoC constructor.</summary>
@@ -38,13 +34,11 @@ namespace Lokad.Cloud.Runtime
             IBlobStorageProvider blobStorage,
             IQueueStorageProvider queueStorage,
             ITableStorageProvider tableStorage,
-            IRuntimeFinalizer runtimeFinalizer,
             ILog log)
         {
             BlobStorage = blobStorage;
             QueueStorage = queueStorage;
             TableStorage = tableStorage;
-            RuntimeFinalizer = runtimeFinalizer;
             Log = log;
         }
     }

@@ -12,8 +12,6 @@ namespace Lokad.Cloud.Console.WebRole.Helpers
     {
         public static string PrettyFormat(this TimeSpan timeSpan)
         {
-            // TODO: Reuse Lokad.Shared FormatUtil, once it supports this scenario (implemented but currently internal)
-
             const int second = 1;
             const int minute = 60 * second;
             const int hour = 60 * minute;

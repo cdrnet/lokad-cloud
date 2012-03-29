@@ -115,21 +115,6 @@ namespace Lokad.Cloud.ServiceFabric
             }
         }
 
-        public override void Initialize()
-        {
-            base.Initialize();
-
-            // Auto-register the service for finalization:
-            // 1) Registration should not be made within the constructor
-            //    because providers are not ready at this phase.
-            // 2) Hasty finalization is needed only for cloud-scoped scheduled
-            //    scheduled services (because they have a lease).
-            if (!_scheduledPerWorker)
-            {
-                Providers.RuntimeFinalizer.Register(this);
-            }
-        }
-
         /// <seealso cref="CloudService.StartImpl"/>
         protected sealed override ServiceExecutionFeedback StartImpl()
         {

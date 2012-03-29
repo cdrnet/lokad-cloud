@@ -9,7 +9,7 @@ namespace Lokad.Cloud.ServiceFabric
 {
     /// <summary>High-priority runtime finalizer. Attempts to finalize key cloud resources
     /// when the runtime is forcibly shut down.</summary>
-    public class RuntimeFinalizer : IRuntimeFinalizer
+    public class RuntimeFinalizer
     {
         /// <summary>Locking object used to ensure the thread safety of instance.</summary>
         readonly object _sync;

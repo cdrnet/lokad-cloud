@@ -20,7 +20,6 @@ namespace Lokad.Cloud.ServiceFabric.Runtime
     internal class Runtime
     {
         readonly RuntimeProviders _runtimeProviders;
-        readonly IRuntimeFinalizer _runtimeFinalizer;
         readonly ILog _log;
         readonly ICloudRuntimeObserver _observer;
 
@@ -31,7 +30,6 @@ namespace Lokad.Cloud.ServiceFabric.Runtime
 
         volatile bool _isStopRequested;
         Scheduler _scheduler;
-        IRuntimeFinalizer _applicationFinalizer;
 
         /// <summary>Container used to populate cloud service properties.</summary>
         public IContainer RuntimeContainer { get; set; }
@@ -40,7 +38,6 @@ namespace Lokad.Cloud.ServiceFabric.Runtime
         public Runtime(RuntimeProviders runtimeProviders, ICloudConfigurationSettings settings, ICloudRuntimeObserver observer = null)
         {
             _runtimeProviders = runtimeProviders;
-            _runtimeFinalizer = runtimeProviders.RuntimeFinalizer;
             _log = runtimeProviders.Log;
             _observer = observer;
 
@@ -57,15 +54,13 @@ namespace Lokad.Cloud.ServiceFabric.Runtime
             _executeThread = Thread.CurrentThread;
 
             IContainer applicationContainer = null;
+            List<CloudService> services = null;
             try
             {
-                List<CloudService> services;
-
                 // note: we need to keep the container alive until the finally block
                 // because the finalizer (of the container) is called there.
                 applicationContainer = LoadAndBuildApplication(out services);
 
-                _applicationFinalizer = applicationContainer.ResolveOptional<IRuntimeFinalizer>();
                 _scheduler = new Scheduler(services, service => service.Start(), _observer);
 
                 foreach (var action in _scheduler.Schedule())
@@ -109,14 +104,12 @@ namespace Lokad.Cloud.ServiceFabric.Runtime
             {
                 _log.DebugFormat("Runtime: stopping on worker {0}.", CloudEnvironment.PartitionKey);
 
-                if (_runtimeFinalizer != null)
+                if (services != null)
                 {
-                    _runtimeFinalizer.FinalizeRuntime();
-                }
-
-                if (_applicationFinalizer != null)
-                {
-                    _applicationFinalizer.FinalizeRuntime();
+                    foreach (var disposable in services.OfType<IDisposable>())
+                    {
+                        disposable.Dispose();
+                    }
                 }
 
                 if (applicationContainer != null)

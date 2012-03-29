@@ -79,28 +79,35 @@ namespace Lokad.Cloud.ServiceFabric
         /// <summary>Do not try to override this method, use <see cref="Start"/> instead.</summary>
         protected sealed override ServiceExecutionFeedback StartImpl()
         {
-            if (_resilientDequeue)
+            try
             {
-                using(var message = QueueStorage.GetResilient<T>(_queueName, _resilientAfter, _maxProcessingTrials))
+                if (_resilientDequeue)
                 {
-                    if (message == null)
+                    using (var message = QueueStorage.GetResilient<T>(_queueName, _resilientAfter, _maxProcessingTrials))
                     {
-                        return ServiceExecutionFeedback.Skipped;
+                        if (message == null)
+                        {
+                            return ServiceExecutionFeedback.Skipped;
+                        }
+
+                        ProcessMessage(message.Message);
+                        return ServiceExecutionFeedback.WorkAvailable;
                     }
-
-                    ProcessMessage(message.Message);
-                    return ServiceExecutionFeedback.WorkAvailable;
                 }
-            }
 
-            var messages = QueueStorage.Get<T>(_queueName, 1, _visibilityTimeout, _maxProcessingTrials).ToList();
-            if (messages.Count == 0)
+                var messages = QueueStorage.Get<T>(_queueName, 1, _visibilityTimeout, _maxProcessingTrials).ToList();
+                if (messages.Count == 0)
+                {
+                    return ServiceExecutionFeedback.Skipped;
+                }
+
+                ProcessMessage(messages[0]);
+                return ServiceExecutionFeedback.WorkAvailable;
+            }
+            finally
             {
-                return ServiceExecutionFeedback.Skipped;
+                QueueStorage.AbandonAll();
             }
-
-            ProcessMessage(messages[0]);
-            return ServiceExecutionFeedback.WorkAvailable;
         }
 
         private void ProcessMessage(T message)

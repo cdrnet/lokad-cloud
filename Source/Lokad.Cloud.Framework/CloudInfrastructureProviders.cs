@@ -28,7 +28,7 @@ namespace Lokad.Cloud
             CloudStorageProviders storageProviders,
             IProvisioningProvider provisioning,
             ILog log)
-            : base(storageProviders)
+            : base(storageProviders.BlobStorage, storageProviders.QueueStorage, storageProviders.TableStorage)
         {
             Provisioning = provisioning;
             Log = log;
