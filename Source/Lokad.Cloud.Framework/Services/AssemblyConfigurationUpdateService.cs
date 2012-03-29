@@ -3,9 +3,9 @@
 // URL: http://www.lokad.com/
 #endregion
 
-using Lokad.Cloud.Runtime;
 using Lokad.Cloud.ServiceFabric;
 using Lokad.Cloud.ServiceFabric.Runtime;
+using Lokad.Cloud.Storage;
 
 namespace Lokad.Cloud.Services
 {
@@ -22,13 +22,13 @@ namespace Lokad.Cloud.Services
     {
         readonly AssemblyLoader _assemblyLoader;
 
-        public AssemblyConfigurationUpdateService(RuntimeProviders runtimeProviders)
+        public AssemblyConfigurationUpdateService(IBlobStorageProvider storage)
         {
             // NOTE: we can't use the BlobStorage as provided by the base class
             // as this is not available at constructur time, but we want to reset
             // the status as soon as possible to avoid missing any changes
 
-            _assemblyLoader = new AssemblyLoader(runtimeProviders);
+            _assemblyLoader = new AssemblyLoader(storage);
             _assemblyLoader.ResetUpdateStatus();
         }
 

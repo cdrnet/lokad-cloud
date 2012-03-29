@@ -8,7 +8,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Lokad.Cloud.Diagnostics;
 using Lokad.Cloud.Jobs;
-using Lokad.Cloud.Runtime;
 using Lokad.Cloud.Shared.Threading;
 using Lokad.Cloud.Storage;
 
@@ -95,22 +94,24 @@ namespace Lokad.Cloud.ServiceFabric
             get { return GetType().FullName; }
         }
 
+        protected readonly IDataSerializer _runtimeSerializer;
+
+        /// <summary>Providers used by the cloud service to access the storage.</summary>
+        public CloudStorageProviders StorageProviders { get; set; }
+
         /// <summary>Providers used by the cloud service to access the storage.</summary>
         public CloudInfrastructureProviders Providers { get; set; }
 
-        public RuntimeProviders RuntimeProviders { get; set; }
-
-        // Short-hands are only provided for the most frequently used providers.
-        // (ex: IRuntimeFinalizer is typically NOT a frequently used provider)
+        // Short-hands are only provided for the most frequently used providers:
 
         /// <summary>Short-hand for <c>Providers.BlobStorage</c>.</summary>
-        public IBlobStorageProvider BlobStorage { get { return Providers.BlobStorage; } }
+        public IBlobStorageProvider BlobStorage { get { return StorageProviders.BlobStorage; } }
 
         /// <summary>Short-hand for <c>Providers.QueueStorage</c>.</summary>
-        public IQueueStorageProvider QueueStorage { get { return Providers.QueueStorage; } }
+        public IQueueStorageProvider QueueStorage { get { return StorageProviders.QueueStorage; } }
 
         /// <summary>Short-hand for <c>Providers.TableStorage</c>.</summary>
-        public ITableStorageProvider TableStorage { get { return Providers.TableStorage; } }
+        public ITableStorageProvider TableStorage { get { return StorageProviders.TableStorage; } }
 
         /// <summary>Short-hand for <c>Providers.Log</c>.</summary>
         public ILog Log { get { return Providers.Log; } }
@@ -122,6 +123,8 @@ namespace Lokad.Cloud.ServiceFabric
         /// </summary>
         protected CloudService()
         {
+            _runtimeSerializer = new CloudFormatter();
+
             // default setting
             _defaultState = CloudServiceState.Started;
             _state = _defaultState;
@@ -168,13 +171,13 @@ namespace Lokad.Cloud.ServiceFabric
             {
                 var stateBlobName = new CloudServiceStateName(Name);
 
-                var state = RuntimeProviders.BlobStorage.GetBlob(stateBlobName);
+                var state = BlobStorage.GetBlob(stateBlobName, _runtimeSerializer);
 
                 // no state can be retrieved, update blob storage
                 if(!state.HasValue)
                 {
                     state = _defaultState;
-                    RuntimeProviders.BlobStorage.PutBlob(stateBlobName, state.Value);
+                    BlobStorage.PutBlob(stateBlobName, state.Value, _runtimeSerializer);
                 }
 
                 _state = state.Value;

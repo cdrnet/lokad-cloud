@@ -4,11 +4,11 @@
 #endregion
 
 using System.Web.Mvc;
-
 using Lokad.Cloud.Console.WebRole.Behavior;
 using Lokad.Cloud.Console.WebRole.Controllers.ObjectModel;
 using Lokad.Cloud.Console.WebRole.Framework.Discovery;
 using Lokad.Cloud.Console.WebRole.Framework.Services;
+using Lokad.Cloud.Storage;
 
 namespace Lokad.Cloud.Console.WebRole.Controllers
 {
@@ -26,7 +26,7 @@ namespace Lokad.Cloud.Console.WebRole.Controllers
         public override ActionResult ByHostedService(string hostedServiceName)
         {
             InitializeDeploymentTenant(hostedServiceName);
-            var provider = new AppDefinitionWithLiveDataProvider(Providers);
+            var provider = new AppDefinitionWithLiveDataProvider(Storage);
             return View(provider.QueryQueues());
         }
 
@@ -34,7 +34,7 @@ namespace Lokad.Cloud.Console.WebRole.Controllers
         public EmptyResult Queue(string hostedServiceName, string id)
         {
             InitializeDeploymentTenant(hostedServiceName);
-            Providers.QueueStorage.DeleteQueue(id);
+            Storage.QueueStorage.DeleteQueue(id);
             return null;
         }
 
@@ -42,7 +42,7 @@ namespace Lokad.Cloud.Console.WebRole.Controllers
         public EmptyResult QuarantinedMessage(string hostedServiceName, string id)
         {
             InitializeDeploymentTenant(hostedServiceName);
-            Providers.QueueStorage.DeletePersisted(FailingMessagesStoreName, id);
+            Storage.QueueStorage.DeletePersisted(FailingMessagesStoreName, id, new CloudFormatter());
             return null;
         }
 
@@ -50,7 +50,7 @@ namespace Lokad.Cloud.Console.WebRole.Controllers
         public EmptyResult RestoreQuarantinedMessage(string hostedServiceName, string id)
         {
             InitializeDeploymentTenant(hostedServiceName);
-            Providers.QueueStorage.RestorePersisted(FailingMessagesStoreName, id);
+            Storage.QueueStorage.RestorePersisted(FailingMessagesStoreName, id);
             return null;
         }
     }

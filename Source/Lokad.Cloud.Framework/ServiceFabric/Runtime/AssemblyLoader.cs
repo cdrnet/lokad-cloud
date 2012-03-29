@@ -4,9 +4,7 @@
 #endregion
 
 using System;
-
 using Lokad.Cloud.Application;
-using Lokad.Cloud.Runtime;
 using Lokad.Cloud.Storage;
 
 namespace Lokad.Cloud.ServiceFabric.Runtime
@@ -33,7 +31,8 @@ namespace Lokad.Cloud.ServiceFabric.Runtime
             get { return TimeSpan.FromMinutes(1); }
         }
 
-        readonly IBlobStorageProvider _provider;
+        readonly IBlobStorageProvider _blobs;
+        readonly IDataSerializer _runtimeSerializer;
 
         /// <summary>Etag of the assembly package. This property is set when
         /// assemblies are loaded. It can be used to monitor the availability of
@@ -45,9 +44,10 @@ namespace Lokad.Cloud.ServiceFabric.Runtime
         DateTimeOffset _lastPackageCheck;
 
         /// <summary>Build a new package loader.</summary>
-        public AssemblyLoader(RuntimeProviders runtimeProviders)
+        public AssemblyLoader(IBlobStorageProvider storage)
         {
-            _provider = runtimeProviders.BlobStorage;
+            _blobs = storage;
+            _runtimeSerializer = new CloudFormatter();
         }
 
         /// <summary>Loads the assembly package.</summary>
@@ -55,7 +55,7 @@ namespace Lokad.Cloud.ServiceFabric.Runtime
         /// afterward.</remarks>
         public void LoadPackage()
         {
-            var buffer = _provider.GetBlob<byte[]>(ContainerName, PackageBlobName, out _lastPackageEtag);
+            var buffer = _blobs.GetBlob<byte[]>(ContainerName, PackageBlobName, out _lastPackageEtag, _runtimeSerializer);
             _lastPackageCheck = DateTimeOffset.UtcNow;
 
             // if no assemblies have been loaded yet, just skip the loading
@@ -72,7 +72,7 @@ namespace Lokad.Cloud.ServiceFabric.Runtime
 
         public Maybe<byte[]> LoadConfiguration()
         {
-            return _provider.GetBlob<byte[]>(ContainerName, ConfigurationBlobName, out _lastConfigurationEtag);
+            return _blobs.GetBlob<byte[]>(ContainerName, ConfigurationBlobName, out _lastConfigurationEtag, _runtimeSerializer);
         }
 
         /// <summary>
@@ -81,8 +81,8 @@ namespace Lokad.Cloud.ServiceFabric.Runtime
         /// </summary>
         public void ResetUpdateStatus()
         {
-            _lastPackageEtag = _provider.GetBlobEtag(ContainerName, PackageBlobName);
-            _lastConfigurationEtag = _provider.GetBlobEtag(ContainerName, ConfigurationBlobName);
+            _lastPackageEtag = _blobs.GetBlobEtag(ContainerName, PackageBlobName);
+            _lastConfigurationEtag = _blobs.GetBlobEtag(ContainerName, ConfigurationBlobName);
             _lastPackageCheck = DateTimeOffset.UtcNow;
         }
 
@@ -102,8 +102,8 @@ namespace Lokad.Cloud.ServiceFabric.Runtime
                 return;
             }
 
-            var newPackageEtag = _provider.GetBlobEtag(ContainerName, PackageBlobName);
-            var newConfigurationEtag = _provider.GetBlobEtag(ContainerName, ConfigurationBlobName);
+            var newPackageEtag = _blobs.GetBlobEtag(ContainerName, PackageBlobName);
+            var newConfigurationEtag = _blobs.GetBlobEtag(ContainerName, ConfigurationBlobName);
 
             if (!string.Equals(_lastPackageEtag, newPackageEtag))
             {

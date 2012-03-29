@@ -5,7 +5,6 @@
 
 using System;
 using System.Text;
-using Lokad.Cloud.Runtime;
 using Lokad.Cloud.ServiceFabric.Runtime;
 using Lokad.Cloud.Storage;
 
@@ -16,15 +15,17 @@ namespace Lokad.Cloud.Management
     /// </summary>
     public class CloudConfiguration
     {
-        readonly IBlobStorageProvider _blobProvider;
+        readonly IBlobStorageProvider _blobs;
+        readonly IDataSerializer _runtimeSerializer;
         readonly UTF8Encoding _encoding = new UTF8Encoding();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CloudConfiguration"/> class.
         /// </summary>
-        public CloudConfiguration(RuntimeProviders runtimeProviders)
+        public CloudConfiguration(IBlobStorageProvider storage)
         {
-            _blobProvider = runtimeProviders.BlobStorage;
+            _blobs = storage;
+            _runtimeSerializer = new CloudFormatter();
         }
 
         /// <summary>
@@ -32,9 +33,10 @@ namespace Lokad.Cloud.Management
         /// </summary>
         public string GetConfigurationString()
         {
-            var buffer = _blobProvider.GetBlob<byte[]>(
+            var buffer = _blobs.GetBlob<byte[]>(
                 AssemblyLoader.ContainerName,
-                AssemblyLoader.ConfigurationBlobName);
+                AssemblyLoader.ConfigurationBlobName,
+                _runtimeSerializer);
 
             return buffer.Convert(bytes => _encoding.GetString(bytes), String.Empty);
         }
@@ -57,10 +59,11 @@ namespace Lokad.Cloud.Management
                 return;
             }
 
-            _blobProvider.PutBlob(
+            _blobs.PutBlob(
                 AssemblyLoader.ContainerName,
                 AssemblyLoader.ConfigurationBlobName,
-                _encoding.GetBytes(configuration));
+                _encoding.GetBytes(configuration),
+                _runtimeSerializer);
         }
 
         /// <summary>
@@ -68,7 +71,7 @@ namespace Lokad.Cloud.Management
         /// </summary>
         public void RemoveConfiguration()
         {
-            _blobProvider.DeleteBlobIfExist(
+            _blobs.DeleteBlobIfExist(
                 AssemblyLoader.ContainerName,
                 AssemblyLoader.ConfigurationBlobName);
         }

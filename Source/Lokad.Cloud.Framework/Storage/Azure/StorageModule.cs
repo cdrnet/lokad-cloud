@@ -10,7 +10,6 @@ using System.Net;
 using Autofac;
 using Lokad.Cloud.Diagnostics;
 using Lokad.Cloud.Management;
-using Lokad.Cloud.Runtime;
 using Lokad.Cloud.Storage.Instrumentation;
 using Microsoft.WindowsAzure;
 
@@ -30,7 +29,6 @@ namespace Lokad.Cloud.Storage.Azure
             builder.Register(QueueStorageProvider).OnRelease(queues => queues.AbandonAll());
             builder.Register(TableStorageProvider);
 
-            builder.Register(RuntimeProviders).OnRelease(storage => storage.QueueStorage.AbandonAll());
             builder.Register(CloudStorageProviders).OnRelease(storage => storage.QueueStorage.AbandonAll());
             builder.Register(CloudInfrastructureProviders);
 
@@ -54,14 +52,6 @@ namespace Lokad.Cloud.Storage.Azure
                 return account;
             }
             throw new InvalidOperationException("Failed to get valid connection string");
-        }
-
-        static RuntimeProviders RuntimeProviders(IComponentContext c)
-        {
-            return CloudStorage
-                .ForAzureAccount(c.Resolve<CloudStorageAccount>())
-                .WithObserver(c.Resolve<IStorageObserver>())
-                .BuildRuntimeProviders(c.ResolveOptional<ILog>());
         }
 
         static CloudInfrastructureProviders CloudInfrastructureProviders(IComponentContext c)

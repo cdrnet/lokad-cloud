@@ -8,8 +8,8 @@ using System.IO;
 using System.Linq;
 using Autofac;
 using Lokad.Cloud.Management;
-using Lokad.Cloud.Runtime;
 using Lokad.Cloud.ServiceFabric.Runtime;
+using Lokad.Cloud.Storage;
 using NUnit.Framework;
 
 namespace Lokad.Cloud.Test.ServiceFabric
@@ -34,13 +34,12 @@ namespace Lokad.Cloud.Test.ServiceFabric
                 dllFile.Read(buffer, 0, buffer.Length);
             }
 
-            var runtimeProviders = GlobalSetup.Container.Resolve<RuntimeProviders>();
-            runtimeProviders.BlobStorage.CreateContainerIfNotExist(AssemblyLoader.ContainerName);
+            var storage = GlobalSetup.Container.Resolve<CloudStorageProviders>();
 
             // put the sample assembly
-            runtimeProviders.BlobStorage.PutBlob(AssemblyLoader.ContainerName, AssemblyLoader.PackageBlobName, buffer);
+            storage.BlobStorage.PutBlob(AssemblyLoader.ContainerName, AssemblyLoader.PackageBlobName, buffer);
 
-            var loader = new AssemblyLoader(runtimeProviders);
+            var loader = new AssemblyLoader(storage.BlobStorage);
             loader.LoadPackage();
             loader.LoadConfiguration();
 
@@ -49,7 +48,7 @@ namespace Lokad.Cloud.Test.ServiceFabric
             Assert.That(assemblies.Any(a => a.FullName.StartsWith("sample")));
 
             // validate using management class
-            var cloudAssemblies = new CloudAssemblies(runtimeProviders);
+            var cloudAssemblies = new CloudAssemblies(storage.BlobStorage);
             Assert.That(cloudAssemblies.GetApplicationDefinition().Value.Assemblies.Any(a => a.AssemblyName.StartsWith("sample")));
 
             // no update, checking

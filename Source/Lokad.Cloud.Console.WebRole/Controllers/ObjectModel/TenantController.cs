@@ -6,7 +6,6 @@
 using System.Linq;
 using System.Web.Mvc;
 using Lokad.Cloud.Console.WebRole.Framework.Discovery;
-using Lokad.Cloud.Runtime;
 using Lokad.Cloud.Storage;
 
 namespace Lokad.Cloud.Console.WebRole.Controllers.ObjectModel
@@ -14,7 +13,7 @@ namespace Lokad.Cloud.Console.WebRole.Controllers.ObjectModel
     public abstract class TenantController : ApplicationController
     {
         protected LokadCloudHostedService HostedService { get; private set; }
-        protected RuntimeProviders Providers { get; private set; }
+        protected CloudStorageProviders Storage { get; private set; }
 
         protected TenantController(AzureDiscoveryInfo discoveryInfo) : base(discoveryInfo)
         {
@@ -27,9 +26,9 @@ namespace Lokad.Cloud.Console.WebRole.Controllers.ObjectModel
             var services = DiscoveryInfo.LokadCloudDeployments;
             HostedService = services.Single(d => d.ServiceName == hostedServiceName);
 
-            Providers = CloudStorage
+            Storage = CloudStorage
                 .ForAzureAccount(HostedService.StorageAccount)
-                .BuildRuntimeProviders();
+                .BuildStorageProviders();
         }
 
         public abstract ActionResult ByHostedService(string hostedServiceName);

@@ -8,14 +8,12 @@ using System.Linq;
 using System.Text;
 using System.Web;
 using System.Xml;
-
 using Lokad.Cloud.Application;
 using Lokad.Cloud.Console.WebRole.Helpers;
 using Lokad.Cloud.Console.WebRole.Models.Queues;
 using Lokad.Cloud.Console.WebRole.Models.Services;
 using Lokad.Cloud.Management;
 using Lokad.Cloud.Management.Api10;
-using Lokad.Cloud.Runtime;
 using Lokad.Cloud.Storage;
 
 namespace Lokad.Cloud.Console.WebRole.Framework.Services
@@ -23,19 +21,19 @@ namespace Lokad.Cloud.Console.WebRole.Framework.Services
     public class AppDefinitionWithLiveDataProvider
     {
         const string FailingMessagesStoreName = "failing-messages";
-        private readonly RuntimeProviders _runtimeProviders;
+        readonly CloudStorageProviders _storage;
 
-        public AppDefinitionWithLiveDataProvider(RuntimeProviders runtimeProviders)
+        public AppDefinitionWithLiveDataProvider(CloudStorageProviders storage)
         {
-            _runtimeProviders = runtimeProviders;
+            _storage = storage;
         }
 
         public ServicesModel QueryServices()
         {
-            var serviceManager = new CloudServices(_runtimeProviders);
+            var serviceManager = new CloudServices(_storage.BlobStorage);
             var services = serviceManager.GetServices();
 
-            var inspector = new CloudApplicationInspector(_runtimeProviders);
+            var inspector = new CloudApplicationInspector(_storage.BlobStorage);
             var applicationDefinition = inspector.Inspect();
 
             if (!applicationDefinition.HasValue)
@@ -74,12 +72,13 @@ namespace Lokad.Cloud.Console.WebRole.Framework.Services
 
         public QueuesModel QueryQueues()
         {
-            var queueStorage = _runtimeProviders.QueueStorage;
-            var inspector = new CloudApplicationInspector(_runtimeProviders);
+            var queueStorage = _storage.QueueStorage;
+            var inspector = new CloudApplicationInspector(_storage.BlobStorage);
             var applicationDefinition = inspector.Inspect();
+            var runtimeSerializer = new CloudFormatter();
 
             var failingMessages = queueStorage.ListPersisted(FailingMessagesStoreName)
-                .Select(key => queueStorage.GetPersisted(FailingMessagesStoreName, key))
+                .Select(key => queueStorage.GetPersisted(FailingMessagesStoreName, key, runtimeSerializer))
                 .Where(m => m.HasValue)
                 .Select(m => m.Value)
                 .OrderByDescending(m => m.PersistenceTime)

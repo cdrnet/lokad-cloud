@@ -124,13 +124,13 @@ namespace Lokad.Cloud.ServiceFabric
 
             if (_scheduledPerWorker)
             {
-                var blobState = RuntimeProviders.BlobStorage.GetBlob(stateReference);
+                var blobState = BlobStorage.GetBlob(stateReference, _runtimeSerializer);
                 if (!blobState.HasValue)
                 {
                     // even though we will never change it from here, a state blob 
                     // still needs to exist so it can be configured by the console
                     var newState = GetDefaultState();
-                    RuntimeProviders.BlobStorage.PutBlob(stateReference, newState);
+                    BlobStorage.PutBlob(stateReference, newState, _runtimeSerializer);
                     blobState = newState;
                 }
 
@@ -154,7 +154,7 @@ namespace Lokad.Cloud.ServiceFabric
             // it simply means that another worker is already on its ways
             // to execute the service.
 
-            var resultIfChanged = RuntimeProviders.BlobStorage.UpsertBlobOrSkip(
+            var resultIfChanged = BlobStorage.UpsertBlobOrSkip(
                 stateReference,
                 () =>
                     {
@@ -191,7 +191,8 @@ namespace Lokad.Cloud.ServiceFabric
                         state.LastExecuted = now;
                         state.Lease = CreateLease(now);
                         return state;
-                    });
+                    },
+                _runtimeSerializer);
 
             // 3. IF WE SHOULD NOT EXECUTE NOW, SKIP
 
@@ -228,7 +229,7 @@ namespace Lokad.Cloud.ServiceFabric
             // a lease has been forcefully removed from the console and another service
             // has taken a lease in the meantime.
 
-            RuntimeProviders.BlobStorage.UpdateBlobIfExistOrSkip(
+            BlobStorage.UpdateBlobIfExistOrSkip(
                 new ScheduledServiceStateName(Name),
                 state =>
                     {
@@ -241,7 +242,8 @@ namespace Lokad.Cloud.ServiceFabric
                         // remove lease
                         state.Lease = null;
                         return state;
-                    });
+                    },
+                _runtimeSerializer);
         }
 
         /// <summary>Don't call this method. Disposing the scheduled service

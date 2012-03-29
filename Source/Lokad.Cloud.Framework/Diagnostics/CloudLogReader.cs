@@ -17,11 +17,13 @@ namespace Lokad.Cloud.Diagnostics
         private const string ContainerNamePrefix = "lokad-cloud-logs";
         private const int DeleteBatchSize = 50;
 
-        private readonly IBlobStorageProvider _blobStorage;
+        readonly IBlobStorageProvider _blobs;
+        readonly IDataSerializer _runtimeSerializer;
 
-        public CloudLogReader(IBlobStorageProvider blobStorage)
+        public CloudLogReader(IBlobStorageProvider storage)
         {
-            _blobStorage = blobStorage;
+            _blobs = storage;
+            _runtimeSerializer = new CloudFormatter();
         }
 
         /// <summary>
@@ -29,8 +31,8 @@ namespace Lokad.Cloud.Diagnostics
         /// </summary>
         public IEnumerable<CloudLogEntry> GetLogsOfLevel(LogLevel level, int skip = 0)
         {
-            return _blobStorage
-                .ListBlobs<string>(LevelToContainer(level), skip: skip)
+            return _blobs
+                .ListBlobs<string>(LevelToContainer(level), skip: skip, serializer: _runtimeSerializer)
                 .Select(ParseLogEntry);
         }
 
@@ -48,7 +50,7 @@ namespace Lokad.Cloud.Diagnostics
                 .Select(level =>
                     {
                         var containerName = LevelToContainer(level);
-                        return _blobStorage.ListBlobNames(containerName, string.Empty)
+                        return _blobs.ListBlobNames(containerName, string.Empty)
                             .Select(blobName => Tuple.Create(containerName, blobName))
                             .GetEnumerator();
                     })
@@ -76,7 +78,7 @@ namespace Lokad.Cloud.Diagnostics
             while (enumerators.Count > 0)
             {
                 var max = enumerators.Aggregate((left, right) => String.CompareOrdinal(left.Current.Item2, right.Current.Item2) < 0 ? left : right);
-                var blob = _blobStorage.GetBlob<string>(max.Current.Item1, max.Current.Item2);
+                var blob = _blobs.GetBlob<string>(max.Current.Item1, max.Current.Item2, _runtimeSerializer);
                 if (blob.HasValue)
                 {
                     yield return ParseLogEntry(blob.Value);
@@ -104,7 +106,7 @@ namespace Lokad.Cloud.Diagnostics
             foreach (var level in Enum.GetValues(typeof(LogLevel)).OfType<LogLevel>()
                 .Where(l => l < LogLevel.Max && l > LogLevel.Min))
             {
-                _blobStorage.DeleteContainerIfExist(LevelToContainer(level));
+                _blobs.DeleteContainerIfExist(LevelToContainer(level));
             }
         }
 
@@ -136,7 +138,7 @@ namespace Lokad.Cloud.Diagnostics
             {
                 deleteQueue.Clear();
 
-                foreach (var blobName in _blobStorage.ListBlobNames(blobContainer, string.Empty))
+                foreach (var blobName in _blobs.ListBlobNames(blobContainer, string.Empty))
                 {
                     var dateTime = ParseDateTimeFromName(blobName);
                     if (dateTime < olderThanUtc) deleteQueue.Add(blobName);
@@ -146,7 +148,7 @@ namespace Lokad.Cloud.Diagnostics
 
                 foreach (var blobName in deleteQueue)
                 {
-                    _blobStorage.DeleteBlobIfExist(blobContainer, blobName);
+                    _blobs.DeleteBlobIfExist(blobContainer, blobName);
                 }
 
             } while (deleteQueue.Count > 0);

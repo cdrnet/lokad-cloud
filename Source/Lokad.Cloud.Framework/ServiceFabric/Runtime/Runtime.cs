@@ -12,14 +12,14 @@ using Autofac;
 using Autofac.Configuration;
 using Lokad.Cloud.Diagnostics;
 using Lokad.Cloud.Instrumentation;
-using Lokad.Cloud.Runtime;
+using Lokad.Cloud.Storage;
 
 namespace Lokad.Cloud.ServiceFabric.Runtime
 {
     /// <summary>Organize the executions of the services.</summary>
     internal class Runtime
     {
-        readonly RuntimeProviders _runtimeProviders;
+        readonly CloudStorageProviders _storage;
         readonly ILog _log;
         readonly ICloudRuntimeObserver _observer;
 
@@ -35,10 +35,10 @@ namespace Lokad.Cloud.ServiceFabric.Runtime
         public IContainer RuntimeContainer { get; set; }
 
         /// <summary>IoC constructor.</summary>
-        public Runtime(RuntimeProviders runtimeProviders, ICloudConfigurationSettings settings, ICloudRuntimeObserver observer = null)
+        public Runtime(CloudStorageProviders storage, ICloudConfigurationSettings settings, ILog log, ICloudRuntimeObserver observer = null)
         {
-            _runtimeProviders = runtimeProviders;
-            _log = runtimeProviders.Log;
+            _storage = storage;
+            _log = log;
             _observer = observer;
 
             _settings = settings;
@@ -164,7 +164,7 @@ namespace Lokad.Cloud.ServiceFabric.Runtime
             applicationBuilder.RegisterInstance(_settings);
 
             // Load Application Assemblies into the AppDomain
-            var loader = new AssemblyLoader(_runtimeProviders);
+            var loader = new AssemblyLoader(_storage.BlobStorage);
             loader.LoadPackage();
 
             // Load Application IoC Configuration and apply it to the builder

@@ -150,14 +150,12 @@
     <Compile Include="Management\IProvisioningProvider.cs" />
     <Compile Include="Mock\MemoryProvisioning.cs" />
     <Compile Include="RoleConfigurationSettings.cs" />
-    <Compile Include="Runtime\CloudStorageExtensions.cs" />
     <Compile Include="Runtime\RuntimeProviders.cs" />
     <Compile Include="ServiceFabric\CloudService.cs" />
     <Compile Include="ServiceFabric\CloudServiceSettingsAttribute.cs" />
     <Compile Include="ServiceFabric\IInitializable.cs" />
     <Compile Include="ServiceFabric\QueueService.cs" />
     <Compile Include="ServiceFabric\QueueServiceSettingsAttribute.cs" />
-    <Compile Include="ServiceFabric\RuntimeFinalizer.cs" />
     <Compile Include="ServiceFabric\Runtime\Runtime.cs" />
     <Compile Include="ServiceFabric\Runtime\ServiceFabricHost.cs" />
     <Compile Include="ServiceFabric\Runtime\SingleRuntimeHost.cs" />
