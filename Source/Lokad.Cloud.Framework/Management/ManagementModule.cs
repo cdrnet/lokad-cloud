@@ -9,7 +9,6 @@ using System.Linq;
 using Autofac;
 using Lokad.Cloud.Diagnostics;
 using Lokad.Cloud.Provisioning.Instrumentation;
-using Lokad.Cloud.Provisioning.Instrumentation.Events;
 
 namespace Lokad.Cloud.Management
 {
@@ -31,14 +30,14 @@ namespace Lokad.Cloud.Management
 
             // Provisioning Observer Subject
             builder.Register(ProvisioningObserver)
-                .As<ICloudProvisioningObserver, IObservable<ICloudProvisioningEvent>>()
+                .As<IProvisioningObserver, IObservable<IProvisioningEvent>>()
                 .SingleInstance();
         }
 
-        static CloudProvisioningInstrumentationSubject ProvisioningObserver(IComponentContext c)
+        static ProvisioningObserverSubject ProvisioningObserver(IComponentContext c)
         {
             // will include any registered storage event observers, if there are any, as fixed subscriptions
-            return new CloudProvisioningInstrumentationSubject(c.Resolve<IEnumerable<IObserver<ICloudProvisioningEvent>>>().ToArray());
+            return new ProvisioningObserverSubject(c.Resolve<IEnumerable<IObserver<IProvisioningEvent>>>().ToArray());
         }
     }
 }

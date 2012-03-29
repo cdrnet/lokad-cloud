@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
+using Lokad.Cloud.Provisioning.Instrumentation;
 using Lokad.Cloud.Provisioning.Instrumentation.Events;
 
 namespace Lokad.Cloud.Diagnostics
@@ -15,11 +16,11 @@ namespace Lokad.Cloud.Diagnostics
 
     internal class CloudProvisioningLogger : Autofac.IStartable, IDisposable
     {
-        private readonly IObservable<ICloudProvisioningEvent> _observable;
+        private readonly IObservable<IProvisioningEvent> _observable;
         private readonly ILog _log;
         private readonly List<IDisposable> _subscriptions;
 
-        public CloudProvisioningLogger(IObservable<ICloudProvisioningEvent> observable, ILog log)
+        public CloudProvisioningLogger(IObservable<IProvisioningEvent> observable, ILog log)
         {
             _observable = observable;
             _log = log;

@@ -24,7 +24,7 @@ namespace Lokad.Cloud.Management
         private readonly AzureProvisioning _provisioning;
 
         /// <summary>IoC constructor.</summary>
-        public CloudProvisioning(ICloudConfigurationSettings settings, ILog log, ICloudProvisioningObserver provisioningObserver = null)
+        public CloudProvisioning(ICloudConfigurationSettings settings, ILog log, IProvisioningObserver provisioningObserver = null)
         {
             _log = log;
 

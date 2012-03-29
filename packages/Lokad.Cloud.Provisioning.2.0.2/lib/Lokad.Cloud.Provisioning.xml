@@ -4,9 +4,9 @@
         <name>Lokad.Cloud.Provisioning</name>
     </assembly>
     <members>
-        <member name="T:GlobalAssemblyInfo">
+        <member name="T:Lokad.Cloud.Provisioning.Instrumentation.IProvisioningEvent">
             <summary>
-             Assembly information class that is shared between all projects
+            Provisioning System Event (Instrumentation)
             </summary>
         </member>
         <member name="T:Lokad.Cloud.Provisioning.Internal.AzureXml">
@@ -25,7 +25,7 @@
             Azure management api retry policies for corner-situation and server errors.
             </summary>
         </member>
-        <member name="M:Lokad.Cloud.Provisioning.Internal.RetryPolicies.#ctor(Lokad.Cloud.Provisioning.Instrumentation.ICloudProvisioningObserver)">
+        <member name="M:Lokad.Cloud.Provisioning.Internal.RetryPolicies.#ctor(Lokad.Cloud.Provisioning.Instrumentation.IProvisioningObserver)">
             <param name="observer">Can be <see langword="null"/>.</param>
         </member>
         <member name="T:Lokad.Cloud.Provisioning.Internal.ServiceConfigXml">
@@ -61,14 +61,14 @@
             </para>
             </summary>
         </member>
-        <member name="T:Lokad.Cloud.Provisioning.Instrumentation.CloudProvisioningInstrumentationSubject">
+        <member name="T:Lokad.Cloud.Provisioning.Instrumentation.ProvisioningObserverSubject">
             <summary>
             Cloud storage observer that implements a hot Rx Observable, forwarding all events synchronously
             (similar to Rx's FastSubject). Use this class if you want an easy way to observe Lokad.Cloud.Provisioning
             using Rx. Alternatively you can implement your own storage observer instead, or not use any observers at all.
             </summary>
         </member>
-        <member name="M:Lokad.Cloud.Provisioning.Instrumentation.CloudProvisioningInstrumentationSubject.#ctor(System.IObserver{Lokad.Cloud.Provisioning.Instrumentation.Events.ICloudProvisioningEvent}[])">
+        <member name="M:Lokad.Cloud.Provisioning.Instrumentation.ProvisioningObserverSubject.#ctor(System.IObserver{Lokad.Cloud.Provisioning.Instrumentation.IProvisioningEvent}[])">
             <param name="fixedObservers">Optional externally managed fixed observers, will neither be completed nor disposed by this class.</param>
         </member>
     </members>
