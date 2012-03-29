@@ -20,9 +20,7 @@ namespace Lokad.Cloud.Test.Services
         public void SquareServiceTest()
         {
             var storage = CloudStorage.ForInMemoryStorage().BuildStorageProviders();
-            var legacyProviders = new CloudInfrastructureProviders(storage, new MemoryProvisioning(), NullLog.Instance);
-            
-            var service = new SquareQueueService { StorageProviders = storage, Providers = legacyProviders };
+            var service = new SquareQueueService { Storage = storage, Log = NullLog.Instance, Provisioning = new MemoryProvisioning() };
 
             const string containerName = "mockcontainer";
 
@@ -78,15 +76,13 @@ namespace Lokad.Cloud.Test.Services
 
             protected override void Start(SquareMessage message)
             {
-                var blobStorage = Providers.BlobStorage;
-
                 if (message.IsStart)
                 {
                     var counterName = TemporaryBlobName<decimal>.GetNew(message.Expiration);
-                    var counter = new BlobCounter(blobStorage, counterName);
+                    var counter = new BlobCounter(Blobs, counterName);
                     counter.Reset(BlobCounter.Aleph);
 
-                    var blobNames = blobStorage.ListBlobNames(message.ContainerName).ToList();
+                    var blobNames = Blobs.ListBlobNames(message.ContainerName).ToList();
                     
                     foreach (var blobName in blobNames)
                     {
@@ -108,10 +104,10 @@ namespace Lokad.Cloud.Test.Services
                 }
                 else
                 {
-                    var value = blobStorage.GetBlob<double>(message.ContainerName, message.BlobName).Value;
-                    blobStorage.PutBlob(message.ContainerName, message.BlobName, value * value);
+                    var value = Blobs.GetBlob<double>(message.ContainerName, message.BlobName).Value;
+                    Blobs.PutBlob(message.ContainerName, message.BlobName, value * value);
 
-                    var counter = new BlobCounter(Providers.BlobStorage, message.BlobCounter);
+                    var counter = new BlobCounter(Blobs, message.BlobCounter);
                     if (0m >= counter.Increment(-1))
                     {
                         Finish(counter);

@@ -166,7 +166,6 @@
     <Compile Include="ServiceFabric\SynchronizationLeaseState.cs" />
     <Compile Include="ServiceFabric\Runtime\AssemblyLoader.cs" />
     <Compile Include="ServiceFabric\Runtime\NoRestartFloodPolicy.cs" />
-    <Compile Include="CloudInfrastructureProviders.cs" />
     <Compile Include="Diagnostics\DiagnosticsModule.cs" />
     <Compile Include="Management\CloudAssemblies.cs" />
     <Compile Include="Management\CloudConfiguration.cs" />

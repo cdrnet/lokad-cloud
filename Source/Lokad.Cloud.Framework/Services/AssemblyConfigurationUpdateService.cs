@@ -24,7 +24,7 @@ namespace Lokad.Cloud.Services
 
         public AssemblyConfigurationUpdateService(IBlobStorageProvider storage)
         {
-            // NOTE: we can't use the BlobStorage as provided by the base class
+            // NOTE: we can't use the Blobs as provided by the base class
             // as this is not available at constructur time, but we want to reset
             // the status as soon as possible to avoid missing any changes
 
