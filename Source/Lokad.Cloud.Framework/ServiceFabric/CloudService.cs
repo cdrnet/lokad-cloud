@@ -208,19 +208,19 @@ namespace Lokad.Cloud.ServiceFabric
         /// <summary>Put a message into the queue implicitly associated to the type <c>T</c>.</summary>
         public void Put<T>(T message)
         {
-            PutRange(new[]{message});
+            Queues.Put(TypeMapper.GetStorageName(typeof(T)), message);
         }
 
         /// <summary>Put a message into the queue identified by <c>queueName</c>.</summary>
         public void Put<T>(T message, string queueName)
         {
-            PutRange(new[] { message }, queueName);
+            Queues.Put(queueName, message);
         }
 
         /// <summary>Put messages into the queue implicitly associated to the type <c>T</c>.</summary>
         public void PutRange<T>(IEnumerable<T> messages)
         {
-            PutRange(messages, TypeMapper.GetStorageName(typeof(T)));
+            Queues.PutRange(TypeMapper.GetStorageName(typeof(T)), messages);
         }
 
         /// <summary>Put messages into the queue identified by <c>queueName</c>.</summary>
@@ -229,34 +229,64 @@ namespace Lokad.Cloud.ServiceFabric
             Queues.PutRange(queueName, messages);
         }
 
+        /// <summary>Put a message with delay into the queue implicitly associated to the type <c>T</c>.</summary>
+        public void PutWithDelay<T>(T message, TimeSpan delay)
+        {
+            Queues.Put(TypeMapper.GetStorageName(typeof(T)), message, delay: delay);
+        }
+
+        /// <summary>Put a message with delay into the queue identified by <c>queueName</c>.</summary>
+        public void PutWithDelay<T>(T message, TimeSpan delay, string queueName)
+        {
+            Queues.Put(queueName, message, delay: delay);
+        }
+
+        /// <summary>Put messages with delay into the queue implicitly associated to the type <c>T</c>.</summary>
+        public void PutRangeWithDelay<T>(IEnumerable<T> messages, TimeSpan delay)
+        {
+            Queues.PutRange(TypeMapper.GetStorageName(typeof(T)), messages, delay: delay);
+        }
+
+        /// <summary>Put messages with delay into the queue identified by <c>queueName</c></summary>
+        /// <remarks>This method acts as a delayed put operation, the message not being put
+        /// before the <c>triggerTime</c> is reached.</remarks>
+        public void PutRangeWithDelay<T>(IEnumerable<T> messages, TimeSpan delay, string queueName)
+        {
+            Queues.PutRange(queueName, messages, delay: delay);
+        }
+
         /// <summary>Put a message into the queue implicitly associated to the type <c>T</c> at the
         /// time specified by the <c>triggerTime</c>.</summary>
+        [Obsolete("Use the TimeSpan overload instead.")]
         public void PutWithDelay<T>(T message, DateTimeOffset triggerTime)
         {
-            new DelayedQueue(Blobs).PutWithDelay(message, triggerTime);
+            Queues.Put(TypeMapper.GetStorageName(typeof(T)), message, delay: triggerTime - DateTimeOffset.Now);
         }
 
         /// <summary>Put a message into the queue identified by <c>queueName</c> at the
         /// time specified by the <c>triggerTime</c>.</summary>
+        [Obsolete("Use the TimeSpan overload instead.")]
         public void PutWithDelay<T>(T message, DateTimeOffset triggerTime, string queueName)
         {
-            new DelayedQueue(Blobs).PutWithDelay(message, triggerTime, queueName);
+            Queues.Put(queueName, message, delay: triggerTime - DateTimeOffset.Now);
         }
 
         /// <summary>Put messages into the queue implicitly associated to the type <c>T</c> at the
         /// time specified by the <c>triggerTime</c>.</summary>
+        [Obsolete("Use the TimeSpan overload instead.")]
         public void PutRangeWithDelay<T>(IEnumerable<T> messages, DateTimeOffset triggerTime)
         {
-            new DelayedQueue(Blobs).PutRangeWithDelay(messages, triggerTime);
+            Queues.PutRange(TypeMapper.GetStorageName(typeof(T)), messages, delay: triggerTime - DateTimeOffset.Now);
         }
 
         /// <summary>Put messages into the queue identified by <c>queueName</c> at the
         /// time specified by the <c>triggerTime</c>.</summary>
         /// <remarks>This method acts as a delayed put operation, the message not being put
         /// before the <c>triggerTime</c> is reached.</remarks>
+        [Obsolete("Use the TimeSpan overload instead.")]
         public void PutRangeWithDelay<T>(IEnumerable<T> messages, DateTimeOffset triggerTime, string queueName)
         {
-            new DelayedQueue(Blobs).PutRangeWithDelay(messages, triggerTime, queueName);
+            Queues.PutRange(queueName, messages, delay: triggerTime - DateTimeOffset.Now);
         }
     }
 }

@@ -186,7 +186,6 @@
     <Compile Include="Shared\Threading\WaitFor.cs" />
     <Compile Include="Storage\Azure\StorageModule.cs" />
     <Compile Include="Storage\BlobCounter.cs" />
-    <Compile Include="Storage\DelayedQueue.cs" />
     <Compile Include="Storage\StorageCredentialsVerifier.cs" />
     <Compile Include="TypeMapperProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
