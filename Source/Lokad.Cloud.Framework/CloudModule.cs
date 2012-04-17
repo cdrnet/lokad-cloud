@@ -24,6 +24,8 @@ namespace Lokad.Cloud
     {
         protected override void Load(ContainerBuilder builder)
         {
+            builder.RegisterType<EnvironmentAdapter>().As<IEnvironment>();
+
             builder.RegisterModule(new Storage.Azure.StorageModule());
             builder.RegisterModule(new Diagnostics.DiagnosticsModule());
             builder.RegisterModule(new Management.ManagementModule());

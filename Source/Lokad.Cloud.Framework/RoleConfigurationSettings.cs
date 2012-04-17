@@ -4,7 +4,6 @@
 #endregion
 
 using System;
-using Lokad.Cloud.Storage;
 
 namespace Lokad.Cloud
 {
@@ -14,25 +13,6 @@ namespace Lokad.Cloud
         public string DataConnectionString { get; set; }
         public string SelfManagementSubscriptionId { get; set; }
         public string SelfManagementCertificateThumbprint { get; set; }
-
-        public static Maybe<ICloudConfigurationSettings> LoadFromRoleEnvironment()
-        {
-            if (!CloudEnvironment.IsAvailable)
-            {
-                return Maybe<ICloudConfigurationSettings>.Empty;
-            }
-
-            var setting = new RoleConfigurationSettings();
-            ApplySettingFromRole("DataConnectionString", v => setting.DataConnectionString = v);
-            ApplySettingFromRole("SelfManagementSubscriptionId", v => setting.SelfManagementSubscriptionId = v);
-            ApplySettingFromRole("SelfManagementCertificateThumbprint", v => setting.SelfManagementCertificateThumbprint = v);
-            return setting;
-        }
-
-        static void ApplySettingFromRole(string setting, Action<string> setter)
-        {
-            CloudEnvironment.GetConfigurationSetting(setting).Apply(setter);
-        }
     }
 
     /// <summary>

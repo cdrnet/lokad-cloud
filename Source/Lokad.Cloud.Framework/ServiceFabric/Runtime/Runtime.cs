@@ -20,6 +20,7 @@ namespace Lokad.Cloud.ServiceFabric.Runtime
     internal class Runtime
     {
         readonly CloudStorageProviders _storage;
+        readonly IEnvironment _environment;
         readonly ILog _log;
         readonly ICloudRuntimeObserver _observer;
 
@@ -35,9 +36,10 @@ namespace Lokad.Cloud.ServiceFabric.Runtime
         public IContainer RuntimeContainer { get; set; }
 
         /// <summary>IoC constructor.</summary>
-        public Runtime(CloudStorageProviders storage, ICloudConfigurationSettings settings, ILog log, ICloudRuntimeObserver observer = null)
+        public Runtime(CloudStorageProviders storage, IEnvironment environment, ICloudConfigurationSettings settings, ILog log, ICloudRuntimeObserver observer = null)
         {
             _storage = storage;
+            _environment = environment;
             _log = log;
             _observer = observer;
 
@@ -48,7 +50,7 @@ namespace Lokad.Cloud.ServiceFabric.Runtime
         /// until stop is requested, or an uncaught exception is thrown.</summary>
         public void Execute()
         {
-            _log.TryDebugFormat("Runtime: started on worker {0}.", CloudEnvironment.PartitionKey);
+            _log.TryDebugFormat("Runtime: started on worker {0}.", _environment.Host.WorkerName);
 
             // hook on the current thread to force shut down
             _executeThread = Thread.CurrentThread;
@@ -76,19 +78,19 @@ namespace Lokad.Cloud.ServiceFabric.Runtime
             catch (ThreadInterruptedException)
             {
                 _log.TryWarnFormat("Runtime: execution was interrupted on worker {0} in service {1}. The Runtime will be restarted.",
-                    CloudEnvironment.PartitionKey, GetNameOfServiceInExecution());
+                    _environment.Host.WorkerName, GetNameOfServiceInExecution());
             }
             catch (ThreadAbortException)
             {
                 Thread.ResetAbort();
 
                 _log.TryDebugFormat("Runtime: execution was aborted on worker {0} in service {1}. The Runtime is stopping.",
-                    CloudEnvironment.PartitionKey, GetNameOfServiceInExecution());
+                    _environment.Host.WorkerName, GetNameOfServiceInExecution());
             }
             catch (TimeoutException)
             {
                 _log.TryWarnFormat("Runtime: execution timed out on worker {0} in service {1}. The Runtime will be restarted.",
-                    CloudEnvironment.PartitionKey, GetNameOfServiceInExecution());
+                    _environment.Host.WorkerName, GetNameOfServiceInExecution());
             }
             catch (TriggerRestartException)
             {
@@ -98,11 +100,11 @@ namespace Lokad.Cloud.ServiceFabric.Runtime
             catch (Exception ex)
             {
                 _log.TryErrorFormat(ex, "Runtime: An unhandled {0} exception occurred on worker {1} in service {2}. The Runtime will be restarted.",
-                    ex.GetType().Name, CloudEnvironment.PartitionKey, GetNameOfServiceInExecution());
+                    ex.GetType().Name, _environment.Host.WorkerName, GetNameOfServiceInExecution());
             }
             finally
             {
-                _log.TryDebugFormat("Runtime: stopping on worker {0}.", CloudEnvironment.PartitionKey);
+                _log.TryDebugFormat("Runtime: stopping on worker {0}.", _environment.Host.WorkerName);
 
                 if (services != null)
                 {
@@ -117,7 +119,7 @@ namespace Lokad.Cloud.ServiceFabric.Runtime
                     applicationContainer.Dispose();
                 }
 
-                _log.TryDebugFormat("Runtime: stopped on worker {0}.", CloudEnvironment.PartitionKey);
+                _log.TryDebugFormat("Runtime: stopped on worker {0}.", _environment.Host.WorkerName);
             }
         }
 
@@ -140,7 +142,7 @@ namespace Lokad.Cloud.ServiceFabric.Runtime
         public void Stop()
         {
             _isStopRequested = true;
-            _log.TryDebugFormat("Runtime: Stop() on worker {0}.", CloudEnvironment.PartitionKey);
+            _log.TryDebugFormat("Runtime: Stop() on worker {0}.", _environment.Host.WorkerName);
 
             if (_executeThread != null)
             {
@@ -176,7 +178,7 @@ namespace Lokad.Cloud.ServiceFabric.Runtime
                 const string fileName = "lokad.cloud.clientapp.config";
                 const string resourceName = "LokadCloudStorage";
 
-                var pathToFile = Path.Combine(CloudEnvironment.GetLocalStoragePath(resourceName), fileName);
+                var pathToFile = Path.Combine(_environment.GetLocalResourcePath(resourceName), fileName);
                 File.WriteAllBytes(pathToFile, config.Value);
                 applicationBuilder.RegisterModule(new ConfigurationSettingsReader("autofac", pathToFile));
             }

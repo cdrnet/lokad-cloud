@@ -24,14 +24,14 @@ namespace Lokad.Cloud.Management
         private readonly AzureProvisioning _provisioning;
 
         /// <summary>IoC constructor.</summary>
-        public CloudProvisioning(ICloudConfigurationSettings settings, ILog log, IProvisioningObserver provisioningObserver = null)
+        public CloudProvisioning(IEnvironment environment, ICloudConfigurationSettings settings, ILog log, IProvisioningObserver provisioningObserver = null)
         {
             _log = log;
 
             // try get settings and certificate
             if (!CloudEnvironment.IsAvailable)
             {
-                _log.TryWarnFormat("Provisioning: RoleEnvironment not available on worker {0}.", CloudEnvironment.PartitionKey);
+                _log.TryWarnFormat("Provisioning: RoleEnvironment not available on worker {0}.", environment.Host.WorkerName);
                 return;
             }
 
@@ -39,7 +39,7 @@ namespace Lokad.Cloud.Management
             Maybe<X509Certificate2> certificate = Maybe<X509Certificate2>.Empty;
             if (!String.IsNullOrWhiteSpace(settings.SelfManagementCertificateThumbprint))
             {
-                certificate = CloudEnvironment.GetCertificate(settings.SelfManagementCertificateThumbprint);
+                certificate = environment.GetCertificate(settings.SelfManagementCertificateThumbprint);
             }
 
             // early evaluate management status for intrinsic fault states, to skip further processing

@@ -99,6 +99,7 @@ namespace Lokad.Cloud.ServiceFabric
 
         /// <summary>Providers used by the cloud service to access the storage.</summary>
         public CloudStorageProviders Storage { get; set; }
+        public IEnvironment Environment { get; set; }
 
         public ILog Log { get; set; }
         public IProvisioningProvider Provisioning { get; set; }
@@ -145,6 +146,10 @@ namespace Lokad.Cloud.ServiceFabric
 
         public virtual void Initialize()
         {
+            if (Environment == null)
+            {
+                Environment = new EnvironmentAdapter();
+            }
         }
 
         /// <summary>

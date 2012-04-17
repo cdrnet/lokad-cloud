@@ -95,7 +95,7 @@ namespace Lokad.Cloud.ServiceFabric
         {
             // runtime fixed settings
             _leaseTimeout = ExecutionTimeout + TimeSpan.FromMinutes(5);
-            _workerKey = CloudEnvironment.PartitionKey;
+            _workerKey = Environment.Host.WorkerName;
 
             // default setting
             _scheduledPerWorker = false;

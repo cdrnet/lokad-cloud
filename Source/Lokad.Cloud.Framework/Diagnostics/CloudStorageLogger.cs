@@ -15,12 +15,14 @@ namespace Lokad.Cloud.Diagnostics
 
     internal class CloudStorageLogger : Autofac.IStartable, IDisposable
     {
+        private readonly IEnvironment _environment;
         private readonly IObservable<IStorageEvent> _observable;
         private readonly ILog _log;
         private readonly List<IDisposable> _subscriptions;
 
-        public CloudStorageLogger(IObservable<IStorageEvent> observable, ILog log)
+        public CloudStorageLogger(IEnvironment environment, IObservable<IStorageEvent> observable, ILog log)
         {
+            _environment = environment;
             _observable = observable;
             _log = log;
             _subscriptions = new List<IDisposable>();
@@ -47,7 +49,7 @@ namespace Lokad.Cloud.Diagnostics
                         _log.TryDebugFormat(e.Exception,"Storage: Retried on policy {0}{1} on {2}.{3}",
                             e.Policy,
                             e.Exception != null ? " because of " + e.Exception.GetType().Name : string.Empty,
-                            CloudEnvironment.PartitionKey,
+                            _environment.Host.WorkerName,
                             @event.DroppedItems > 0 ? string.Format(" There have been {0} similar events in the last 15 minutes.", @event.DroppedItems) : string.Empty);
                     }));
         }

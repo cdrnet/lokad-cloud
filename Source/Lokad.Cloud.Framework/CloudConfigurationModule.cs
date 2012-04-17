@@ -33,46 +33,26 @@ namespace Lokad.Cloud
         {
         }
 
-        public CloudConfigurationModule(ICloudConfigurationSettings externalSettings)
-        {
-            ApplySettings(externalSettings);
-        }
-
-        protected override void Load(ContainerBuilder builder)
-        {
-            if (string.IsNullOrEmpty(DataConnectionString))
-            {
-                var config = RoleConfigurationSettings.LoadFromRoleEnvironment();
-                if (config.HasValue)
-                {
-                    ApplySettings(config.Value);
-                }
-            }
-
-            // Only register storage components if the storage credentials are OK
-            // This will cause exceptions to be thrown quite soon, but this way
-            // the roles' OnStart() method returns correctly, allowing the web role
-            // to display a warning to the user (the worker is recycled indefinitely
-            // as Run() throws almost immediately)
-
-            if (string.IsNullOrEmpty(DataConnectionString))
-            {
-                return;
-            }
-
-            builder.RegisterInstance(new RoleConfigurationSettings
-                {
-                    DataConnectionString = DataConnectionString,
-                    SelfManagementSubscriptionId = SelfManagementSubscriptionId,
-                    SelfManagementCertificateThumbprint = SelfManagementCertificateThumbprint
-                }).As<ICloudConfigurationSettings>();
-        }
-
-        void ApplySettings(ICloudConfigurationSettings settings)
+        public CloudConfigurationModule(ICloudConfigurationSettings settings)
         {
             DataConnectionString = settings.DataConnectionString;
             SelfManagementSubscriptionId = settings.SelfManagementSubscriptionId;
             SelfManagementCertificateThumbprint = settings.SelfManagementCertificateThumbprint;
+        }
+
+        protected override void Load(ContainerBuilder builder)
+        {
+            builder.Register(c => MergeWithEnvironment(c.Resolve<IEnvironment>())).As<ICloudConfigurationSettings>();
+        }
+
+        RoleConfigurationSettings MergeWithEnvironment(IEnvironment environment)
+        {
+            return new RoleConfigurationSettings
+                {
+                    DataConnectionString = DataConnectionString ?? environment.GetSettingValue("DataConnectionString"),
+                    SelfManagementSubscriptionId = SelfManagementSubscriptionId ?? environment.GetSettingValue("SelfManagementSubscriptionId"),
+                    SelfManagementCertificateThumbprint = SelfManagementCertificateThumbprint ?? environment.GetSettingValue("SelfManagementCertificateThumbprint")
+                };
         }
     }
 }

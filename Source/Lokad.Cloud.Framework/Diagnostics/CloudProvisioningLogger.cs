@@ -16,12 +16,14 @@ namespace Lokad.Cloud.Diagnostics
 
     internal class CloudProvisioningLogger : Autofac.IStartable, IDisposable
     {
+        private readonly IEnvironment _environment;
         private readonly IObservable<IProvisioningEvent> _observable;
         private readonly ILog _log;
         private readonly List<IDisposable> _subscriptions;
 
-        public CloudProvisioningLogger(IObservable<IProvisioningEvent> observable, ILog log)
+        public CloudProvisioningLogger(IEnvironment environment, IObservable<IProvisioningEvent> observable, ILog log)
         {
+            _environment = environment;
             _observable = observable;
             _log = log;
             _subscriptions = new List<IDisposable>();
@@ -41,7 +43,7 @@ namespace Lokad.Cloud.Diagnostics
                         foreach (var group in events.GroupBy(e => e.Policy))
                         {
                             _log.TryDebugFormat("Provisioning: {0} retries in 5 min for the {1} policy on {2}. {3}",
-                                group.Count(), group.Key, CloudEnvironment.PartitionKey,
+                                group.Count(), group.Key, _environment.Host.WorkerName,
                                 string.Join(", ", group.Where(e => e.Exception != null).Select(e => e.Exception.GetType().Name).Distinct().ToArray()));
                         }
                     }));

@@ -23,7 +23,8 @@ namespace Lokad.Cloud.Management
             // will not be available. That's ok, since in this case Provisioning is not
             // available anyway and there's no need to make Provisioning resolveable.
             builder.Register(c => new CloudProvisioning(
-                    c.Resolve<ICloudConfigurationSettings>(), 
+                    c.Resolve<IEnvironment>(),
+                    c.Resolve<ICloudConfigurationSettings>(),
                     c.Resolve<ILog>()))
                 .As<IProvisioningProvider>()
                 .SingleInstance();

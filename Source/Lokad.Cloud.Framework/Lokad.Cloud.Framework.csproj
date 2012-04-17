@@ -141,6 +141,8 @@
     <Compile Include="Diagnostics\LogEntryBuilder.cs" />
     <Compile Include="Diagnostics\TockenBucketThrottling.cs" />
     <Compile Include="Diagnostics\XmlExtension.cs" />
+    <Compile Include="EnvironmentAdapter.cs" />
+    <Compile Include="IEnvironment.cs" />
     <Compile Include="Instrumentation\CloudRuntimeInstrumentationSubject.cs" />
     <Compile Include="Instrumentation\Events\CloudRuntimeBusyEvent.cs" />
     <Compile Include="Instrumentation\Events\ICloudRuntimeEvent.cs" />
