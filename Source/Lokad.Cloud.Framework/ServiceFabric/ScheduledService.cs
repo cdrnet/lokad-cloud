@@ -82,12 +82,12 @@ namespace Lokad.Cloud.ServiceFabric
         internal const string ScheduleStateContainer = "lokad-cloud-schedule-state";
 
         readonly bool _scheduledPerWorker;
-        readonly string _workerKey;
         readonly TimeSpan _leaseTimeout;
         readonly TimeSpan _defaultTriggerPeriod;
 
         DateTimeOffset _workerScopeLastExecuted;
 
+        string _workerKey;
         bool _isLeaseOwner;
 
         /// <summary>Default Constructor</summary>
@@ -95,7 +95,6 @@ namespace Lokad.Cloud.ServiceFabric
         {
             // runtime fixed settings
             _leaseTimeout = ExecutionTimeout + TimeSpan.FromMinutes(5);
-            _workerKey = Environment.Host.WorkerName;
 
             // default setting
             _scheduledPerWorker = false;
@@ -113,6 +112,13 @@ namespace Lokad.Cloud.ServiceFabric
                     _defaultTriggerPeriod = TimeSpan.FromSeconds(settings.TriggerInterval);
                 }
             }
+        }
+
+        public override void Initialize()
+        {
+            base.Initialize();
+
+            _workerKey = Environment.Host.WorkerName;
         }
 
         /// <seealso cref="CloudService.StartImpl"/>
