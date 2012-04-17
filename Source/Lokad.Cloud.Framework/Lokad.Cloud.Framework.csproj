@@ -153,6 +153,7 @@
     <Compile Include="Management\CloudProvisioning.cs" />
     <Compile Include="Management\IProvisioningProvider.cs" />
     <Compile Include="Mock\MemoryProvisioning.cs" />
+    <Compile Include="Mock\MockEnvironment.cs" />
     <Compile Include="RoleConfigurationSettings.cs" />
     <Compile Include="Runtime\RuntimeProviders.cs" />
     <Compile Include="ServiceFabric\CloudService.cs" />
