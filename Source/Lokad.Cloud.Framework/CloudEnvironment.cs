@@ -19,6 +19,7 @@ namespace Lokad.Cloud
     /// Providing functionality of Azure <see cref="RoleEnvironment"/>,
     /// but more neutral and resilient to missing runtime.
     /// </remarks>
+    [Obsolete("Use IEnvironment instead. Will be removed in the next release.")]
     public static class CloudEnvironment
     {
         static bool _runtimeAvailable;

@@ -4,7 +4,11 @@
 #endregion
 
 using Autofac;
+using Lokad.Cloud.Diagnostics;
+using Lokad.Cloud.Management;
+using Lokad.Cloud.Provisioning.Instrumentation;
 using Lokad.Cloud.Storage;
+using Lokad.Cloud.Storage.Azure;
 
 namespace Lokad.Cloud
 {
@@ -24,11 +28,16 @@ namespace Lokad.Cloud
     {
         protected override void Load(ContainerBuilder builder)
         {
-            builder.RegisterType<EnvironmentAdapter>().As<IEnvironment>();
+            builder.RegisterModule(new StorageModule());
+            builder.RegisterModule(new DiagnosticsModule());
+            builder.RegisterModule(new ManagementModule());
 
-            builder.RegisterModule(new Storage.Azure.StorageModule());
-            builder.RegisterModule(new Diagnostics.DiagnosticsModule());
-            builder.RegisterModule(new Management.ManagementModule());
+            builder.Register(
+                c => new EnvironmentAdapter(
+                    c.Resolve<ICloudConfigurationSettings>(),
+                    c.Resolve<ILog>(),
+                    c.ResolveOptional<IProvisioningObserver>()))
+                .As<IEnvironment>().SingleInstance();
 
             builder.RegisterType<Jobs.JobManager>();
         }

@@ -42,17 +42,14 @@ namespace Lokad.Cloud
 
         protected override void Load(ContainerBuilder builder)
         {
-            builder.Register(c => MergeWithEnvironment(c.Resolve<IEnvironment>())).As<ICloudConfigurationSettings>();
-        }
-
-        RoleConfigurationSettings MergeWithEnvironment(IEnvironment environment)
-        {
-            return new RoleConfigurationSettings
-                {
-                    DataConnectionString = DataConnectionString ?? environment.GetSettingValue("DataConnectionString"),
-                    SelfManagementSubscriptionId = SelfManagementSubscriptionId ?? environment.GetSettingValue("SelfManagementSubscriptionId"),
-                    SelfManagementCertificateThumbprint = SelfManagementCertificateThumbprint ?? environment.GetSettingValue("SelfManagementCertificateThumbprint")
-                };
+            builder.RegisterInstance(
+                new RoleConfigurationSettings
+                    {
+                        DataConnectionString = DataConnectionString,
+                        SelfManagementSubscriptionId = SelfManagementSubscriptionId,
+                        SelfManagementCertificateThumbprint = SelfManagementCertificateThumbprint
+                    })
+                .As<ICloudConfigurationSettings>();
         }
     }
 }

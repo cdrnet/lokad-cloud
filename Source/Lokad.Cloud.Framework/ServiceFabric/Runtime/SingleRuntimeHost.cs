@@ -10,6 +10,7 @@ using System.Security;
 using System.Threading;
 using Autofac;
 using Lokad.Cloud.Diagnostics;
+using Microsoft.WindowsAzure.ServiceRuntime;
 
 namespace Lokad.Cloud.ServiceFabric.Runtime
 {
@@ -28,12 +29,11 @@ namespace Lokad.Cloud.ServiceFabric.Runtime
         /// <returns>True if the worker stopped as planned (e.g. due to updated assemblies)</returns>
         public bool Run()
         {
-            IEnvironment environment = new EnvironmentAdapter();
             var settings = new RoleConfigurationSettings
                 {
-                    DataConnectionString = environment.GetSettingValue("DataConnectionString"),
-                    SelfManagementSubscriptionId = environment.GetSettingValue("SelfManagementSubscriptionId"),
-                    SelfManagementCertificateThumbprint = environment.GetSettingValue("SelfManagementCertificateThumbprint")
+                    DataConnectionString = RoleEnvironment.GetConfigurationSettingValue("DataConnectionString"),
+                    SelfManagementSubscriptionId = RoleEnvironment.GetConfigurationSettingValue("SelfManagementSubscriptionId"),
+                    SelfManagementCertificateThumbprint = RoleEnvironment.GetConfigurationSettingValue("SelfManagementCertificateThumbprint")
                 };
 
             // The trick is to load this same assembly in another domain, then

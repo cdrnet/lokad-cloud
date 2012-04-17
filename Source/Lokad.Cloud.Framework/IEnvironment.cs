@@ -5,7 +5,6 @@
 
 using System.Net;
 using System.Security.Cryptography.X509Certificates;
-using Microsoft.WindowsAzure.ServiceRuntime;
 
 namespace Lokad.Cloud
 {
@@ -13,20 +12,14 @@ namespace Lokad.Cloud
     {
         HostInfo Host { get; }
 
-        ///<summary>
-        /// Retreives the configuration setting from the <see cref="RoleEnvironment"/>.
-        ///</summary>
-        ///<param name="settingName">Name of the configuration setting</param>
         string GetSettingValue(string settingName);
-
         X509Certificate2 GetCertificate(string thumbprint);
-
-        /// <summary>
-        /// Retrieves the root path of a named local resource.
-        /// </summary>
         string GetLocalResourcePath(string resourceName);
-
         IPEndPoint GetEndpoint(string endpointName);
+
+        int CurrentWorkerInstanceCount { get; }
+        void ProvisionWorkerInstances(int numberOfInstances);
+        void ProvisionWorkerInstancesAtLeast(int minNumberOfInstances);
     }
 
     public class HostInfo

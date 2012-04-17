@@ -124,13 +124,13 @@ namespace Lokad.Cloud.ServiceFabric
 
             if (_scheduledPerWorker)
             {
-                var blobState = Blobs.GetBlob(stateReference, _runtimeSerializer);
+                var blobState = Blobs.GetBlob(stateReference, RuntimeSerializer);
                 if (!blobState.HasValue)
                 {
                     // even though we will never change it from here, a state blob 
                     // still needs to exist so it can be configured by the console
                     var newState = GetDefaultState();
-                    Blobs.PutBlob(stateReference, newState, _runtimeSerializer);
+                    Blobs.PutBlob(stateReference, newState, RuntimeSerializer);
                     blobState = newState;
                 }
 
@@ -192,7 +192,7 @@ namespace Lokad.Cloud.ServiceFabric
                         state.Lease = CreateLease(now);
                         return state;
                     },
-                _runtimeSerializer);
+                RuntimeSerializer);
 
             // 3. IF WE SHOULD NOT EXECUTE NOW, SKIP
 
@@ -243,7 +243,7 @@ namespace Lokad.Cloud.ServiceFabric
                         state.Lease = null;
                         return state;
                     },
-                _runtimeSerializer);
+                RuntimeSerializer);
         }
 
         /// <summary>Should be called when the environment is forcibly shut down.</summary>

@@ -16,6 +16,7 @@ using Lokad.Cloud.Storage;
 namespace Lokad.Cloud.Management
 {
     /// <summary>Azure Management API Provider, Provisioning Provider.</summary>
+    [Obsolete("Use IEnvironment instead. Will be removed in the next release.")]
     public class CloudProvisioning : IProvisioningProvider
     {
         private readonly ILog _log;

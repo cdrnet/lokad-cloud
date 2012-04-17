@@ -61,12 +61,7 @@ namespace Lokad.Cloud.ServiceFabric
     /// <see cref="QueueService{T}"/> or <see cref="ScheduledService"/> instead.</remarks>
     public abstract class CloudService : IInitializable
     {
-        /// <summary>Name of the container associated to temporary items. Each blob
-        /// is prefixed with his lifetime expiration date.</summary>
-        internal const string TemporaryContainer = "lokad-cloud-temporary";
-
         internal const string ServiceStateContainer = "lokad-cloud-services-state";
-        internal const string DelayedMessageContainer = "lokad-cloud-messages";
 
         /// <summary>Timeout set at 1h58.</summary>
         /// <remarks>The timeout provided by Windows Azure for message consumption
@@ -95,13 +90,15 @@ namespace Lokad.Cloud.ServiceFabric
             get { return GetType().FullName; }
         }
 
-        protected readonly IDataSerializer _runtimeSerializer;
+        protected readonly IDataSerializer RuntimeSerializer;
 
         /// <summary>Providers used by the cloud service to access the storage.</summary>
         public CloudStorageProviders Storage { get; set; }
         public IEnvironment Environment { get; set; }
 
         public ILog Log { get; set; }
+
+        [Obsolete("Use Environment instead. Will be removed in the next release.")]
         public IProvisioningProvider Provisioning { get; set; }
         public JobManager Jobs { get; set; }
 
@@ -121,7 +118,7 @@ namespace Lokad.Cloud.ServiceFabric
         /// </summary>
         protected CloudService()
         {
-            _runtimeSerializer = new CloudFormatter();
+            RuntimeSerializer = new CloudFormatter();
 
             // default setting
             _defaultState = CloudServiceState.Started;
@@ -146,10 +143,6 @@ namespace Lokad.Cloud.ServiceFabric
 
         public virtual void Initialize()
         {
-            if (Environment == null)
-            {
-                Environment = new EnvironmentAdapter();
-            }
         }
 
         /// <summary>
@@ -173,13 +166,13 @@ namespace Lokad.Cloud.ServiceFabric
             {
                 var stateBlobName = new CloudServiceStateName(Name);
 
-                var state = Blobs.GetBlob(stateBlobName, _runtimeSerializer);
+                var state = Blobs.GetBlob(stateBlobName, RuntimeSerializer);
 
                 // no state can be retrieved, update blob storage
                 if(!state.HasValue)
                 {
                     state = _defaultState;
-                    Blobs.PutBlob(stateBlobName, state.Value, _runtimeSerializer);
+                    Blobs.PutBlob(stateBlobName, state.Value, RuntimeSerializer);
                 }
 
                 _state = state.Value;
