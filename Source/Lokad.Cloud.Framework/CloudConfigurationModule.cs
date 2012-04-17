@@ -4,7 +4,7 @@
 #endregion
 
 using Autofac;
-using Autofac.Builder;
+using Lokad.Cloud.Storage;
 
 namespace Lokad.Cloud
 {
@@ -14,10 +14,10 @@ namespace Lokad.Cloud
     /// </summary>
     /// <remarks>
     /// When only using the storage (O/C mapping) toolkit standalone it is easier
-    /// to let the <see cref="Standalone"/> factory create the storage providers on demand.
+    /// to let the <see cref="CloudStorage"/> factory create the storage providers on demand.
     /// </remarks>
     /// <seealso cref="CloudModule"/>
-    /// <seealso cref="Standalone"/>
+    /// <seealso cref="CloudStorage"/>
     public sealed class CloudConfigurationModule : Module
     {
         /// <summary>Azure storage connection string.</summary>

@@ -123,6 +123,7 @@
     <Compile Include="..\VersionAssemblyInfo.cs">
       <Link>Properties\VersionAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="Annotations.cs" />
     <Compile Include="Application\AssemblyResolver.cs" />
     <Compile Include="Application\CloudApplicationAssemblyInfo.cs" />
     <Compile Include="Application\CloudApplicationInspector.cs" />
@@ -137,6 +138,7 @@
     <Compile Include="Diagnostics\CloudStorageLogger.cs" />
     <Compile Include="Diagnostics\CloudProvisioningLogger.cs" />
     <Compile Include="Diagnostics\CloudLogEntry.cs" />
+    <Compile Include="Diagnostics\LogEntryBuilder.cs" />
     <Compile Include="Diagnostics\TockenBucketThrottling.cs" />
     <Compile Include="Diagnostics\XmlExtension.cs" />
     <Compile Include="Instrumentation\CloudRuntimeInstrumentationSubject.cs" />

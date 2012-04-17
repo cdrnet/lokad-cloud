@@ -16,7 +16,15 @@ namespace Lokad.Cloud.Diagnostics
         /// <summary>Writes the message to the logger</summary>
         /// <param name="level">The importance level</param>
         /// <param name="message">The actual message</param>
+        /// <param name="exception">The actual exception</param>
         /// <param name="meta">Optional semantic meta data</param>
+        void Log(LogLevel level, string message, Exception exception = null, XElement meta = null);
+
+        /// <summary>Writes the message to the logger</summary>
+        /// <param name="level">The importance level</param>
+        /// <param name="message">The actual message</param>
+        /// <param name="meta">Optional semantic meta data</param>
+        [Obsolete("Will be dropped in the next release")]
         void Log(LogLevel level, object message, params XElement[] meta);
 
         /// <summary>Writes the exception and associated information to the logger</summary>
@@ -24,6 +32,7 @@ namespace Lokad.Cloud.Diagnostics
         /// <param name="exception">The actual exception</param>
         /// <param name="message">Information related to the exception</param>
         /// <param name="meta">Optional semantic meta data</param>
+        [Obsolete("Will be dropped in the next release")]
         void Log(LogLevel level, Exception exception, object message, params XElement[] meta);
     }
 }

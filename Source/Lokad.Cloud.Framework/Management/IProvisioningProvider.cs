@@ -16,7 +16,6 @@ namespace Lokad.Cloud.Management
 
         /// <summary>Defines the number of regular VM instances to get allocated
         /// for the cloud app.</summary>
-        /// <param name="count"></param>
         Task SetWorkerInstanceCount(int count, CancellationToken cancellationToken);
 
         /// <summary>Indicates the number of VM instances currently allocated

@@ -12,7 +12,6 @@ namespace Lokad.Cloud.Storage
 {
     /// <summary>Used as a wrapper for delayed messages (stored in the
     /// blob storage waiting to be pushed into a queue).</summary>
-    /// <seealso cref="DelayedQueue.PutWithDelay{T}(T,System.DateTime)"/>
     /// <remarks>
     /// Due to genericity, this message is not tagged with <c>DataContract</c>.
     /// </remarks>

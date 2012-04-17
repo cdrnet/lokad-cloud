@@ -40,31 +40,11 @@ namespace Lokad.Cloud.Diagnostics
                     {
                         foreach (var group in events.GroupBy(e => e.Policy))
                         {
-                            TryLog(string.Format("Provisioning: {0} retries in 5 min for the {1} policy on {2}. {3}",
+                            _log.TryDebugFormat("Provisioning: {0} retries in 5 min for the {1} policy on {2}. {3}",
                                 group.Count(), group.Key, CloudEnvironment.PartitionKey,
-                                string.Join(", ", group.Where(e => e.Exception != null).Select(e => e.Exception.GetType().Name).Distinct().ToArray())),
-                                level: LogLevel.Debug);
+                                string.Join(", ", group.Where(e => e.Exception != null).Select(e => e.Exception.GetType().Name).Distinct().ToArray()));
                         }
                     }));
-        }
-
-        void TryLog(object message, Exception exception = null, LogLevel level = LogLevel.Warn)
-        {
-            try
-            {
-                if (exception != null)
-                {
-                    _log.Log(level, exception, message);
-                }
-                else
-                {
-                    _log.Log(level, message);
-                }
-            }
-            catch (Exception)
-            {
-                // If logging fails, ignore (we can't report)
-            }
         }
 
         public void Dispose()

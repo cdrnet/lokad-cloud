@@ -21,6 +21,10 @@ namespace Lokad.Cloud.Diagnostics
         {
         }
 
+        void ILog.Log(LogLevel level, string message, Exception exception, XElement meta)
+        {
+        }
+
         void ILog.Log(LogLevel level, object message, params XElement[] meta)
         {
         }

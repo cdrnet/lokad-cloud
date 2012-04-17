@@ -33,10 +33,10 @@ namespace Lokad.Cloud.Diagnostics
                 return;
             }
 
-            _subscriptions.Add(_observable.OfType<BlobDeserializationFailedEvent>().Subscribe(e => TryLog(e, e.Exception, LogLevel.Error)));
-            _subscriptions.Add(_observable.OfType<MessageDeserializationFailedQuarantinedEvent>().Subscribe(e => TryLog(e, e.Exceptions)));
-            _subscriptions.Add(_observable.OfType<MessageProcessingFailedQuarantinedEvent>().Subscribe(e => TryLog(e)));
-            _subscriptions.Add(_observable.OfType<MessagesRevivedEvent>().Subscribe(e => TryLog(e)));
+            _subscriptions.Add(_observable.OfType<BlobDeserializationFailedEvent>().Subscribe(e => _log.TryLog(LogLevel.Error, e.Describe(), e.Exception, e.DescribeMeta())));
+            _subscriptions.Add(_observable.OfType<MessageDeserializationFailedQuarantinedEvent>().Subscribe(e => _log.TryLog(LogLevel.Warn, e.Describe(), e.Exceptions, e.DescribeMeta())));
+            _subscriptions.Add(_observable.OfType<MessageProcessingFailedQuarantinedEvent>().Subscribe(e => _log.TryLog(LogLevel.Warn, e.Describe(), meta: e.DescribeMeta())));
+            _subscriptions.Add(_observable.OfType<MessagesRevivedEvent>().Subscribe(e => _log.TryLog(LogLevel.Warn, e.Describe(), meta: e.DescribeMeta())));
 
             _subscriptions.Add(_observable.OfType<StorageOperationRetriedEvent>()
                 .Where(@event => @event.Policy != "OptimisticConcurrency")
@@ -44,32 +44,12 @@ namespace Lokad.Cloud.Diagnostics
                 .Subscribe(@event =>
                     {
                         var e = @event.Item;
-                        TryLog(string.Format("Storage: Retried on policy {0}{1} on {2}.{3}",
+                        _log.TryDebugFormat(e.Exception,"Storage: Retried on policy {0}{1} on {2}.{3}",
                             e.Policy,
                             e.Exception != null ? " because of " + e.Exception.GetType().Name : string.Empty,
                             CloudEnvironment.PartitionKey,
-                            @event.DroppedItems > 0 ? string.Format(" There have been {0} similar events in the last 15 minutes.", @event.DroppedItems) : string.Empty),
-                            e.Exception, LogLevel.Debug);
+                            @event.DroppedItems > 0 ? string.Format(" There have been {0} similar events in the last 15 minutes.", @event.DroppedItems) : string.Empty);
                     }));
-        }
-
-        void TryLog(object message, Exception exception = null, LogLevel level = LogLevel.Warn)
-        {
-            try
-            {
-                if (exception != null)
-                {
-                    _log.Log(level, exception, message);
-                }
-                else
-                {
-                    _log.Log(level, message);
-                }
-            }
-            catch (Exception)
-            {
-                // If logging fails, ignore (we can't report)
-            }
         }
 
         public void Dispose()

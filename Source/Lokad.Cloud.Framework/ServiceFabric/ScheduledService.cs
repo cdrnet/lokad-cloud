@@ -182,7 +182,7 @@ namespace Lokad.Cloud.ServiceFabric
                                 return Maybe<ScheduledServiceState>.Empty;
                             }
 
-                            Log.WarnFormat(
+                            Log.TryWarnFormat(
                                 "ScheduledService {0}: Expired lease owned by {1} was reset after blocking for {2} minutes.",
                                 Name, state.Lease.Owner, (int) (now - state.Lease.Acquired).TotalMinutes);
                         }
@@ -246,9 +246,7 @@ namespace Lokad.Cloud.ServiceFabric
                 _runtimeSerializer);
         }
 
-        /// <summary>Don't call this method. Disposing the scheduled service
-        /// should only be done by the <see cref="IRuntimeFinalizer"/> when
-        /// the environment is being forcibly shut down.</summary>
+        /// <summary>Should be called when the environment is forcibly shut down.</summary>
         public void Dispose()
         {
             if(_isLeaseOwner)

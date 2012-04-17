@@ -31,7 +31,7 @@ namespace Lokad.Cloud.Management
             // try get settings and certificate
             if (!CloudEnvironment.IsAvailable)
             {
-                _log.WarnFormat("Provisioning: RoleEnvironment not available on worker {0}.", CloudEnvironment.PartitionKey);
+                _log.TryWarnFormat("Provisioning: RoleEnvironment not available on worker {0}.", CloudEnvironment.PartitionKey);
                 return;
             }
 
@@ -45,14 +45,14 @@ namespace Lokad.Cloud.Management
             // early evaluate management status for intrinsic fault states, to skip further processing
             if (!currentDeploymentPrivateId.HasValue || !certificate.HasValue || string.IsNullOrWhiteSpace(settings.SelfManagementSubscriptionId))
             {
-                _log.DebugFormat("Provisioning: Not available because either the certificate or the subscription was not provided correctly.");
+                _log.TryDebug("Provisioning: Not available because either the certificate or the subscription was not provided correctly.");
                 return;
             }
 
             // detect dev fabric
             if (currentDeploymentPrivateId.Value.StartsWith("deployment("))
             {
-                _log.DebugFormat("Provisioning: Not available in dev fabric instance '{0}'.", CloudEnvironment.AzureCurrentInstanceId.GetValue("N/A"));
+                _log.TryDebugFormat("Provisioning: Not available in dev fabric instance '{0}'.", CloudEnvironment.AzureCurrentInstanceId.GetValue("N/A"));
                 return;
             }
 
@@ -83,11 +83,11 @@ namespace Lokad.Cloud.Management
                         {
                             if (ProvisioningErrorHandling.IsTransientError(t.Exception))
                             {
-                                _log.DebugFormat(task.Exception.GetBaseException(), "Provisioning: Getting the current worker instance count failed with a transient error.");
+                                _log.TryDebug("Provisioning: Getting the current worker instance count failed with a transient error.", task.Exception.GetBaseException());
                             }
                             else
                             {
-                                _log.WarnFormat(task.Exception.GetBaseException(), "Provisioning: Getting the current worker instance count failed with a permanent error.");
+                                _log.TryWarn("Provisioning: Getting the current worker instance count failed with a permanent error.", task.Exception.GetBaseException());
                             }
                         }
                     }
@@ -111,7 +111,7 @@ namespace Lokad.Cloud.Management
                 throw new ArgumentOutOfRangeException("count");
             }
 
-            _log.InfoFormat("Provisioning: Updating the worker instance count to {0}.", count);
+            _log.TryInfoFormat("Provisioning: Updating the worker instance count to {0}.", count);
 
             var task = _provisioning.UpdateCurrentLokadCloudWorkerCount(_currentDeployment, count, cancellationToken);
 
@@ -128,20 +128,20 @@ namespace Lokad.Cloud.Management
                                 switch(httpStatus)
                                 {
                                     case HttpStatusCode.Conflict:
-                                        _log.DebugFormat("Provisioning: Updating the worker instance count to {0} failed because another deployment update is already in progress.", count);
+                                        _log.TryDebugFormat("Provisioning: Updating the worker instance count to {0} failed because another deployment update is already in progress.", count);
                                         break;
                                     default:
-                                        _log.DebugFormat("Provisioning: Updating the worker instance count failed with HTTP Status {0} ({1}).", httpStatus, (int)httpStatus);
+                                        _log.TryDebugFormat("Provisioning: Updating the worker instance count failed with HTTP Status {0} ({1}).", httpStatus, (int)httpStatus);
                                         break;
                                 }
                             }
                             else if (ProvisioningErrorHandling.IsTransientError(t.Exception))
                             {
-                                _log.DebugFormat(task.Exception.GetBaseException(), "Provisioning: Updating the worker instance count failed with a transient error.");
+                                _log.TryDebug("Provisioning: Updating the worker instance count failed with a transient error.", task.Exception.GetBaseException());
                             }
                             else
                             {
-                                _log.WarnFormat(task.Exception.GetBaseException(), "Provisioning: Updating the worker instance count failed with a permanent error.");
+                                _log.TryWarn("Provisioning: Updating the worker instance count failed with a permanent error.", task.Exception.GetBaseException());
                             }
                         }
                     }

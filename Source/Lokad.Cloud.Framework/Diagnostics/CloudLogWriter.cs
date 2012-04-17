@@ -47,11 +47,28 @@ namespace Lokad.Cloud.Diagnostics
             _blobStorage = blobStorage;
         }
 
+        public void Log(LogLevel level, string message, Exception exception = null, XElement meta = null)
+        {
+            var now = DateTime.UtcNow;
+
+            var blobContent = FormatLogEntry(now, level, message, exception, meta);
+            var blobName = string.Format("{0}/{1}/", FormatDateTimeNamePrefix(now), level);
+            var blobContainer = LevelToContainer(level);
+
+            var attempt = 0;
+            while (!_blobStorage.PutBlob(blobContainer, blobName + attempt, blobContent, false))
+            {
+                attempt++;
+            }
+        }
+
+        [Obsolete("Will be dropped in the next release")]
         public void Log(LogLevel level, object message, params XElement[] meta)
         {
             Log(level, null, message, meta);
         }
 
+        [Obsolete("Will be dropped in the next release")]
         public void Log(LogLevel level, Exception exception, object message, params XElement[] meta)
         {
             var now = DateTime.UtcNow;
@@ -72,6 +89,35 @@ namespace Lokad.Cloud.Diagnostics
             return ContainerNamePrefix + "-" + level.ToString().ToLower();
         }
 
+        private static string FormatLogEntry(DateTime dateTimeUtc, LogLevel level, string message, Exception exception, XElement meta)
+        {
+            var entry = new XElement("log",
+                new XElement("level", level),
+                new XElement("timestamp", dateTimeUtc.ToString("o", CultureInfo.InvariantCulture)),
+                new XElement("message", message));
+
+            if (exception != null)
+            {
+                entry.Add(new XElement("error", exception.ToString()));
+            }
+
+            if (meta != null)
+            {
+                // Grab exception data from meta, if available (and not already provided)
+                XElement exceptionXml;
+                if (exception == null && (exceptionXml = meta.Element("Exception")) != null)
+                {
+                    entry.Add(new XElement("error", exceptionXml.Value));
+                }
+
+                // Patch xml if needed
+                entry.Add(meta.Name == "Meta" ? meta : new XElement("Meta", meta.Elements()));
+            }
+
+            return entry.ToString();
+        }
+
+        [Obsolete("Will be dropped in the next release")]
         private static string FormatLogEntry(DateTime dateTimeUtc, LogLevel level, string message, Exception exception, XElement[] meta)
         {
             var entry = new XElement("log",
