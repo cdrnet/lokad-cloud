@@ -36,7 +36,8 @@ namespace Lokad.Cloud.Diagnostics
                 return;
             }
 
-            _subscriptions.Add(_observable.OfType<ProvisioningOperationRetriedEvent>()
+            _subscriptions.Add(_observable
+                .OfType<ProvisioningOperationRetriedEvent>()
                 .Buffer(TimeSpan.FromMinutes(5))
                 .Subscribe(events =>
                     {
@@ -47,6 +48,10 @@ namespace Lokad.Cloud.Diagnostics
                                 string.Join(", ", group.Where(e => e.Exception != null).Select(e => e.Exception.GetType().Name).Distinct().ToArray()));
                         }
                     }));
+
+            _subscriptions.Add(_observable
+                .Where(e => !(e is ProvisioningOperationRetriedEvent))
+                .Subscribe(@event => _log.TryDebug(@event.Describe(), meta: @event.DescribeMeta())));
         }
 
         public void Dispose()

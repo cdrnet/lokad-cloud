@@ -41,20 +41,6 @@ namespace Lokad.Cloud
                 return;
             }
 
-            try
-            {
-                if (!RoleEnvironment.IsAvailable)
-                {
-
-                    return;
-                }
-            }
-            catch (TypeInitializationException)
-            {
-                _log.WarnFormat("Provisioning: RoleEnvironment not available on worker {0}.", _hostName.Value);
-                return;
-            }
-
             var currentDeploymentPrivateId = RoleEnvironment.DeploymentId;
             X509Certificate2 certificate = null;
             if (!String.IsNullOrWhiteSpace(settings.SelfManagementCertificateThumbprint))
@@ -160,11 +146,15 @@ namespace Lokad.Cloud
 
         public void ProvisionWorkerInstances(int numberOfInstances)
         {
+            _log.DebugFormat("Provisioning: Current provisioning target: {0} worker instances.", numberOfInstances);
+
             SetWorkerInstanceCount(numberOfInstances, CancellationToken.None);
         }
 
         public void ProvisionWorkerInstancesAtLeast(int minNumberOfInstances)
         {
+            _log.DebugFormat("Provisioning: Current provisioning target: at least {0} worker instances.", minNumberOfInstances);
+
             GetWorkerInstanceCount(CancellationToken.None).ContinueWith(task =>
             {
                 if (task.Result < minNumberOfInstances)
@@ -218,8 +208,6 @@ namespace Lokad.Cloud
             {
                 throw new ArgumentOutOfRangeException("count");
             }
-
-            _log.InfoFormat("Provisioning: Updating the worker instance count to {0}.", count);
 
             var task = _provisioning.UpdateCurrentLokadCloudWorkerCount(_currentDeployment, count, cancellationToken);
 
