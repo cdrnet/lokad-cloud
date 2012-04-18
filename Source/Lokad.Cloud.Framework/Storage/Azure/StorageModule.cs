@@ -15,7 +15,7 @@ namespace Lokad.Cloud.Storage.Azure
 {
     /// <summary>IoC module that registers
     /// <see cref="BlobStorageProvider"/>, <see cref="QueueStorageProvider"/> and
-    /// <see cref="TableStorageProvider"/> from the <see cref="ICloudConfigurationSettings"/>.</summary>
+    /// <see cref="TableStorageProvider"/> from the <see cref="CloudConfigurationSettings"/>.</summary>
     public sealed class StorageModule : Module
     {
         protected override void Load(ContainerBuilder builder)
@@ -37,7 +37,7 @@ namespace Lokad.Cloud.Storage.Azure
 
         private static CloudStorageAccount StorageAccountFromSettings(IComponentContext c)
         {
-            var settings = c.Resolve<ICloudConfigurationSettings>();
+            var settings = c.Resolve<CloudConfigurationSettings>();
             CloudStorageAccount account;
             if (CloudStorageAccount.TryParse(settings.DataConnectionString, out account))
             {

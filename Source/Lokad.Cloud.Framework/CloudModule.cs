@@ -15,13 +15,13 @@ namespace Lokad.Cloud
     /// IoC module that registers all usually required components, including
     /// storage providers, management and provisioning and diagnostics/logging.
     /// It is recommended to load this module even when only using the storage (O/C mapping) providers.
-    /// Expects the <see cref="CloudConfigurationModule"/> (or the mock module) to be registered as well.
+    /// Expects a <see cref="CloudConfigurationSettings"/> instance to be registered as well.
     /// </summary>
     /// <remarks>
     /// When only using the storage (O/C mapping) toolkit standalone it is easier
     /// to let the <see cref="CloudStorage"/> factory create the storage providers on demand.
     /// </remarks>
-    /// <seealso cref="CloudConfigurationModule"/>
+    /// <seealso cref="CloudConfigurationSettings"/>
     /// <seealso cref="CloudStorage"/>
     public sealed class CloudModule : Module
     {
@@ -32,7 +32,7 @@ namespace Lokad.Cloud
 
             builder.Register(
                 c => new EnvironmentAdapter(
-                    c.Resolve<ICloudConfigurationSettings>(),
+                    c.Resolve<CloudConfigurationSettings>(),
                     c.Resolve<ILog>(),
                     c.ResolveOptional<IProvisioningObserver>()))
                 .As<IEnvironment>().SingleInstance();

@@ -24,7 +24,7 @@ namespace Lokad.Cloud.ServiceFabric.Runtime
         readonly ILog _log;
         readonly ICloudRuntimeObserver _observer;
 
-        readonly ICloudConfigurationSettings _settings;
+        readonly CloudConfigurationSettings _settings;
 
         /// <summary>Main thread used to schedule services in <see cref="Execute()"/>.</summary>
         Thread _executeThread;
@@ -36,7 +36,7 @@ namespace Lokad.Cloud.ServiceFabric.Runtime
         public IContainer RuntimeContainer { get; set; }
 
         /// <summary>IoC constructor.</summary>
-        public Runtime(CloudStorageProviders storage, IEnvironment environment, ICloudConfigurationSettings settings, ILog log, ICloudRuntimeObserver observer = null)
+        public Runtime(CloudStorageProviders storage, IEnvironment environment, CloudConfigurationSettings settings, ILog log, ICloudRuntimeObserver observer = null)
         {
             _storage = storage;
             _environment = environment;

@@ -29,7 +29,7 @@ namespace Lokad.Cloud.ServiceFabric.Runtime
         /// <returns>True if the worker stopped as planned (e.g. due to updated assemblies)</returns>
         public bool Run()
         {
-            var settings = new RoleConfigurationSettings
+            var settings = new CloudConfigurationSettings
                 {
                     DataConnectionString = RoleEnvironment.GetConfigurationSettingValue("DataConnectionString"),
                     SelfManagementSubscriptionId = RoleEnvironment.GetConfigurationSettingValue("SelfManagementSubscriptionId"),
@@ -95,7 +95,7 @@ namespace Lokad.Cloud.ServiceFabric.Runtime
         /// Run the hosted runtime, blocking the calling thread.
         /// </summary>
         /// <returns>True if the worker stopped as planned (e.g. due to updated assemblies)</returns>
-        public bool Run(ICloudConfigurationSettings settings)
+        public bool Run(CloudConfigurationSettings settings)
         {
             _stoppedWaitHandle.Reset();
 
@@ -103,7 +103,7 @@ namespace Lokad.Cloud.ServiceFabric.Runtime
 
             var runtimeBuilder = new ContainerBuilder();
             runtimeBuilder.RegisterModule(new CloudModule());
-            runtimeBuilder.RegisterModule(new CloudConfigurationModule(settings));
+            runtimeBuilder.RegisterInstance(settings);
             runtimeBuilder.RegisterType<Runtime>().InstancePerDependency();
 
             // Run

@@ -29,7 +29,7 @@ namespace Lokad.Cloud
         private readonly AzureCurrentDeployment _currentDeployment;
         private readonly AzureProvisioning _provisioning;
 
-        public EnvironmentAdapter(ICloudConfigurationSettings settings, ILog log, IProvisioningObserver provisioningObserver = null)
+        public EnvironmentAdapter(CloudConfigurationSettings settings, ILog log, IProvisioningObserver provisioningObserver = null)
         {
             _log = log;
 
