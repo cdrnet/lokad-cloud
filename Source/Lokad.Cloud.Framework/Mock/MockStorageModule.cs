@@ -5,7 +5,6 @@
 
 using Autofac;
 using Lokad.Cloud.Diagnostics;
-using Lokad.Cloud.Management;
 using Lokad.Cloud.Storage;
 using Lokad.Cloud.Storage.InMemory;
 
@@ -23,7 +22,6 @@ namespace Lokad.Cloud.Mock
             builder.Register(c => new MemoryTableStorageProvider()).As<ITableStorageProvider>();
 
             builder.RegisterInstance(NullLog.Instance).As<ILog>();
-            builder.Register(c => new MemoryProvisioning()).As<IProvisioningProvider>();
         }
     }
 }

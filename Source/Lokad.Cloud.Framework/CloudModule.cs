@@ -5,7 +5,6 @@
 
 using Autofac;
 using Lokad.Cloud.Diagnostics;
-using Lokad.Cloud.Management;
 using Lokad.Cloud.Provisioning.Instrumentation;
 using Lokad.Cloud.Storage;
 using Lokad.Cloud.Storage.Azure;
@@ -30,7 +29,6 @@ namespace Lokad.Cloud
         {
             builder.RegisterModule(new StorageModule());
             builder.RegisterModule(new DiagnosticsModule());
-            builder.RegisterModule(new ManagementModule());
 
             builder.Register(
                 c => new EnvironmentAdapter(

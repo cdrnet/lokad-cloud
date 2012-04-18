@@ -32,14 +32,6 @@ namespace Lokad.Cloud.ServiceFabric
         [DataMember(IsRequired = false, EmitDefaultValue = false)]
         public SynchronizationLeaseState Lease { get; set; }
 
-        /// <summary>
-        /// Indicates whether this service is currently running
-        /// (apply only to globally scoped services, not per worker ones)
-        /// .</summary>
-        [Obsolete("Use the Lease mechanism instead.")]
-        [DataMember(IsRequired = false, EmitDefaultValue = false)]
-        public bool IsBusy { get; set; }
-
         /// <summary>Indicates whether the services is called once
         /// every N seconds for the entire distributed app, or
         /// if the service is called once every N seconds on each

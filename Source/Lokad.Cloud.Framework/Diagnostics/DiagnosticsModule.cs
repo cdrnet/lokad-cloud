@@ -9,6 +9,7 @@ using System.Linq;
 using Autofac;
 using Lokad.Cloud.Instrumentation;
 using Lokad.Cloud.Instrumentation.Events;
+using Lokad.Cloud.Provisioning.Instrumentation;
 using Lokad.Cloud.Storage;
 using Microsoft.WindowsAzure;
 
@@ -24,6 +25,11 @@ namespace Lokad.Cloud.Diagnostics
             // Runtime Observer Subject
             builder.Register(RuntimeObserver)
                 .As<ICloudRuntimeObserver, IObservable<ICloudRuntimeEvent>>()
+                .SingleInstance();
+
+            // Provisioning Observer Subject
+            builder.Register(ProvisioningObserver)
+                .As<IProvisioningObserver, IObservable<IProvisioningEvent>>()
                 .SingleInstance();
 
             // TODO (ruegg, 2011-05-30): Observer that logs system events to the log: temporary! to keep old logging behavior for now
@@ -54,6 +60,12 @@ namespace Lokad.Cloud.Diagnostics
         {
             // will include any registered storage event observers, if there are any, as fixed subscriptions
             return new CloudRuntimeInstrumentationSubject(c.Resolve<IEnumerable<IObserver<ICloudRuntimeEvent>>>().ToArray());
+        }
+
+        static ProvisioningObserverSubject ProvisioningObserver(IComponentContext c)
+        {
+            // will include any registered storage event observers, if there are any, as fixed subscriptions
+            return new ProvisioningObserverSubject(c.Resolve<IEnumerable<IObserver<IProvisioningEvent>>>().ToArray());
         }
     }
 }

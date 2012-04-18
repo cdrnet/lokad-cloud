@@ -8,7 +8,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Lokad.Cloud.Diagnostics;
 using Lokad.Cloud.Jobs;
-using Lokad.Cloud.Management;
 using Lokad.Cloud.Shared.Threading;
 using Lokad.Cloud.Storage;
 
@@ -98,8 +97,6 @@ namespace Lokad.Cloud.ServiceFabric
 
         public ILog Log { get; set; }
 
-        [Obsolete("Use Environment instead. Will be removed in the next release.")]
-        public IProvisioningProvider Provisioning { get; set; }
         public JobManager Jobs { get; set; }
 
         // Short-hands are only provided for the most frequently used providers:
@@ -251,40 +248,6 @@ namespace Lokad.Cloud.ServiceFabric
         public void PutRangeWithDelay<T>(IEnumerable<T> messages, TimeSpan delay, string queueName)
         {
             Queues.PutRange(queueName, messages, delay: delay);
-        }
-
-        /// <summary>Put a message into the queue implicitly associated to the type <c>T</c> at the
-        /// time specified by the <c>triggerTime</c>.</summary>
-        [Obsolete("Use the TimeSpan overload instead.")]
-        public void PutWithDelay<T>(T message, DateTimeOffset triggerTime)
-        {
-            Queues.Put(TypeMapper.GetStorageName(typeof(T)), message, delay: triggerTime - DateTimeOffset.Now);
-        }
-
-        /// <summary>Put a message into the queue identified by <c>queueName</c> at the
-        /// time specified by the <c>triggerTime</c>.</summary>
-        [Obsolete("Use the TimeSpan overload instead.")]
-        public void PutWithDelay<T>(T message, DateTimeOffset triggerTime, string queueName)
-        {
-            Queues.Put(queueName, message, delay: triggerTime - DateTimeOffset.Now);
-        }
-
-        /// <summary>Put messages into the queue implicitly associated to the type <c>T</c> at the
-        /// time specified by the <c>triggerTime</c>.</summary>
-        [Obsolete("Use the TimeSpan overload instead.")]
-        public void PutRangeWithDelay<T>(IEnumerable<T> messages, DateTimeOffset triggerTime)
-        {
-            Queues.PutRange(TypeMapper.GetStorageName(typeof(T)), messages, delay: triggerTime - DateTimeOffset.Now);
-        }
-
-        /// <summary>Put messages into the queue identified by <c>queueName</c> at the
-        /// time specified by the <c>triggerTime</c>.</summary>
-        /// <remarks>This method acts as a delayed put operation, the message not being put
-        /// before the <c>triggerTime</c> is reached.</remarks>
-        [Obsolete("Use the TimeSpan overload instead.")]
-        public void PutRangeWithDelay<T>(IEnumerable<T> messages, DateTimeOffset triggerTime, string queueName)
-        {
-            Queues.PutRange(queueName, messages, delay: triggerTime - DateTimeOffset.Now);
         }
     }
 }
