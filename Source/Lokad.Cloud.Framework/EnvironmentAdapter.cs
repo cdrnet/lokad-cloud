@@ -145,15 +145,11 @@ namespace Lokad.Cloud
 
         public void ProvisionWorkerInstances(int numberOfInstances)
         {
-            _log.TryDebugFormat("Provisioning: Current provisioning target: {0} worker instances.", numberOfInstances);
-
             SetWorkerInstanceCount(numberOfInstances, CancellationToken.None);
         }
 
         public void ProvisionWorkerInstancesAtLeast(int minNumberOfInstances)
         {
-            _log.TryDebugFormat("Provisioning: Current provisioning target: at least {0} worker instances.", minNumberOfInstances);
-
             GetWorkerInstanceCount(CancellationToken.None).ContinueWith(task =>
             {
                 if (task.Result < minNumberOfInstances)

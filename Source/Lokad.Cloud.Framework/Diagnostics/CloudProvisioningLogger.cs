@@ -50,7 +50,12 @@ namespace Lokad.Cloud.Diagnostics
                     }));
 
             _subscriptions.Add(_observable
-                .Where(e => !(e is ProvisioningOperationRetriedEvent))
+                .OfType<ProvisioningUpdateInstanceCountEvent>()
+                .Subscribe(@event => _log.Info().WithMeta(@event.DescribeMeta())
+                    .TryWriteFormat("Provisioning: requesting {0} workers, from currently {1}", @event.RequestedInstanceCount, @event.CurrentInstanceCount)));
+
+            _subscriptions.Add(_observable
+                .Where(e => !(e is ProvisioningOperationRetriedEvent) && !(e is ProvisioningUpdateInstanceCountEvent))
                 .Subscribe(@event => _log.TryDebug(@event.Describe(), meta: @event.DescribeMeta())));
         }
 
