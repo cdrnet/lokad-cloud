@@ -75,9 +75,9 @@
     <Reference Include="Ionic.Zip.Reduced">
       <HintPath>..\..\packages\DotNetZip.Reduced.1.9.1.8\lib\net20\Ionic.Zip.Reduced.dll</HintPath>
     </Reference>
-    <Reference Include="Lokad.Cloud.Provisioning, Version=2.0.2.4, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Lokad.Cloud.Provisioning, Version=2.1.0.6, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Lokad.Cloud.Provisioning.2.0.2\lib\Lokad.Cloud.Provisioning.dll</HintPath>
+      <HintPath>..\..\packages\Lokad.Cloud.Provisioning.2.1.0\lib\Lokad.Cloud.Provisioning.dll</HintPath>
     </Reference>
     <Reference Include="Lokad.Cloud.Storage, Version=2.3.4.16, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
