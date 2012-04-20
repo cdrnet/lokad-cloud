@@ -88,12 +88,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="App.template.config">
-      <SubType>Designer</SubType>
-    </None>
     <Compile Include="Diagnostics\CloudLoggerTests.cs" />
     <Compile Include="GlobalSetup.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -117,6 +111,5 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="BeforeBuild">
-    <Copy SourceFiles="App.template.config" DestinationFiles="App.config" Condition="!Exists('App.config')" />
   </Target>
 </Project>

@@ -4,7 +4,6 @@
 #endregion
 
 using Autofac;
-using Autofac.Configuration;
 using Lokad.Cloud.Mock;
 
 namespace Lokad.Cloud.Test
@@ -17,7 +16,7 @@ namespace Lokad.Cloud.Test
         {
             var builder = new ContainerBuilder();
             builder.RegisterModule(new CloudModule());
-            builder.RegisterModule(new ConfigurationSettingsReader("autofac"));
+            builder.RegisterInstance(new CloudConfigurationSettings { DataConnectionString = "UseDevelopmentStorage=true" });
 
             builder.RegisterType<MockEnvironment>().As<IEnvironment>().SingleInstance();
 
