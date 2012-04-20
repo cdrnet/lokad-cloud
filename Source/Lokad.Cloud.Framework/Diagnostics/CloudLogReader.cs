@@ -168,7 +168,7 @@ namespace Lokad.Cloud.Diagnostics
                     DateTimeUtc = xml.Element("timestamp").ProjectOrDefault(x => DateTime.ParseExact(x.Value, "o", CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal).ToUniversalTime()),
                     Message = xml.Element("message").ValueOrEmpty(),
                     Error = xml.Element("error").ValueOrEmpty(),
-                    Meta = xml.Element("meta").ProjectOrDefault(x => x.Elements().ToArray(), () => new XElement[0])
+                    Meta = xml.Element("Meta").ProjectOrDefault(x => x.Elements().ToArray(), () => new XElement[0])
                 };
         }
 
