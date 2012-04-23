@@ -17,6 +17,6 @@ namespace Lokad.Cloud.Diagnostics
         public string Level { get; set; }
         public string Message { get; set; }
         public string Error { get; set; }
-        public XElement[] Meta { get; set; }
+        public XElement Meta { get; set; }
     }
 }
