@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
+  <metadata>
+    <id>Ninject.MVC3</id>
+    <version>2.2.2.0</version>
+    <title>Ninject.MVC3</title>
+    <authors>Remo Gloor,  Ian Davis</authors>
+    <owners>Remo Gloor,  Ian Davis</owners>
+    <licenseUrl>https://github.com/ninject/ninject.web.mvc/raw/master/mvc3/LICENSE.txt</licenseUrl>
+    <projectUrl>http://www.ninject.org/</projectUrl>
+    <iconUrl>https://nugetgallery.blob.core.windows.net/icons/Ninject.MVC3.2.2.2.0.png</iconUrl>
+    <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <description>Extension for Ninject providing integration with ASP.NET MVC3</description>
+    <summary>Extension for Ninject providing integration with ASP.NET MVC3</summary>
+    <copyright>Copyright 2011 by Ninject Project Contributors</copyright>
+    <tags>Ninject ioc di web mvc3</tags>
+    <dependencies>
+      <dependency id="Ninject" version="[2.2.0.0, 2.3.0.0)" />
+      <dependency id="WebActivator" version="1.4" />
+    </dependencies>
+    <frameworkAssemblies>
+      <frameworkAssembly assemblyName="Microsoft.Web.Infrastructure" targetFramework=".NETFramework4.0" />
+    </frameworkAssemblies>
+  </metadata>
+</package>
