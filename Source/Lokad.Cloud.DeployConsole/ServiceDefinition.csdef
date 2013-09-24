@@ -1,11 +1,18 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<ServiceDefinition name="Lokad.Cloud.DeployConsole" xmlns="http://schemas.microsoft.com/ServiceHosting/2008/10/ServiceDefinition">
+<ServiceDefinition name="Lokad.Cloud.DeployConsole" xmlns="http://schemas.microsoft.com/ServiceHosting/2008/10/ServiceDefinition" schemaVersion="2013-03.2.0">
   <WebRole name="Lokad.Cloud.Console.WebRole" vmsize="ExtraSmall">
+    <Runtime executionContext="elevated" />
+    <Sites>
+      <Site name="Web">
+        <Bindings>
+          <Binding name="HttpIn" endpointName="HttpIn"/>
+        </Bindings>
+      </Site>
+    </Sites>
     <Endpoints>
-      <InputEndpoint name="HttpIn" protocol="http" port="80" />
+      <InputEndpoint name="HttpIn" protocol="http" port="80" localPort="80" />
     </Endpoints>
-    <Imports>
-    </Imports>
+    <Imports></Imports>
     <Certificates>
       <Certificate name="ManagementCertificate" storeLocation="CurrentUser" storeName="My" />
     </Certificates>

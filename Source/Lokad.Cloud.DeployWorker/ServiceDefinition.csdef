@@ -1,8 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<ServiceDefinition name="Lokad.Cloud.DeployWorker" xmlns="http://schemas.microsoft.com/ServiceHosting/2008/10/ServiceDefinition">
+<ServiceDefinition name="Lokad.Cloud.DeployWorker" xmlns="http://schemas.microsoft.com/ServiceHosting/2008/10/ServiceDefinition" schemaVersion="2013-03.2.0">
   <WorkerRole name="Lokad.Cloud.WorkerRole" enableNativeCodeExecution="true" vmsize="Small">
-    <Imports>
-    </Imports>
+    <Imports></Imports>
     <LocalResources>
       <LocalStorage name="LokadCloudStorage" cleanOnRoleRecycle="true" sizeInMB="2" />
       <LocalStorage name="LocalCacheStorage" cleanOnRoleRecycle="true" sizeInMB="1024" />
