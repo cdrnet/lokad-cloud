@@ -11,7 +11,7 @@ using Lokad.Cloud.Instrumentation;
 using Lokad.Cloud.Instrumentation.Events;
 using Lokad.Cloud.Provisioning.Instrumentation;
 using Lokad.Cloud.Storage;
-using Microsoft.WindowsAzure;
+using Microsoft.WindowsAzure.Storage;
 
 namespace Lokad.Cloud.Diagnostics
 {

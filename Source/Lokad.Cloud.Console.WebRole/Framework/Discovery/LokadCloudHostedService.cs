@@ -4,8 +4,7 @@
 #endregion
 
 using System.Collections.Generic;
-
-using Microsoft.WindowsAzure;
+using Microsoft.WindowsAzure.Storage;
 
 namespace Lokad.Cloud.Console.WebRole.Framework.Discovery
 {

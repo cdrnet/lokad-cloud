@@ -9,7 +9,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Lokad.Cloud.Provisioning;
 using Lokad.Cloud.Provisioning.Info;
-using Microsoft.WindowsAzure;
+using Microsoft.WindowsAzure.Storage;
 
 namespace Lokad.Cloud.Console.WebRole.Framework.Discovery
 {
@@ -50,7 +50,7 @@ namespace Lokad.Cloud.Console.WebRole.Framework.Discovery
                 {
                     var workerRole = deployment.Roles.Single(r => r.RoleName == "Lokad.Cloud.WorkerRole");
                     var storageAccount = CloudStorageAccount.Parse(workerRole.Settings["DataConnectionString"]);
-                    var accountAndKey = storageAccount.Credentials as StorageCredentialsAccountAndKey;
+                    var credentials = storageAccount.Credentials;
 
                     return new LokadCloudDeployment
                         {
@@ -63,7 +63,7 @@ namespace Lokad.Cloud.Console.WebRole.Framework.Discovery
                             IsTransitioning = deployment.Status != DeploymentStatus.Running && deployment.Status != DeploymentStatus.Suspended,
                             StorageAccount = storageAccount,
                             StorageAccountName = storageAccount.Credentials.AccountName,
-                            StorageAccountKeyPrefix = accountAndKey != null ? accountAndKey.Credentials.ExportBase64EncodedKey().Substring(0, 4) : null,
+                            StorageAccountKeyPrefix = credentials != null ? credentials.ExportBase64EncodedKey().Substring(0, 4) : null,
                         };
                 }).ToList();
 

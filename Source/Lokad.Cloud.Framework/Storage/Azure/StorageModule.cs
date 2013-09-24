@@ -9,7 +9,7 @@ using System.Linq;
 using System.Net;
 using Autofac;
 using Lokad.Cloud.Storage.Instrumentation;
-using Microsoft.WindowsAzure;
+using Microsoft.WindowsAzure.Storage;
 
 namespace Lokad.Cloud.Storage.Azure
 {
